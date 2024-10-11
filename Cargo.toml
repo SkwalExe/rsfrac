@@ -1,0 +1,25 @@
+[package]
+name = "rsfrac"
+version = "0.0.1"
+edition = "2021"
+authors = ["Léopold Koprivnik <koprivnik@skwal.net>"]
+description = "The Terminal-Based Fractal Explorer. Rsfrac is your terminal gateway to Mandelbrot, Burning Ship, and Julia."
+documentation = "https://rsfrac.skwal.net/"
+homepage = "https://rsfrac.skwal.net/"
+repository = "https://github.com/SkwalExe/rsfrac"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+keywords = ["fractals", "terminal", "mandelbrot", "julia"]
+categories = ["command-line-utilities", "visualization", "science", "rendering", "mathematics"]
+
+
+[dependencies]
+ansi_term = "0.12.1"
+rand = "0.8.5"
+ratatui = { version = "0.28.1", features = ["all-widgets", "unstable-rendered-line-info"] }
+rayon = "1.10.0"
+rug = "1.26.1"
+tui-input = "0.10.1"
+tui-markup = { version = "0.5.0", features = ["ratatui", "ansi"] }
+tui-scrollview = "0.4.0"
+
