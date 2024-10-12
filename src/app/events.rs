@@ -1,7 +1,8 @@
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
+    crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
     layout::Position,
 };
+use tui_input::backend::crossterm::EventHandler;
 
 use crate::{
     app::App,
@@ -67,5 +68,12 @@ impl App {
             }
         }
         true
+    }
+    pub fn handle_paste(&mut self, text: String) {
+        // Todo: there must be a better way to do this
+        for char in text.chars().map(|c| if c == '\n' { ' ' } else { c }) {
+            self.command_input
+                .handle(tui_input::InputRequest::InsertChar(char));
+        }
     }
 }

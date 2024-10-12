@@ -45,7 +45,8 @@ impl App {
                                 self.dispatch_event(key)
                             }
                         }
-                    }
+                    },
+                    Event::Paste(text) => self.handle_paste(text),
                     Event::Resize(_, _) => self.redraw_canvas = true,
                     Event::Mouse(mouse_ev) => self.handle_mouse_event(mouse_ev),
                     _ => {}

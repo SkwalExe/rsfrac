@@ -14,10 +14,7 @@ use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
 use crate::{
-    colors::{self, Palette},
-    components::{canvas::Canvas, input::Input, log_panel::LogPanel},
-    helpers::{Chunks, Focus},
-    stats::Stats,
+    colors::{self, Palette}, commands::{create_commands, Command}, components::{canvas::Canvas, input::Input, log_panel::LogPanel}, helpers::{Chunks, Focus}, stats::Stats
 };
 pub const DEFAULT_PREC: u32 = 32;
 pub const DEFAULT_MAX_DIVERG: i32 = 32;
@@ -33,6 +30,7 @@ pub struct RenderSettings {
 }
 
 pub struct App {
+    pub commands: HashMap<&'static str, Command>,
     pub focused: Focus,
     pub quit: bool,
     pub marker: Option<CanvasCoords>,
@@ -66,6 +64,7 @@ impl Default for App {
     fn default() -> Self {
         Self {
             palette_index: 0,
+            commands: create_commands(),
             focused: Default::default(),
             quit: false,
             points: Default::default(),

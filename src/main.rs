@@ -1,4 +1,4 @@
-use ratatui::crossterm::{event::{DisableMouseCapture, EnableMouseCapture}, execute};
+use ratatui::crossterm::{event::{DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture}, execute};
 use rsfrac::app::App;
 use std::io::{self, stdout};
 
@@ -12,11 +12,13 @@ fn main() -> io::Result<()> {
     let mut app = App::default();
 
     execute!(stdout(), EnableMouseCapture)?;
+    execute!(stdout(), EnableBracketedPaste)?;
 
     // Run the app
     app.run(&mut term)?;
 
     execute!(stdout(), DisableMouseCapture)?;
+    execute!(stdout(), DisableBracketedPaste)?;
 
     // Restore the terminal
     ratatui::restore();

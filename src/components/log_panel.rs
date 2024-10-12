@@ -63,8 +63,17 @@ impl<'a> Widget for LogPanel<'a> {
             // Create a ganerator with custom tags
             let gen = get_ratatui_generator();
             // Create a paragraph, using the generator to parse markup syntax
-            let para = Paragraph::new(compile_with(message.as_str(), gen).unwrap())
-                .wrap(Wrap { trim: false });
+            let para = Paragraph::new(
+                compile_with(
+                    message.as_str(), gen
+                ).unwrap_or(
+                    format!(
+                        "There was an error parsing the log message, please report this at https://github.com/SkwalExe/rsfrac/issues. \nMessage: {}",
+                        message.as_str()
+                    ).into()
+                )
+            )
+            .wrap(Wrap { trim: false });
 
             // Calculate how tall the paragraph will be when fit in the width of the log panel
             let line_count = para.line_count(para_width) as u16;

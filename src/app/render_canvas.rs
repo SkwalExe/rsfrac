@@ -35,7 +35,10 @@ impl App {
                 let point_divergs: Vec<i32> = points
                     .par_iter()
                     .map(|x| {
-                        fractals::Mandelbrot::get(self.coord_to_c(CanvasCoords::new(*x, *y)), self)
+                        fractals::Mandelbrot::get(
+                            self.render_settings.coord_to_c(CanvasCoords::new(*x, *y)),
+                            &self.render_settings,
+                        )
                     })
                     .collect();
                 point_divergs
