@@ -7,10 +7,21 @@ use ratatui::{
 };
 use tui_input::backend::crossterm::EventHandler;
 
-use crate::{app::App, commands::get_command, helpers::Focus};
+use crate::{app::App, helpers::Focus};
 
 pub struct Input<'a> {
     app: &'a App,
+}
+
+fn enumerate_strings(elements: &[usize]) -> String {
+    assert!(elements.len() > 0);
+    let elements: Vec<_> = elements.iter().map(usize::to_string).collect();
+    if elements.len() == 1 {
+        return elements[0].clone()
+    }
+    // We can unwrap because we know the length is >1
+    let split = elements.split_last().unwrap();
+    split.1.join(", ") + " or " + split.0
 }
 
 impl<'a> Input<'a> {
@@ -21,28 +32,51 @@ impl<'a> Input<'a> {
     pub fn handle_mouse_event(app: &mut App, _event: MouseEvent) {
         app.focused = Focus::Input;
     }
+    pub fn run_command(app: &mut App) {
+        let input = String::from(app.command_input.value());
+        app.command_input.reset();
+
+        let mut args: Vec<_> = input.split_whitespace().collect();
+
+        // Do nothing more if the command is empty
+        if args.is_empty() {
+            return;
+        }
+
+        // The first argument is the command name
+        let command_name = args.remove(0);
+        if let Some(command) = app.commands.get(command_name) {
+            if !command.accepted_arg_count.contains(&args.len()) {
+                // If the number of provided arguments in not in the accepted argument
+                // count list, then print an error and return
+                app.log_error(
+                    format!(
+                        concat!("<bg:black,fg:white {}> expects {} arguments but got {}. ", 
+                            "Use <bg:black,fg:white help {}> for more details on the usage of this command."), 
+                        command.name, 
+                        enumerate_strings(command.accepted_arg_count),
+                        args.len(),
+                        command.name
+                    )
+                );
+                return;
+            }
+            (command.execute)(app, args);
+        } else {
+            // TODO: centralize this message, that is used in other places
+            app.log_error(
+                format!(
+                    concat!("Command not found: <bgred,white {}>. ", 
+                        "Use <command help> for an overview of available commands."), 
+                    command_name
+                )
+            )
+        }
+
+    }
     pub fn handle_event(app: &mut App, key: KeyEvent) {
         match key.code {
-            KeyCode::Enter => {
-                let input = String::from(app.command_input.value());
-                app.command_input.reset();
-
-                let mut args: Vec<_> = input.split_whitespace().collect();
-
-                // Do nothing more if the command is empty
-                if args.is_empty() {
-                    return;
-                }
-
-                // The first argument is the command name
-                let command_name = args.remove(0);
-                let command = get_command(command_name);
-                if let Some(command) = command {
-                    command(app, args);
-                } else {
-                    app.log_error(format!("Command not found: <bgred,white {command_name}>"))
-                }
-            }
+            KeyCode::Enter => Input::run_command(app),
             _ => {
                 app.command_input.handle_event(&Event::Key(key));
             }

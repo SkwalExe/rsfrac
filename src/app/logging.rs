@@ -22,7 +22,14 @@ impl App {
     }
 
     pub fn log_error(&mut self, message: impl Into<String>) {
-        self.log_raw(format!("<bgred  Error >\n<red {}>", message.into()))
+        self.log_error_title("Error", message);
+    }
+    pub fn log_error_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
+        self.log_raw(format!(
+            "<bgred  {} >\n<red {}>",
+            title.into(),
+            message.into()
+        ))
     }
 
     /// Print the initial log messages

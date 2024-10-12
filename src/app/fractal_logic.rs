@@ -4,7 +4,7 @@ use rug::Complex;
 
 use crate::helpers::{Vec2, ZoomDirection};
 
-use super::App;
+use super::{App, RenderSettings};
 
 // Coordinate system ============
 // Ratatui Coordinates:
@@ -67,24 +67,28 @@ impl Deref for CanvasCoords {
     }
 }
 
-impl App {
-    pub fn zoom_at(&mut self, pos: CanvasCoords, direction: ZoomDirection) {
-        let inintial_c_pos = self.coord_to_c(pos.clone());
-        self.zoom(direction);
-        let new_c_pos = self.coord_to_c(pos);
+impl RenderSettings {
 
-        self.render_settings.pos += inintial_c_pos - new_c_pos;
-    }
     /// Takes coordinates on the canvas and return the
     /// complex number at the corresponding position on the complex plane
     pub fn coord_to_c(&self, coords: CanvasCoords) -> Complex {
         Complex::with_val(
-            self.render_settings.prec,
+            self.prec,
             (
-                coords.0.x * &self.render_settings.cell_size,
-                coords.0.y * &self.render_settings.cell_size,
+                coords.0.x * &self.cell_size,
+                coords.0.y * &self.cell_size,
             ),
-        ) + &self.render_settings.pos
+        ) + &self.pos
+    }
+
+}
+impl App {
+    pub fn zoom_at(&mut self, pos: CanvasCoords, direction: ZoomDirection) {
+        let inintial_c_pos = self.render_settings.coord_to_c(pos.clone());
+        self.zoom(direction);
+        let new_c_pos = self.render_settings.coord_to_c(pos);
+
+        self.render_settings.pos += inintial_c_pos - new_c_pos;
     }
 
     pub fn zoom(&mut self, direction: ZoomDirection) {
