@@ -43,9 +43,7 @@ pub fn ratatui_to_canvas_coords(app: &App, x: u16, y: u16) -> CanvasCoords {
     // I don't understand how this works
     CanvasCoords::new(
         x as i32 - app.chunks.canvas_inner.x as i32 - app.render_settings.canvas_size.x / 2,
-        y as i32 * -2
-            + app.chunks.canvas_inner.y as i32
-            + app.render_settings.canvas_size.y / 2,
+        y as i32 * -2 + app.chunks.canvas_inner.y as i32 + app.render_settings.canvas_size.y / 2,
     )
 }
 
@@ -68,19 +66,14 @@ impl Deref for CanvasCoords {
 }
 
 impl RenderSettings {
-
     /// Takes coordinates on the canvas and return the
     /// complex number at the corresponding position on the complex plane
     pub fn coord_to_c(&self, coords: CanvasCoords) -> Complex {
         Complex::with_val(
             self.prec,
-            (
-                coords.0.x * &self.cell_size,
-                coords.0.y * &self.cell_size,
-            ),
+            (coords.0.x * &self.cell_size, coords.0.y * &self.cell_size),
         ) + &self.pos
     }
-
 }
 impl App {
     pub fn zoom_at(&mut self, pos: CanvasCoords, direction: ZoomDirection) {
@@ -92,8 +85,7 @@ impl App {
     }
 
     pub fn zoom(&mut self, direction: ZoomDirection) {
-        // todo: Make configurable at app level
-        let scaling_factor = 1.2;
+        let scaling_factor = 1.0 + self.scaling_factor as f64 / 100.0;
 
         match direction {
             ZoomDirection::In => self.render_settings.cell_size /= scaling_factor,

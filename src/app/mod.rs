@@ -46,6 +46,7 @@ pub struct App {
     pub render_settings: RenderSettings,
     /// The duration took by the latest full canvas rendering
     pub render_time: Duration,
+    pub scaling_factor: i32,
 }
 
 impl Default for RenderSettings {
@@ -63,6 +64,7 @@ impl Default for RenderSettings {
 impl Default for App {
     fn default() -> Self {
         Self {
+            scaling_factor: 20,
             palette_index: 0,
             commands: create_commands(),
             focused: Default::default(),

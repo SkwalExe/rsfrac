@@ -13,32 +13,38 @@ pub fn execute_pos(app: &mut crate::app::App, args: Vec<&str>) {
                 app.render_settings.pos.imag()
             ),
         );
-        return
-    } 
+        return;
+    }
     // If args were provided, there must be exactly 2 args.
     let real = args[0];
     let imag = args[1];
+    let set_real = real != "~";
+    let set_imag = imag != "~";
+    let parsed_real;
+    let parsed_imag;
 
-    if real != "~" {
-        let parsed = Float::parse(real);
-        if parsed.is_err() { 
-            app.log_error("The provided real part must be a valid float or <acc ~>.");
-            return
-        }
-        // We can unwrap because we checked for Err just above
-        app.render_settings.pos.mut_real().assign(parsed.unwrap());
-        app.redraw_canvas = true;
+    // todo: I don't like this
+    parsed_real = Float::parse(real);
+    parsed_imag = Float::parse(imag);
+
+    if (set_real && parsed_real.is_err()) || (set_imag && parsed_imag.is_err()) {
+        app.log_error("The provided real and imaginary parts must be valid floats or <acc ~>.");
+        return;
     }
-    if imag != "~" {
-        let parsed = Float::parse(imag);
-        if parsed.is_err() { 
-            app.log_error("The provided imag part must be a valid float or <acc ~>.");
-            return
-        }
-        // We can unwrap because we checked for Err just above
-        app.render_settings.pos.mut_imag().assign(parsed.unwrap());
-        app.redraw_canvas = true;
+
+    if set_real {
+        app.render_settings
+            .pos
+            .mut_real()
+            .assign(parsed_real.unwrap());
     }
+    if set_imag {
+        app.render_settings
+            .pos
+            .mut_imag()
+            .assign(parsed_imag.unwrap());
+    }
+    app.redraw_canvas = true;
 }
 
 pub const POS: Command = Command {

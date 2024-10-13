@@ -30,6 +30,7 @@ pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSI
         "bgred" => Some(ANSIStyle::default().on(RED.into())),
         "red" => Some(ANSIStyle::default().fg(RED.into())),
         "green" => Some(ANSIStyle::default().fg(GREEN.into())),
+        "bggreen" => Some(ANSIStyle::default().on(GREEN.into())),
         "command" => Some(
             ANSIStyle::default()
                 .fg(COMMAND_FG.into())
@@ -47,6 +48,7 @@ pub fn get_ratatui_generator() -> RatatuiTextGenerator<impl Fn(&str) -> Option<S
         "bgred" => Some(Style::default().bg(RED.into())),
         "red" => Some(Style::default().fg(RED.into())),
         "green" => Some(Style::default().fg(GREEN.into())),
+        "bggreen" => Some(Style::default().bg(GREEN.into())),
         "command" => Some(Style::default().fg(COMMAND_FG.into()).bg(COMMAND_BG.into())),
         "dim" => Some(Style::default().fg(DIM.into())),
         _ => None,

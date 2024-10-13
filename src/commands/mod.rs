@@ -5,6 +5,7 @@ pub mod clear;
 pub mod help;
 pub mod pos;
 pub mod quit;
+pub mod zoom_factor;
 
 pub struct Command {
     pub execute: &'static dyn Fn(&mut App, Vec<&str>),
@@ -20,5 +21,6 @@ pub fn create_commands() -> HashMap<&'static str, Command> {
         ("quit", quit::QUIT),
         ("pos", pos::POS),
         ("help", help::HELP),
+        ("zoom_factor", zoom_factor::ZOOM_FACTOR),
     ])
 }
