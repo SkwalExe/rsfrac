@@ -14,6 +14,12 @@ impl App {
         state.log_panel_scroll_state.scroll_to_bottom();
     }
 
+    pub fn log_success_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
+        self.log_raw(format!("<bggreen  {} >\n{}", title.into(), message.into()))
+    }
+    pub fn log_success(&mut self, message: impl Into<String>) {
+        self.log_success_title("Success", message.into())
+    }
     pub fn log_info_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
         self.log_raw(format!("<bgacc  {} >\n{}", title.into(), message.into()))
     }
