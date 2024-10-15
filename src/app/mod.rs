@@ -1,7 +1,7 @@
 mod build_chunks;
 mod events;
 pub mod fractal_logic;
-mod logging;
+pub mod logging;
 mod main_loop;
 mod render_app;
 mod render_canvas;
