@@ -283,10 +283,10 @@ pub fn palette_color(i: i32, pal: &Palette) -> Color {
     pal.colors[i as usize % pal.colors.len()]
 }
 
-pub fn get_palette_by_name(name: &str) -> Option<&'static Palette> {
+pub fn get_palette_index_by_name(name: &str) -> Option<usize> {
     COLORS
         .iter()
-        .find(|pal| pal.name.to_lowercase() == name.to_lowercase())
+        .position(|pal| pal.name.to_lowercase() == name.to_lowercase())
 }
 
 #[cfg(test)]
@@ -294,14 +294,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_palette_by_name() {
-        let pal = get_palette_by_name("Mountain").unwrap();
-        assert_eq!(pal.name, "Mountain")
+    fn test_get_palette_index_by_name() {
+        let pal = get_palette_index_by_name("Mountain").unwrap();
+        assert_eq!(COLORS[pal].name, "Mountain")
     }
 
     #[test]
     fn test_palette_color() {
-        let palette = get_palette_by_name("sunset").unwrap();
+        let palette = &COLORS[get_palette_index_by_name("sunset").unwrap()];
         assert_eq!(Color::Reset, palette_color(-1, palette));
         // The first and last color of the sunset palettes
         assert_eq!(Color::Rgb(25, 7, 26), palette_color(0, palette));
