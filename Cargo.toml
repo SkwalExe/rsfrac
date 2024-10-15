@@ -15,6 +15,7 @@ categories = ["command-line-utilities", "visualization", "science", "rendering",
 
 [dependencies]
 ansi_term = "0.12.1"
+num-traits = "0.2.19"
 rand = "0.8.5"
 ratatui = { version = "0.28.1", features = ["all-widgets", "unstable-rendered-line-info"] }
 rayon = "1.10.0"

@@ -1,8 +1,7 @@
 use ratatui::{
-    crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
     layout::Position,
 };
-use tui_input::backend::crossterm::EventHandler;
 
 use crate::{
     app::App,
