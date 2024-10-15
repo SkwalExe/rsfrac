@@ -16,16 +16,14 @@ use tui_scrollview::ScrollViewState;
 use crate::{
     colors::{self, Palette},
     commands::{
-        create_commands,
-        prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
-        Command,
+        create_commands, max_iter::{MAX_MAX_ITER, MIN_MAX_ITER}, prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC}, Command
     },
     components::{canvas::Canvas, input::Input, log_panel::LogPanel},
     helpers::{Chunks, Focus},
     stats::Stats,
 };
 pub const DEFAULT_PREC: u32 = 32;
-pub const DEFAULT_MAX_DIVERG: i32 = 32;
+pub const DEFAULT_MAX_ITER: i32 = 32;
 pub const DEFAULT_POS: (f64, f64) = (-0.5, 0.0);
 
 pub struct RenderSettings {
@@ -34,7 +32,7 @@ pub struct RenderSettings {
     // The size of the canvas in Canvas Coordinates
     pub canvas_size: CanvasCoords,
     pub prec: u32,
-    pub max_diverg: i32,
+    pub max_iter: i32,
 }
 
 pub struct App {
@@ -59,7 +57,7 @@ pub struct App {
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
-            max_diverg: DEFAULT_MAX_DIVERG,
+            max_iter: DEFAULT_MAX_ITER,
             pos: Complex::with_val(DEFAULT_PREC, DEFAULT_POS),
             cell_size: Float::new(DEFAULT_PREC),
             canvas_size: Default::default(),
@@ -124,6 +122,15 @@ impl App {
         self.render_settings
             .cell_size
             .set_prec(self.render_settings.prec);
+
+        // Ask for canvas redraw
+        self.redraw_canvas = true;
+    }
+    /// Increment positively or negatively the maximum divergence, and ask for canvas redraw
+    pub fn increment_max_iter(&mut self, increment: i32) {
+        let new_max_iter = self.render_settings.max_iter.saturating_add(increment);
+        self.render_settings.max_iter = MIN_MAX_ITER.max(MAX_MAX_ITER.min(new_max_iter));
+        self.redraw_canvas = true;
     }
 
     /// Return the total number of points to render in the canvas
@@ -148,12 +155,6 @@ impl App {
 
     pub fn get_zoom(&self) -> Float {
         self.get_default_cell_size() / &self.render_settings.cell_size
-    }
-
-    /// Increment positively or negatively the maximum divergence, and ask for canvas redraw
-    pub fn increment_max_diverg(&mut self, increment: i32) {
-        self.render_settings.max_diverg = 0.max(self.render_settings.max_diverg + increment);
-        self.redraw_canvas = true;
     }
 
     pub fn get_palette(&self) -> &'static Palette {

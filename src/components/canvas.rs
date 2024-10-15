@@ -128,9 +128,9 @@ impl<'a> Canvas<'a> {
                 app.palette_index = (app.palette_index + 1) % colors::COLORS.len();
             }
             // Increment the maximum divergence
-            KeyCode::Char('o') => app.increment_max_diverg(10),
+            KeyCode::Char('o') => app.increment_max_iter(10),
             // Decrement the maximum divergence
-            KeyCode::Char('y') => app.increment_max_diverg(-10),
+            KeyCode::Char('y') => app.increment_max_iter(-10),
             _ => {
                 // Return from the function to avoid setting redraw_canvas
                 return;
@@ -163,7 +163,7 @@ impl<'a> Widget for Canvas<'a> {
                 Line::from(format!("HighDiv[{}]", self.app.stats.highest_diverg)).left_aligned(),
             )
             .title_top(
-                Line::from(format!("MxDiv[{}]", self.app.render_settings.max_diverg))
+                Line::from(format!("MxDiv[{}]", self.app.render_settings.max_iter))
                     .right_aligned(),
             )
             .title_top(

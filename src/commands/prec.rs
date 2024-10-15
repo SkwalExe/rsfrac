@@ -1,4 +1,4 @@
-use super::{command_increment, Command};
+use super::{command_increment::command_increment, Command};
 pub const MIN_DECIMAL_PREC: u32 = 8;
 pub const MAX_DECIMAL_PREC: u32 = 10000;
 
