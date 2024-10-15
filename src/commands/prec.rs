@@ -20,10 +20,13 @@ pub const PREC: Command = Command {
     accepted_arg_count: &[0, 1, 2],
 
     detailed_desc: Some(concat!(
+        "<green Usage: <command +/- [increment]>>\n",
         "<green Usage: <command [precision]>>\n",
         "<green Usage: <command [without args]>>\n",
-        "If no arguments are given, display the current precision. ",
-        "Else, set the numeric precision to the given bit-length. ",
+        "- If no arguments are given, display the current precision.\n",
+        "- If a value is specified directly, set the precision to the given bit-length.\n",
+        "- If a value is specified alongside an operator, ",
+        "increase of decrease the move precision by the given value.\n",
         "<acc [precision]> must be a valid integer.",
     )),
     basic_desc:

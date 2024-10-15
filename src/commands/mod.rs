@@ -4,9 +4,10 @@ use crate::app::App;
 pub mod clear;
 pub mod command_increment;
 pub mod help;
+pub mod max_iter;
+pub mod move_dist;
 pub mod pos;
 pub mod prec;
-pub mod max_iter;
 pub mod quit;
 pub mod zoom_factor;
 
@@ -20,12 +21,13 @@ pub struct Command {
 
 pub fn create_commands() -> HashMap<&'static str, &'static Command> {
     HashMap::from([
-        ("clear", &clear::CLEAR),
-        ("quit", &quit::QUIT),
-        ("pos", &pos::POS),
-        ("help", &help::HELP),
-        ("zoom_factor", &zoom_factor::ZOOM_FACTOR),
-        ("prec", &prec::PREC),
-        ("max_iter", &max_iter::MAX_ITER),
+        (clear::CLEAR.name, &clear::CLEAR),
+        (quit::QUIT.name, &quit::QUIT),
+        (pos::POS.name, &pos::POS),
+        (help::HELP.name, &help::HELP),
+        (zoom_factor::ZOOM_FACTOR.name, &zoom_factor::ZOOM_FACTOR),
+        (prec::PREC.name, &prec::PREC),
+        (max_iter::MAX_ITER.name, &max_iter::MAX_ITER),
+        (move_dist::MOVE_DIST.name, &move_dist::MOVE_DIST),
     ])
 }

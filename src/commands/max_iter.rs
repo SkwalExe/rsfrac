@@ -20,10 +20,13 @@ pub const MAX_ITER: Command = Command {
     accepted_arg_count: &[0, 1, 2],
 
     detailed_desc: Some(concat!(
+        "<green Usage: <command +/- [value]>>\n",
         "<green Usage: <command [max_iter]>>\n",
         "<green Usage: <command [without args]>>\n",
-        "If no arguments are given, display the current iteration limit. ",
-        "Else, set the iteration limit to the given value. ",
+        "- If no arguments are given, display the current iteration limit.\n",
+        "- If a value is specified directly, set the iteration limit to the given value.\n",
+        "- If a value is specified alongside an operator, ",
+        "increase of decrease the iteration limit by the given value.\n",
         "<acc [max_iter]> must be a valid integer.",
     )),
     basic_desc:
