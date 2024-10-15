@@ -1,7 +1,7 @@
 use rug::ops::{CompleteRound, Pow};
 use rug::Complex;
 
-use crate::app::{App, RenderSettings};
+use crate::app::RenderSettings;
 use crate::fractals::Fractal;
 pub struct Mandelbrot;
 
@@ -23,13 +23,13 @@ impl Fractal for Mandelbrot {
             .complete((render_settings.prec, render_settings.prec))
             .real()
             < 2
-            && n < render_settings.max_diverg
+            && n < render_settings.max_iter
         {
             z = z.pow(2) + &p;
             n += 1;
         }
 
-        if n == render_settings.max_diverg {
+        if n == render_settings.max_iter {
             return -1;
         }
 
