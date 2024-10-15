@@ -6,7 +6,7 @@ use crate::helpers::markup::get_ansi_generator;
 
 use super::App;
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 impl App {
     pub fn log_raw(&mut self, message: impl Into<String>) {
         self.log_messages.push(message.into());

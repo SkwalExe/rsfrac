@@ -10,6 +10,7 @@ pub mod pos;
 pub mod prec;
 pub mod quit;
 pub mod zoom_factor;
+pub mod version;
 
 pub struct Command {
     pub execute: &'static dyn Fn(&mut App, Vec<&str>),
@@ -29,5 +30,6 @@ pub fn create_commands() -> HashMap<&'static str, &'static Command> {
         (prec::PREC.name, &prec::PREC),
         (max_iter::MAX_ITER.name, &max_iter::MAX_ITER),
         (move_dist::MOVE_DIST.name, &move_dist::MOVE_DIST),
+        (version::VERSION_COMMAND.name, &version::VERSION_COMMAND),
     ])
 }
