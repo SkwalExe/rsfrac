@@ -70,7 +70,7 @@ impl<'a> Canvas<'a> {
                     .mut_real()
                     .sub_assign(Float::with_val(
                         app.render_settings.prec,
-                        &app.render_settings.cell_size * app.move_intensity,
+                        &app.render_settings.cell_size * app.move_dist,
                     ));
             }
             // When L is pressed move the position of the canvas
@@ -81,7 +81,7 @@ impl<'a> Canvas<'a> {
                     .mut_real()
                     .add_assign(Float::with_val(
                         app.render_settings.prec,
-                        &app.render_settings.cell_size * app.move_intensity,
+                        &app.render_settings.cell_size * app.move_dist,
                     ));
             }
             // When J is pressed move the position of the canvas
@@ -92,7 +92,7 @@ impl<'a> Canvas<'a> {
                     .mut_imag()
                     .sub_assign(Float::with_val(
                         app.render_settings.prec,
-                        &app.render_settings.cell_size * app.move_intensity,
+                        &app.render_settings.cell_size * app.move_dist,
                     ));
             }
             // When K is pressed move the position of the canvas
@@ -103,7 +103,7 @@ impl<'a> Canvas<'a> {
                     .mut_imag()
                     .add_assign(Float::with_val(
                         app.render_settings.prec,
-                        &app.render_settings.cell_size * app.move_intensity,
+                        &app.render_settings.cell_size * app.move_dist,
                     ));
             }
             // When S is pressed increase the cell size, which will zoom out of the canvas
