@@ -167,7 +167,7 @@ impl<'a> Widget for Canvas<'a> {
                     .right_aligned(),
             )
             .title_top(
-                Line::from(format!("RndrTime[{}ms]", self.app.render_time.as_millis()))
+                Line::from(format!("RndrTime[{}ms]", self.app.stats.render_time.as_millis()))
                     .right_aligned(),
             )
             .title_top(

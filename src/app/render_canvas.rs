@@ -74,6 +74,6 @@ impl App {
             self.render_canvas();
         }
 
-        self.render_time = before.elapsed();
+        self.stats.render_time = before.elapsed();
     }
 }

@@ -5,7 +5,7 @@ mod logging;
 mod main_loop;
 mod render_app;
 mod render_canvas;
-use std::{collections::HashMap, sync::Mutex, time::Duration};
+use std::{collections::HashMap, sync::Mutex};
 
 use fractal_logic::CanvasCoords;
 use ratatui::style::Color;
@@ -14,7 +14,15 @@ use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
 use crate::{
-    colors::{self, Palette}, commands::{create_commands, Command}, components::{canvas::Canvas, input::Input, log_panel::LogPanel}, helpers::{Chunks, Focus}, stats::Stats
+    colors::{self, Palette},
+    commands::{
+        create_commands,
+        prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
+        Command,
+    },
+    components::{canvas::Canvas, input::Input, log_panel::LogPanel},
+    helpers::{Chunks, Focus},
+    stats::Stats,
 };
 pub const DEFAULT_PREC: u32 = 32;
 pub const DEFAULT_MAX_DIVERG: i32 = 32;
@@ -30,7 +38,7 @@ pub struct RenderSettings {
 }
 
 pub struct App {
-    pub commands: HashMap<&'static str, Command>,
+    pub commands: HashMap<&'static str, &'static Command>,
     pub focused: Focus,
     pub quit: bool,
     pub marker: Option<CanvasCoords>,
@@ -45,7 +53,6 @@ pub struct App {
     pub app_state: Mutex<AppState>,
     pub render_settings: RenderSettings,
     /// The duration took by the latest full canvas rendering
-    pub render_time: Duration,
     pub scaling_factor: i32,
 }
 
@@ -77,7 +84,6 @@ impl Default for App {
             command_input: Default::default(),
             log_messages: Default::default(),
             app_state: Default::default(),
-            render_time: Default::default(),
             render_settings: Default::default(),
             marker: Default::default(),
         }
@@ -105,8 +111,15 @@ impl App {
         Complex::with_val(self.render_settings.prec, DEFAULT_POS)
     }
 
+    /// Increment positively or negatively the decimal precision, 
+    /// and update the precision of existing numeric values.
     pub fn increment_decimal_prec(&mut self, increment: i32) {
-        self.render_settings.prec = 32.max(self.render_settings.prec as i32 + increment) as u32;
+        let new_prec = self.render_settings.prec.saturating_add_signed(increment);
+
+        // Make sure the precision remains within the fixed bounds.
+        self.render_settings.prec = MAX_DECIMAL_PREC.min(MIN_DECIMAL_PREC.max(new_prec));
+
+        // Update the precision of existing numeric values.
         self.render_settings.pos.set_prec(self.render_settings.prec);
         self.render_settings
             .cell_size

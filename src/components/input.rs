@@ -43,9 +43,11 @@ impl<'a> Input<'a> {
             return;
         }
 
+
         // The first argument is the command name
         let command_name = args.remove(0);
-        if let Some(command) = app.commands.get(command_name) {
+        if let Some(command) = app.commands.get(command_name).copied() {
+            app.log_raw(format!("<command \\> {}>", input));
             if !command.accepted_arg_count.contains(&args.len()) {
                 // If the number of provided arguments in not in the accepted argument
                 // count list, then print an error and return
