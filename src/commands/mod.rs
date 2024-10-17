@@ -2,17 +2,17 @@ use std::collections::HashMap;
 
 use crate::app::App;
 pub mod clear;
+pub mod color;
 pub mod command_increment;
+pub mod frac;
 pub mod help;
 pub mod max_iter;
 pub mod move_dist;
 pub mod pos;
 pub mod prec;
 pub mod quit;
-pub mod frac;
-pub mod zoom_factor;
-pub mod color;
 pub mod version;
+pub mod zoom_factor;
 
 pub struct Command {
     pub execute: &'static dyn Fn(&mut App, Vec<&str>),
@@ -24,16 +24,16 @@ pub struct Command {
 
 pub fn create_commands() -> HashMap<&'static str, &'static Command> {
     HashMap::from([
-        (clear::CLEAR.name, &clear::CLEAR),
-        (quit::QUIT.name, &quit::QUIT),
-        (pos::POS.name, &pos::POS),
         (help::HELP.name, &help::HELP),
-        (zoom_factor::ZOOM_FACTOR.name, &zoom_factor::ZOOM_FACTOR),
+        (quit::QUIT.name, &quit::QUIT),
+        (clear::CLEAR.name, &clear::CLEAR),
+        (version::VERSION_COMMAND.name, &version::VERSION_COMMAND),
+        (pos::POS.name, &pos::POS),
         (prec::PREC.name, &prec::PREC),
         (max_iter::MAX_ITER.name, &max_iter::MAX_ITER),
-        (move_dist::MOVE_DIST.name, &move_dist::MOVE_DIST),
-        (version::VERSION_COMMAND.name, &version::VERSION_COMMAND),
         (color::COLOR.name, &color::COLOR),
         (frac::FRAC.name, &frac::FRAC),
+        (zoom_factor::ZOOM_FACTOR.name, &zoom_factor::ZOOM_FACTOR),
+        (move_dist::MOVE_DIST.name, &move_dist::MOVE_DIST),
     ])
 }
