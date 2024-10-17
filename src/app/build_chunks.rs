@@ -15,7 +15,7 @@ impl App {
         // Split the body and the footer
         let chunks = Layout::default()
             .direction(Dir::Vertical)
-            .constraints([Constraint::Min(0), Constraint::Length(1)])
+            .constraints([Constraint::Min(0), Constraint::Length(2)])
             .split(area);
 
         self.chunks.body = chunks[0];
@@ -50,20 +50,20 @@ mod tests {
     fn test_build_chunks_horizontal() {
         let mut app = App::default();
         app.build_chunks(Rect::new(0, 0, 200, 50));
-        assert_eq!(app.chunks.footer, Rect::new(0, 49, 200, 1));
-        assert_eq!(app.chunks.canvas, Rect::new(0, 0, 140, 49));
-        assert_eq!(app.chunks.canvas_inner, Rect::new(1, 1, 138, 47));
-        assert_eq!(app.chunks.log_panel, Rect::new(140, 0, 60, 46));
-        assert_eq!(app.chunks.input, Rect::new(140, 46, 60, 3));
+        assert_eq!(app.chunks.footer, Rect::new(0, 48, 200, 2));
+        assert_eq!(app.chunks.canvas, Rect::new(0, 0, 140, 48));
+        assert_eq!(app.chunks.canvas_inner, Rect::new(1, 1, 138, 46));
+        assert_eq!(app.chunks.log_panel, Rect::new(140, 0, 60, 45));
+        assert_eq!(app.chunks.input, Rect::new(140, 45, 60, 3));
     }
     #[test]
     fn test_build_chunks_vertical() {
         let mut app = App::default();
         app.build_chunks(Rect::new(0, 0, 100, 100));
-        assert_eq!(app.chunks.footer, Rect::new(0, 99, 100, 1));
+        assert_eq!(app.chunks.footer, Rect::new(0, 98, 100, 2));
         assert_eq!(app.chunks.canvas, Rect::new(0, 0, 100, 69));
         assert_eq!(app.chunks.canvas_inner, Rect::new(1, 1, 98, 67));
-        assert_eq!(app.chunks.log_panel, Rect::new(0, 69, 100, 27));
-        assert_eq!(app.chunks.input, Rect::new(0, 96, 100, 3));
+        assert_eq!(app.chunks.log_panel, Rect::new(0, 69, 100, 26));
+        assert_eq!(app.chunks.input, Rect::new(0, 95, 100, 3));
     }
 }

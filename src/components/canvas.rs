@@ -25,6 +25,8 @@ impl<'a> Canvas<'a> {
     pub const FOOTER_TEXT: &'static [&'static str] = &[
         "Zoom-[s]",
         "Zoom+[d]",
+        "PalOffset+[+]",
+        "PalOffset-[-]",
         "MxDiv-[y]",
         "Prec-[u]",
         "Prec+[i]",
@@ -133,6 +135,18 @@ impl<'a> Canvas<'a> {
             // Increment the color palette index
             KeyCode::Char('c') => {
                 app.palette_index = (app.palette_index + 1) % colors::COLORS.len();
+            }
+            // Todo: remove duplication for + and -
+            // Increment color scheme offset
+            KeyCode::Char('-') => {
+                app.color_scheme_offset =
+                    (app.color_scheme_offset + app.get_palette().colors.len() as i32 - 1)
+                        % app.get_palette().colors.len() as i32
+            }
+            // Increment color scheme offset
+            KeyCode::Char('+') => {
+                app.color_scheme_offset =
+                    (app.color_scheme_offset + 1) % app.get_palette().colors.len() as i32
             }
             // Increment the maximum divergence
             KeyCode::Char('o') => app.increment_max_iter(10),
