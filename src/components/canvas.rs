@@ -1,6 +1,7 @@
 use std::ops::{AddAssign, SubAssign};
 
 use crate::app::fractal_logic::ratatui_to_canvas_coords;
+use crate::fractals::FRACTALS;
 use crate::helpers::{Focus, ZoomDirection};
 use crate::{app::App, colors};
 use ratatui::crossterm::event::{KeyCode, MouseButton, MouseEvent, MouseEventKind};
@@ -29,6 +30,7 @@ impl<'a> Canvas<'a> {
         "Prec+[i]",
         "MxDiv+[o]",
         "Color[c]",
+        "Frac[f]",
         "Rst[r]",
     ];
     pub fn new(app: &'a App) -> Self {
@@ -123,6 +125,11 @@ impl<'a> Canvas<'a> {
                 app.reset_cell_size();
                 app.reset_pos();
             }
+            // Increment the selected frac index
+            KeyCode::Char('f') => {
+                app.render_settings.frac_index =
+                    (app.render_settings.frac_index + 1) % FRACTALS.len();
+            }
             // Increment the color palette index
             KeyCode::Char('c') => {
                 app.palette_index = (app.palette_index + 1) % colors::COLORS.len();
@@ -163,12 +170,14 @@ impl<'a> Widget for Canvas<'a> {
                 Line::from(format!("HighDiv[{}]", self.app.stats.highest_diverg)).left_aligned(),
             )
             .title_top(
-                Line::from(format!("MxDiv[{}]", self.app.render_settings.max_iter))
-                    .right_aligned(),
+                Line::from(format!("MxDiv[{}]", self.app.render_settings.max_iter)).right_aligned(),
             )
             .title_top(
-                Line::from(format!("RndrTime[{}ms]", self.app.stats.render_time.as_millis()))
-                    .right_aligned(),
+                Line::from(format!(
+                    "RndrTime[{}ms]",
+                    self.app.stats.render_time.as_millis()
+                ))
+                .right_aligned(),
             )
             .title_top(
                 Line::from(format!("Mandelbrot[x{:.3e}]", self.app.get_zoom()))
