@@ -56,6 +56,7 @@ pub struct App {
     pub render_settings: RenderSettings,
     /// The duration took by the latest full canvas rendering
     pub scaling_factor: i32,
+    pub color_scheme_offset: i32,
 }
 
 impl Default for RenderSettings {
@@ -98,6 +99,7 @@ impl Default for App {
             app_state: Default::default(),
             render_settings: Default::default(),
             marker: Default::default(),
+            color_scheme_offset: Default::default(),
         }
     }
 }

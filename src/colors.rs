@@ -1,8 +1,7 @@
-use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 
 pub struct Palette {
-    colors: &'static [Color],
+    pub colors: &'static [Color],
     pub name: &'static str,
 }
 
@@ -265,21 +264,6 @@ const BLACK: Color = Color::Rgb(0, 0, 0);
 const WHITE: Color = Color::Rgb(255, 255, 255);
 
 pub fn palette_color(i: i32, pal: &Palette) -> Color {
-    if i == -1 {
-        // Return void color
-
-        return Color::Reset;
-        // return BLACK;
-        // return WHITE;
-
-        // let mut rng = thread_rng();
-        // return Color::Rgb(rng.gen_range(0..255), 0, 0);
-        // return Color::Rgb(0,rng.gen_range(0..255), 0);
-        // return Color::Rgb(0, 0, rng.gen_range(0..255));
-        // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),0);
-        // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),rng.gen_range(0..255));
-        // return Color::Rgb(rng.gen_range(0..255), 0, 0);
-    }
     pal.colors[i as usize % pal.colors.len()]
 }
 
@@ -302,7 +286,6 @@ mod tests {
     #[test]
     fn test_palette_color() {
         let palette = &COLORS[get_palette_index_by_name("sunset").unwrap()];
-        assert_eq!(Color::Reset, palette_color(-1, palette));
         // The first and last color of the sunset palettes
         assert_eq!(Color::Rgb(25, 7, 26), palette_color(0, palette));
         assert_eq!(Color::Rgb(54, 7, 20), palette_color(15, palette));

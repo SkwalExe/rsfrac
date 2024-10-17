@@ -4,6 +4,7 @@ use std::time::Instant;
 use crate::app::App;
 use crate::colors;
 use crate::stats::Stats;
+use ratatui::style::Color;
 use rayon::prelude::*;
 
 use super::fractal_logic::CanvasCoords;
@@ -49,7 +50,25 @@ impl App {
             let y: i32 = y.try_into().unwrap();
             for (x, diverg) in line.iter().enumerate() {
                 let x: i32 = x.try_into().unwrap();
-                let color = colors::palette_color(*diverg, palette);
+
+                let color = if *diverg == -1 {
+                    // Return void color
+
+                    Color::Reset
+                    // return BLACK;
+                    // return WHITE;
+
+                    // let mut rng = thread_rng();
+                    // return Color::Rgb(rng.gen_range(0..255), 0, 0);
+                    // return Color::Rgb(0,rng.gen_range(0..255), 0);
+                    // return Color::Rgb(0, 0, rng.gen_range(0..255));
+                    // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),0);
+                    // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),rng.gen_range(0..255));
+                    // return Color::Rgb(rng.gen_range(0..255), 0, 0);
+                } else {
+                    colors::palette_color(*diverg + self.color_scheme_offset, palette)
+                };
+
                 self.points
                     .entry(color)
                     .or_default()

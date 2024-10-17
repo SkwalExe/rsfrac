@@ -19,8 +19,16 @@ impl<'a> Footer<'a> {
 
 impl<'a> Widget for Footer<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let input = Paragraph::new(format!(" Actions: {}", self.app.footer_text().join(" ")))
-            .block(Block::default().style(Style::default().bg(Color::Rgb(70, 70, 70))));
+        let mut content = String::from(" Actions:");
+        for seg in self.app.footer_text() {
+            if content.len() + seg.len() > area.width as usize - 2 {
+                content += "\n"
+            }
+            content += " ";
+            content += seg;
+        }
+        let input = Paragraph::new(content)
+            .block(Block::default().style(Style::default().bg(Color::Rgb(30, 30, 30))));
 
         input.render(area, buf);
     }
