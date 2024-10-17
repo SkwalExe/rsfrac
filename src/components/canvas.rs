@@ -1,6 +1,8 @@
+use std::fmt::format;
 use std::ops::{AddAssign, SubAssign};
 
 use crate::app::fractal_logic::ratatui_to_canvas_coords;
+use crate::app::void_fills;
 use crate::fractals::FRACTALS;
 use crate::helpers::{Focus, ZoomDirection};
 use crate::{app::App, colors};
@@ -33,6 +35,7 @@ impl<'a> Canvas<'a> {
         "MxDiv+[o]",
         "Color[c]",
         "Frac[f]",
+        "VoidFill[v]",
         "Rst[r]",
     ];
     pub fn new(app: &'a App) -> Self {
@@ -148,6 +151,18 @@ impl<'a> Canvas<'a> {
                 app.color_scheme_offset =
                     (app.color_scheme_offset + 1) % app.get_palette().colors.len() as i32
             }
+            // Cycle through the void fills
+            KeyCode::Char('v') => {
+                app.render_settings.void_fill_index =
+                    (app.render_settings.void_fill_index + 1) % void_fills().len();
+                app.log_info_title(
+                    "Void Fill",
+                    format!(
+                        "Void fill is now: <acc {}>",
+                        void_fills()[app.render_settings.void_fill_index]
+                    ),
+                )
+            }
             // Increment the maximum divergence
             KeyCode::Char('o') => app.increment_max_iter(10),
             // Decrement the maximum divergence
@@ -176,6 +191,9 @@ impl<'a> Widget for Canvas<'a> {
             .title_bottom(Line::from(format!("Pts[{}]", self.app.point_count())).left_aligned())
             .title_bottom(
                 Line::from(format!("AvgDiv[{:.2}]", self.app.stats.avg_diverg)).left_aligned(),
+            )
+            .title_bottom(
+                Line::from(format!("PalOffset[{}]", self.app.color_scheme_offset)).right_aligned(),
             )
             .title_bottom(
                 Line::from(format!("Colors[{}]", self.app.get_palette().name)).right_aligned(),

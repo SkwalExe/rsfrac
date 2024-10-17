@@ -4,10 +4,15 @@ use std::time::Instant;
 use crate::app::App;
 use crate::colors;
 use crate::stats::Stats;
+use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rayon::prelude::*;
 
 use super::fractal_logic::CanvasCoords;
+use super::{void_fills, VoidFill};
+
+const BLACK: Color = Color::Rgb(0, 0, 0);
+const WHITE: Color = Color::Rgb(255, 255, 255);
 
 impl App {
     /// Run the selected fractal algorithm for each canvas coord
@@ -46,6 +51,8 @@ impl App {
 
         let palette = self.get_palette();
         let mut non_void_points = 0;
+        let mut rng = thread_rng();
+        let void_fills_ = void_fills();
         for (y, line) in line_divergs.iter().enumerate() {
             let y: i32 = y.try_into().unwrap();
             for (x, diverg) in line.iter().enumerate() {
@@ -54,17 +61,22 @@ impl App {
                 let color = if *diverg == -1 {
                     // Return void color
 
-                    Color::Reset
-                    // return BLACK;
-                    // return WHITE;
-
-                    // let mut rng = thread_rng();
-                    // return Color::Rgb(rng.gen_range(0..255), 0, 0);
-                    // return Color::Rgb(0,rng.gen_range(0..255), 0);
-                    // return Color::Rgb(0, 0, rng.gen_range(0..255));
-                    // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),0);
-                    // return Color::Rgb(rng.gen_range(0..255),rng.gen_range(0..255),rng.gen_range(0..255));
-                    // return Color::Rgb(rng.gen_range(0..255), 0, 0);
+                    match void_fills_[self.render_settings.void_fill_index] {
+                        VoidFill::Transparent => Color::Reset,
+                        VoidFill::Black => BLACK,
+                        VoidFill::White => WHITE,
+                        VoidFill::ColorScheme => {
+                            colors::palette_color(*diverg + self.color_scheme_offset, palette)
+                        }
+                        VoidFill::RGBNoise => Color::Rgb(
+                            rng.gen_range(0..255),
+                            rng.gen_range(0..255),
+                            rng.gen_range(0..255),
+                        ),
+                        VoidFill::RedNoise => Color::Rgb(rng.gen_range(0..255), 0, 0),
+                        VoidFill::GreenNoise => Color::Rgb(0, rng.gen_range(0..255), 0),
+                        VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
+                    }
                 } else {
                     colors::palette_color(*diverg + self.color_scheme_offset, palette)
                 };

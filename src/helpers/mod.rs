@@ -51,13 +51,3 @@ pub enum ZoomDirection {
     In,
     Out,
 }
-
-pub enum VoidFill {
-    Black,
-    White,
-    RGBNoise,
-    Trensparent,
-    RedNoise, 
-    GreenNoise, 
-    BlueNoise
-}

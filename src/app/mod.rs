@@ -10,6 +10,7 @@ use std::{collections::HashMap, sync::Mutex};
 use fractal_logic::CanvasCoords;
 use ratatui::style::Color;
 use rug::{Complex, Float};
+use strum::{Display, EnumIter, IntoEnumIterator};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
@@ -22,12 +23,29 @@ use crate::{
         Command,
     },
     components::{canvas::Canvas, input::Input, log_panel::LogPanel},
-    fractals::{self, Fractal, FractalClos, FRACTALS},
+    fractals::{Fractal, FractalClos, FRACTALS},
     helpers::{Chunks, Focus},
     stats::Stats,
 };
 pub const DEFAULT_PREC: u32 = 32;
 pub const DEFAULT_MAX_ITER: i32 = 32;
+
+#[derive(EnumIter, Debug, Display)]
+pub enum VoidFill {
+    Transparent,
+    Black,
+    White,
+    GreenNoise,
+    BlueNoise,
+    RedNoise,
+    RGBNoise,
+    ColorScheme
+}
+
+// Todo: find a way to make this a constant
+pub fn void_fills() -> Vec<VoidFill> {
+    VoidFill::iter().collect()
+}
 
 pub struct RenderSettings {
     pub cell_size: Float,
@@ -37,6 +55,7 @@ pub struct RenderSettings {
     pub prec: u32,
     pub max_iter: i32,
     pub frac_index: usize,
+    pub void_fill_index: usize
 }
 
 pub struct App {
@@ -68,6 +87,7 @@ impl Default for RenderSettings {
             cell_size: Float::new(DEFAULT_PREC),
             canvas_size: Default::default(),
             prec: DEFAULT_PREC,
+            void_fill_index: Default::default()
         }
     }
 }

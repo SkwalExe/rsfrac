@@ -686,6 +686,7 @@ dependencies = [
  "ratatui",
  "rayon",
  "rug",
+ "strum",
  "tui-input",
  "tui-markup",
  "tui-scrollview",

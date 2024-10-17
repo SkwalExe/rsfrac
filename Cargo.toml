@@ -20,6 +20,7 @@ rand = "0.8.5"
 ratatui = { version = "0.28.1", features = ["all-widgets", "unstable-rendered-line-info"] }
 rayon = "1.10.0"
 rug = "1.26.1"
+strum = "0.26.3"
 tui-input = "0.10.1"
 tui-markup = { version = "0.5.0", features = ["ratatui", "ansi"] }
 tui-scrollview = "0.4.0"
