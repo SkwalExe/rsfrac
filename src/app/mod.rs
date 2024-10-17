@@ -22,7 +22,7 @@ use crate::{
         Command,
     },
     components::{canvas::Canvas, input::Input, log_panel::LogPanel},
-    fractals::{Fractal, FractalClos, FRACTALS},
+    fractals::{self, Fractal, FractalClos, FRACTALS},
     helpers::{Chunks, Focus},
     stats::Stats,
 };
@@ -73,6 +73,11 @@ impl Default for RenderSettings {
 }
 
 impl RenderSettings {
+    pub fn get_frac_index_by_name(&self, name: &str) -> Option<usize> {
+        FRACTALS
+            .iter()
+            .position(|f| f.name.to_lowercase() == name.to_lowercase())
+    }
     pub fn get_frac_clos(&self) -> FractalClos {
         FRACTALS[self.frac_index].get
     }
