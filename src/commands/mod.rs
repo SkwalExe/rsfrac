@@ -9,6 +9,7 @@ pub mod move_dist;
 pub mod pos;
 pub mod prec;
 pub mod quit;
+pub mod frac;
 pub mod zoom_factor;
 pub mod color;
 pub mod version;
@@ -33,5 +34,6 @@ pub fn create_commands() -> HashMap<&'static str, &'static Command> {
         (move_dist::MOVE_DIST.name, &move_dist::MOVE_DIST),
         (version::VERSION_COMMAND.name, &version::VERSION_COMMAND),
         (color::COLOR.name, &color::COLOR),
+        (frac::FRAC.name, &frac::FRAC),
     ])
 }
