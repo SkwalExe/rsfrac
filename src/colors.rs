@@ -260,9 +260,6 @@ pub const COLORS: &[Palette] = &[
     },
 ];
 
-const BLACK: Color = Color::Rgb(0, 0, 0);
-const WHITE: Color = Color::Rgb(255, 255, 255);
-
 pub fn palette_color(i: i32, pal: &Palette) -> Color {
     pal.colors[i as usize % pal.colors.len()]
 }
