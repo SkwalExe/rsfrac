@@ -3,8 +3,6 @@ use std::time::Instant;
 
 use crate::app::App;
 use crate::colors;
-use crate::fractals;
-use crate::fractals::Fractal;
 use crate::stats::Stats;
 use rayon::prelude::*;
 
@@ -35,7 +33,7 @@ impl App {
                 let point_divergs: Vec<i32> = points
                     .par_iter()
                     .map(|x| {
-                        fractals::Mandelbrot::get(
+                        (self.render_settings.get_frac_clos())(
                             self.render_settings.coord_to_c(CanvasCoords::new(*x, *y)),
                             &self.render_settings,
                         )

@@ -16,15 +16,18 @@ use tui_scrollview::ScrollViewState;
 use crate::{
     colors::{self, Palette},
     commands::{
-        create_commands, max_iter::{MAX_MAX_ITER, MIN_MAX_ITER}, prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC}, Command
+        create_commands,
+        max_iter::{MAX_MAX_ITER, MIN_MAX_ITER},
+        prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
+        Command,
     },
     components::{canvas::Canvas, input::Input, log_panel::LogPanel},
+    fractals::{Fractal, FractalClos, FRACTALS},
     helpers::{Chunks, Focus},
     stats::Stats,
 };
 pub const DEFAULT_PREC: u32 = 32;
 pub const DEFAULT_MAX_ITER: i32 = 32;
-pub const DEFAULT_POS: (f64, f64) = (-0.5, 0.0);
 
 pub struct RenderSettings {
     pub cell_size: Float,
@@ -33,6 +36,7 @@ pub struct RenderSettings {
     pub canvas_size: CanvasCoords,
     pub prec: u32,
     pub max_iter: i32,
+    pub frac_index: usize,
 }
 
 pub struct App {
@@ -57,12 +61,22 @@ pub struct App {
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
+            frac_index: Default::default(),
+            pos: Complex::with_val(DEFAULT_PREC, FRACTALS[0].default_pos),
             max_iter: DEFAULT_MAX_ITER,
-            pos: Complex::with_val(DEFAULT_PREC, DEFAULT_POS),
             cell_size: Float::new(DEFAULT_PREC),
             canvas_size: Default::default(),
             prec: DEFAULT_PREC,
         }
+    }
+}
+
+impl RenderSettings {
+    pub fn get_frac_clos(&self) -> FractalClos {
+        FRACTALS[self.frac_index].get
+    }
+    pub fn get_frac_obj(&self) -> &Fractal {
+        &FRACTALS[self.frac_index]
     }
 }
 
@@ -106,10 +120,13 @@ impl App {
     /// Return a complex corresponding to the default position,
     /// with the decimal precision configured on the App.
     pub fn get_default_pos(&self) -> Complex {
-        Complex::with_val(self.render_settings.prec, DEFAULT_POS)
+        Complex::with_val(
+            self.render_settings.prec,
+            self.render_settings.get_frac_obj().default_pos,
+        )
     }
 
-    /// Increment positively or negatively the decimal precision, 
+    /// Increment positively or negatively the decimal precision,
     /// and update the precision of existing numeric values.
     pub fn increment_decimal_prec(&mut self, increment: i32) {
         let new_prec = self.render_settings.prec.saturating_add_signed(increment);
