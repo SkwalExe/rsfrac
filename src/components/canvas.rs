@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::ops::{AddAssign, SubAssign};
 
 use crate::app::fractal_logic::ratatui_to_canvas_coords;

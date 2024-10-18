@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use rug::Complex;
+use rug::{Complex, Float};
 
 use crate::helpers::{Vec2, ZoomDirection};
 
@@ -66,13 +66,14 @@ impl Deref for CanvasCoords {
 }
 
 impl RenderSettings {
+    pub fn coord_to_c_with_cell_size(&self, coords: CanvasCoords, cell_size: &Float) -> Complex {
+        Complex::with_val(self.prec, (coords.0.x * cell_size, coords.0.y * cell_size)) + &self.pos
+    }
+
     /// Takes coordinates on the canvas and return the
     /// complex number at the corresponding position on the complex plane
     pub fn coord_to_c(&self, coords: CanvasCoords) -> Complex {
-        Complex::with_val(
-            self.prec,
-            (coords.0.x * &self.cell_size, coords.0.y * &self.cell_size),
-        ) + &self.pos
+        self.coord_to_c_with_cell_size(coords, &self.cell_size)
     }
 }
 impl App {

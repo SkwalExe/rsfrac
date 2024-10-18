@@ -11,6 +11,7 @@ pub mod move_dist;
 pub mod pos;
 pub mod prec;
 pub mod quit;
+pub mod capture;
 pub mod version;
 pub mod zoom_factor;
 
@@ -28,6 +29,7 @@ pub fn create_commands() -> HashMap<&'static str, &'static Command> {
         (quit::QUIT.name, &quit::QUIT),
         (clear::CLEAR.name, &clear::CLEAR),
         (version::VERSION_COMMAND.name, &version::VERSION_COMMAND),
+        (capture::CAPTURE.name, &capture::CAPTURE),
         (pos::POS.name, &pos::POS),
         (prec::PREC.name, &prec::PREC),
         (max_iter::MAX_ITER.name, &max_iter::MAX_ITER),
