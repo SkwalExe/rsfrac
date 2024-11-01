@@ -5,7 +5,7 @@ use crate::app::App;
 impl App {
     /// Takes the area of the entire frame and splits it
     /// into sub areas for the different components
-    pub fn build_chunks(&mut self, area: Rect) {
+    pub(crate) fn build_chunks(&mut self, area: Rect) {
         let direction = if area.width <= area.height * 2 {
             Dir::Vertical
         } else {

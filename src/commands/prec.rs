@@ -1,20 +1,22 @@
-use super::{command_increment::command_increment, Command};
-pub const MIN_DECIMAL_PREC: u32 = 8;
-pub const MAX_DECIMAL_PREC: u32 = 10000;
+use crate::app::AppState;
 
-pub fn execute_prec(app: &mut crate::app::App, args: Vec<&str>) {
+use super::{command_increment::command_increment, Command};
+pub(crate) const MIN_DECIMAL_PREC: u32 = 8;
+pub(crate) const MAX_DECIMAL_PREC: u32 = 10000;
+
+pub(crate) fn execute_prec(app_state: &mut AppState, args: Vec<&str>) {
     if let Some(val) = command_increment(
-        app,
-        app.render_settings.prec,
+        app_state,
+        app_state.render_settings.prec,
         args,
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     ) {
-        app.render_settings.prec = val;
-        app.redraw_canvas = true;
+        app_state.render_settings.prec = val;
+        app_state.redraw_canvas = true;
     }
 }
-pub const PREC: Command = Command {
+pub(crate) const PREC: Command = Command {
     execute: &execute_prec,
     name: "prec",
     accepted_arg_count: &[0, 1, 2],

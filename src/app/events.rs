@@ -11,15 +11,15 @@ use crate::{
 
 impl App {
     /// Send a key event to the focused component
-    pub fn dispatch_event(&mut self, key: KeyEvent) {
-        match self.focused {
-            Focus::Canvas => Canvas::handle_key_code(self, key.code),
-            Focus::Input => Input::handle_event(self, key),
-            Focus::LogPanel => LogPanel::handle_event(self, key.code),
+    pub(crate) fn dispatch_event(&mut self, key: KeyEvent) {
+        match self.app_state.focused {
+            Focus::Canvas => Canvas::handle_key_code(&mut self.app_state, key.code),
+            Focus::Input => Input::handle_event(&mut self.app_state, key),
+            Focus::LogPanel => LogPanel::handle_event(&mut self.app_state, key.code),
         }
     }
 
-    pub fn handle_mouse_event(&mut self, event: MouseEvent) {
+    pub(crate) fn handle_mouse_event(&mut self, event: MouseEvent) {
         // Only handle key PRESSES
         if let MouseEventKind::Down(_) = event.kind {
             let component = self.get_component_at_pos(Position::new(event.column, event.row));
@@ -29,15 +29,15 @@ impl App {
 
             // We cheked if None just before so we can unwrap
             match component.unwrap() {
-                Focus::Canvas => Canvas::handle_mouse_event(self, event),
-                Focus::Input => Input::handle_mouse_event(self, event),
-                Focus::LogPanel => LogPanel::handle_mouse_event(self, event),
+                Focus::Canvas => Canvas::handle_mouse_event(&mut self.app_state, event),
+                Focus::Input => Input::handle_mouse_event(&mut self.app_state, event),
+                Focus::LogPanel => LogPanel::handle_mouse_event(&mut self.app_state, event),
             }
         }
     }
 
     /// Return the component at the given position as a Focus variant
-    pub fn get_component_at_pos(&self, pos: Position) -> Option<Focus> {
+    pub(crate) fn get_component_at_pos(&self, pos: Position) -> Option<Focus> {
         Some(if self.chunks.canvas.contains(pos) {
             Focus::Canvas
         } else if self.chunks.log_panel.contains(pos) {
@@ -50,11 +50,13 @@ impl App {
     }
 
     /// Handle global key events, return false if the key was not catched
-    pub fn handle_event(&mut self, key: KeyEvent) -> bool {
+    pub(crate) fn handle_event(&mut self, key: KeyEvent) -> bool {
         match key.code {
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => self.quit = true,
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => {
+                self.app_state.quit = true
+            }
             KeyCode::Tab => {
-                self.focused = match self.focused {
+                self.app_state.focused = match self.app_state.focused {
                     Focus::Input => Focus::Canvas,
                     Focus::Canvas => Focus::LogPanel,
                     Focus::LogPanel => Focus::Input,
@@ -68,10 +70,12 @@ impl App {
         }
         true
     }
-    pub fn handle_paste(&mut self, text: String) {
+
+    pub(crate) fn handle_paste(&mut self, text: String) {
         // Todo: there must be a better way to do this
         for char in text.chars().map(|c| if c == '\n' { ' ' } else { c }) {
-            self.command_input
+            self.app_state
+                .command_input
                 .handle(tui_input::InputRequest::InsertChar(char));
         }
     }

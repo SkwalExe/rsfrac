@@ -1,20 +1,22 @@
-use super::{command_increment::command_increment, Command};
-pub const MIN_MAX_ITER: i32 = 8;
-pub const MAX_MAX_ITER: i32 = 10000;
+use crate::app::AppState;
 
-pub fn execute_max_iter(app: &mut crate::app::App, args: Vec<&str>) {
+use super::{command_increment::command_increment, Command};
+pub(crate) const MIN_MAX_ITER: i32 = 8;
+pub(crate) const MAX_MAX_ITER: i32 = 10000;
+
+pub(crate) fn execute_max_iter(app_state: &mut AppState, args: Vec<&str>) {
     if let Some(val) = command_increment(
-        app,
-        app.render_settings.max_iter,
+        app_state,
+        app_state.render_settings.max_iter,
         args,
         MIN_MAX_ITER,
         MAX_MAX_ITER,
     ) {
-        app.render_settings.max_iter = val;
-        app.redraw_canvas = true;
+        app_state.render_settings.max_iter = val;
+        app_state.redraw_canvas = true;
     }
 }
-pub const MAX_ITER: Command = Command {
+pub(crate) const MAX_ITER: Command = Command {
     execute: &execute_max_iter,
     name: "max_iter",
     accepted_arg_count: &[0, 1, 2],

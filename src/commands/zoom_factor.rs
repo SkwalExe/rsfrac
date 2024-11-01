@@ -1,31 +1,36 @@
+use crate::app::AppState;
+
 use super::Command;
 
-pub fn execute_zoom_factor(app: &mut crate::app::App, args: Vec<&str>) {
+pub(crate) fn execute_zoom_factor(app_state: &mut AppState, args: Vec<&str>) {
     // If no args are provided, show the current positino
     if args.is_empty() {
-        app.log_info_title(
+        app_state.log_info_title(
             "Current Scaling Factor",
-            format!("The scaling factor is set to <acc {}%>", app.scaling_factor),
+            format!(
+                "The scaling factor is set to <acc {}%>",
+                app_state.scaling_factor
+            ),
         );
         return;
     }
 
     if let Ok(new_value) = args[0].parse::<i32>() {
-        if new_value < 1 || new_value > 500 {
-            app.log_error("Please, provide a value between 1 and 500.");
+        if !(1..=500).contains(&new_value) {
+            app_state.log_error("Please, provide a value between 1 and 500.");
             return;
         }
 
-        app.scaling_factor = new_value;
-        app.log_success(format!(
+        app_state.scaling_factor = new_value;
+        app_state.log_success(format!(
             "Scaling factor successfully set to <acc {new_value}%>"
         ));
     } else {
-        app.log_error("Please, provide a valid integer.")
+        app_state.log_error("Please, provide a valid integer.")
     }
 }
 
-pub const ZOOM_FACTOR: Command = Command {
+pub(crate) const ZOOM_FACTOR: Command = Command {
     execute: &execute_zoom_factor,
     name: "zoom_factor",
     accepted_arg_count: &[0, 1],

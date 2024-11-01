@@ -33,7 +33,7 @@ fn get_julia(mut p: Complex, render_settings: &RenderSettings) -> i32 {
     n
 }
 
-pub const JULIA: Fractal = Fractal {
+pub(crate) const JULIA: Fractal = Fractal {
     default_pos: (0.0, 0.0),
     get: &get_julia,
     name: "Julia",

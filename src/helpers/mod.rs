@@ -1,14 +1,14 @@
-pub mod markup;
+pub(crate) mod markup;
 use ratatui::layout::Rect;
 
 #[derive(Default, Debug, Clone)]
-pub struct Vec2<T> {
-    pub x: T,
-    pub y: T,
+pub(crate) struct Vec2<T> {
+    pub(crate) x: T,
+    pub(crate) y: T,
 }
 
 impl<T> Vec2<T> {
-    pub fn new(x: impl Into<T>, y: impl Into<T>) -> Self {
+    pub(crate) fn new(x: impl Into<T>, y: impl Into<T>) -> Self {
         Self {
             x: x.into(),
             y: y.into(),
@@ -29,7 +29,7 @@ impl From<Vec2<u16>> for Vec2<i32> {
 
 /// Used to track which component is focused
 #[derive(Default, PartialEq, Debug)]
-pub enum Focus {
+pub(crate) enum Focus {
     #[default]
     Canvas,
     LogPanel,
@@ -37,17 +37,17 @@ pub enum Focus {
 }
 
 #[derive(Default)]
-pub struct Chunks {
-    pub canvas: Rect,
-    pub side: Rect,
-    pub log_panel: Rect,
-    pub input: Rect,
-    pub footer: Rect,
-    pub body: Rect,
-    pub canvas_inner: Rect,
+pub(crate) struct Chunks {
+    pub(crate) canvas: Rect,
+    pub(crate) side: Rect,
+    pub(crate) log_panel: Rect,
+    pub(crate) input: Rect,
+    pub(crate) footer: Rect,
+    pub(crate) body: Rect,
+    pub(crate) canvas_inner: Rect,
 }
 
-pub enum ZoomDirection {
+pub(crate) enum ZoomDirection {
     In,
     Out,
 }

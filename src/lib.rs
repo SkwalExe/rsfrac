@@ -1,7 +1,6 @@
 pub mod app;
-pub mod colors;
-pub mod components;
-pub mod fractals;
-pub mod commands;
-pub mod helpers;
-pub mod stats;
+pub(crate) mod colors;
+pub(crate) mod commands;
+pub(crate) mod components;
+pub(crate) mod fractals;
+pub(crate) mod helpers;
