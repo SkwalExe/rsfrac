@@ -1,9 +1,11 @@
+use crate::app::AppState;
+
 use super::Command;
-pub fn execute_clear(app: &mut crate::app::App, _args: Vec<&str>) {
-    app.log_messages.clear();
+pub(crate) fn execute_clear(app_state: &mut AppState, _args: Vec<&str>) {
+    app_state.log_messages.clear();
 }
 
-pub const CLEAR: Command = Command {
+pub(crate) const CLEAR: Command = Command {
     execute: &execute_clear,
     name: "clear",
     accepted_arg_count: &[0],

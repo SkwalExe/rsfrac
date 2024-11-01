@@ -11,15 +11,15 @@ const COMMAND_FG: MyOwnColorType = MyOwnColorType(217, 214, 207);
 
 struct MyOwnColorType(u8, u8, u8);
 
-impl Into<Color> for MyOwnColorType {
-    fn into(self) -> Color {
-        Color::Rgb(self.0, self.1, self.2)
+impl From<MyOwnColorType> for Color {
+    fn from(value: MyOwnColorType) -> Self {
+        Color::Rgb(value.0, value.1, value.2)
     }
 }
 
-impl Into<ANSIColor> for MyOwnColorType {
-    fn into(self) -> ANSIColor {
-        ANSIColor::RGB(self.0, self.1, self.2)
+impl From<MyOwnColorType> for ANSIColor {
+    fn from(value: MyOwnColorType) -> Self {
+        ANSIColor::RGB(value.0, value.1, value.2)
     }
 }
 

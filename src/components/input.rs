@@ -7,17 +7,17 @@ use ratatui::{
 };
 use tui_input::backend::crossterm::EventHandler;
 
-use crate::{app::App, helpers::Focus};
+use crate::{app::AppState, commands::get_commands, helpers::Focus};
 
-pub struct Input<'a> {
-    app: &'a App,
+pub(crate) struct Input<'a> {
+    app_state: &'a AppState,
 }
 
 fn enumerate_strings(elements: &[usize]) -> String {
-    assert!(elements.len() > 0);
+    assert!(!elements.is_empty());
     let elements: Vec<_> = elements.iter().map(usize::to_string).collect();
     if elements.len() == 1 {
-        return elements[0].clone()
+        return elements[0].clone();
     }
     // We can unwrap because we know the length is >1
     let split = elements.split_last().unwrap();
@@ -25,16 +25,16 @@ fn enumerate_strings(elements: &[usize]) -> String {
 }
 
 impl<'a> Input<'a> {
-    pub const FOOTER_TEXT: &'static [&'static str] = &["Press [Enter] to run the command"];
-    pub fn new(app: &'a App) -> Self {
-        Self { app }
+    pub(crate) const FOOTER_TEXT: &'static [&'static str] = &["Press [Enter] to run the command"];
+    pub(crate) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
-    pub fn handle_mouse_event(app: &mut App, _event: MouseEvent) {
+    pub(crate) fn handle_mouse_event(app: &mut AppState, _event: MouseEvent) {
         app.focused = Focus::Input;
     }
-    pub fn run_command(app: &mut App) {
-        let input = String::from(app.command_input.value());
-        app.command_input.reset();
+    pub(crate) fn run_command(app_state: &mut AppState) {
+        let input = String::from(app_state.command_input.value());
+        app_state.command_input.reset();
 
         let mut args: Vec<_> = input.split_whitespace().collect();
 
@@ -43,19 +43,18 @@ impl<'a> Input<'a> {
             return;
         }
 
-
         // The first argument is the command name
         let command_name = args.remove(0);
-        if let Some(command) = app.commands.get(command_name).copied() {
-            app.log_raw(format!("<command \\> {}>", input));
+        if let Some(command) = get_commands().get(command_name).copied() {
+            app_state.log_raw(format!("<command \\> {}>", input));
             if !command.accepted_arg_count.contains(&args.len()) {
                 // If the number of provided arguments in not in the accepted argument
                 // count list, then print an error and return
-                app.log_error(
+                app_state.log_error(
                     format!(
                         concat!("<bg:black,fg:white {}> expects {} arguments but got {}. ", 
                             "Use <bg:black,fg:white help {}> for more details on the usage of this command."), 
-                        command.name, 
+                        command.name,
                         enumerate_strings(command.accepted_arg_count),
                         args.len(),
                         command.name
@@ -63,24 +62,23 @@ impl<'a> Input<'a> {
                 );
                 return;
             }
-            (command.execute)(app, args);
+            (command.execute)(app_state, args);
         } else {
             // TODO: centralize this message, that is used in other places
-            app.log_error(
-                format!(
-                    concat!("Command not found: <bgred,white {}>. ", 
-                        "Use <command help> for an overview of available commands."), 
-                    command_name
-                )
-            )
+            app_state.log_error(format!(
+                concat!(
+                    "Command not found: <bgred,white {}>. ",
+                    "Use <command help> for an overview of available commands."
+                ),
+                command_name
+            ))
         }
-
     }
-    pub fn handle_event(app: &mut App, key: KeyEvent) {
+    pub(crate) fn handle_event(app_state: &mut AppState, key: KeyEvent) {
         match key.code {
-            KeyCode::Enter => Input::run_command(app),
+            KeyCode::Enter => Input::run_command(app_state),
             _ => {
-                app.command_input.handle_event(&Event::Key(key));
+                app_state.command_input.handle_event(&Event::Key(key));
             }
         };
     }
@@ -88,13 +86,16 @@ impl<'a> Input<'a> {
 
 impl<'a> Widget for Input<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let border_style = Style::default().fg(if self.app.focused == Focus::Input {
+        let border_style = Style::default().fg(if self.app_state.focused == Focus::Input {
             Color::LightBlue
         } else {
             Color::DarkGray
         });
-        let scroll = self.app.command_input.visual_scroll(area.width as usize);
-        let input = Paragraph::new(self.app.command_input.value())
+        let scroll = self
+            .app_state
+            .command_input
+            .visual_scroll(area.width as usize);
+        let input = Paragraph::new(self.app_state.command_input.value())
             .block(
                 Block::default()
                     .borders(Borders::ALL)

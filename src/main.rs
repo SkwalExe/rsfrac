@@ -1,4 +1,7 @@
-use ratatui::crossterm::{event::{DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture}, execute};
+use ratatui::crossterm::{
+    event::{DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture},
+    execute,
+};
 use rsfrac::app::App;
 use std::io::{self, stdout};
 

@@ -2,9 +2,9 @@ use std::ops::Deref;
 
 use rug::{Complex, Float};
 
-use crate::helpers::{Vec2, ZoomDirection};
+use crate::helpers::Vec2;
 
-use super::{App, RenderSettings};
+use super::render_settings::RenderSettings;
 
 // Coordinate system ============
 // Ratatui Coordinates:
@@ -39,19 +39,11 @@ use super::{App, RenderSettings};
 // ----------------------
 //
 
-pub fn ratatui_to_canvas_coords(app: &App, x: u16, y: u16) -> CanvasCoords {
-    // I don't understand how this works
-    CanvasCoords::new(
-        x as i32 - app.chunks.canvas_inner.x as i32 - app.render_settings.canvas_size.x / 2,
-        y as i32 * -2 + app.chunks.canvas_inner.y as i32 + app.render_settings.canvas_size.y / 2,
-    )
-}
-
 #[derive(Clone, Debug, Default)]
-pub struct CanvasCoords(Vec2<i32>);
+pub(crate) struct CanvasCoords(Vec2<i32>);
 
 impl CanvasCoords {
-    pub fn new(x: impl Into<i32>, y: impl Into<i32>) -> Self {
+    pub(crate) fn new(x: impl Into<i32>, y: impl Into<i32>) -> Self {
         Self(Vec2::new(x, y))
     }
 }
@@ -66,31 +58,17 @@ impl Deref for CanvasCoords {
 }
 
 impl RenderSettings {
-    pub fn coord_to_c_with_cell_size(&self, coords: CanvasCoords, cell_size: &Float) -> Complex {
+    pub(crate) fn coord_to_c_with_cell_size(
+        &self,
+        coords: CanvasCoords,
+        cell_size: &Float,
+    ) -> Complex {
         Complex::with_val(self.prec, (coords.0.x * cell_size, coords.0.y * cell_size)) + &self.pos
     }
 
     /// Takes coordinates on the canvas and return the
     /// complex number at the corresponding position on the complex plane
-    pub fn coord_to_c(&self, coords: CanvasCoords) -> Complex {
+    pub(crate) fn coord_to_c(&self, coords: CanvasCoords) -> Complex {
         self.coord_to_c_with_cell_size(coords, &self.cell_size)
-    }
-}
-impl App {
-    pub fn zoom_at(&mut self, pos: CanvasCoords, direction: ZoomDirection) {
-        let inintial_c_pos = self.render_settings.coord_to_c(pos.clone());
-        self.zoom(direction);
-        let new_c_pos = self.render_settings.coord_to_c(pos);
-
-        self.render_settings.pos += inintial_c_pos - new_c_pos;
-    }
-
-    pub fn zoom(&mut self, direction: ZoomDirection) {
-        let scaling_factor = 1.0 + self.scaling_factor as f64 / 100.0;
-
-        match direction {
-            ZoomDirection::In => self.render_settings.cell_size /= scaling_factor,
-            ZoomDirection::Out => self.render_settings.cell_size *= scaling_factor,
-        }
     }
 }

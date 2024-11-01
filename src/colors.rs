@@ -1,11 +1,11 @@
 use ratatui::style::Color;
 
-pub struct Palette {
-    pub colors: &'static [Color],
-    pub name: &'static str,
+pub(crate) struct Palette {
+    pub(crate) colors: &'static [Color],
+    pub(crate) name: &'static str,
 }
 
-pub const COLORS: &[Palette] = &[
+pub(crate) const COLORS: &[Palette] = &[
     Palette {
         colors: &[
             Color::Rgb(12, 4, 50),
@@ -260,11 +260,11 @@ pub const COLORS: &[Palette] = &[
     },
 ];
 
-pub fn palette_color(i: i32, pal: &Palette) -> Color {
+pub(crate) fn palette_color(i: i32, pal: &Palette) -> Color {
     pal.colors[i as usize % pal.colors.len()]
 }
 
-pub fn get_palette_index_by_name(name: &str) -> Option<usize> {
+pub(crate) fn get_palette_index_by_name(name: &str) -> Option<usize> {
     COLORS
         .iter()
         .position(|pal| pal.name.to_lowercase() == name.to_lowercase())

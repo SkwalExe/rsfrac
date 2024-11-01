@@ -2,10 +2,10 @@ use std::{fmt::Display, str::FromStr};
 
 use num_traits::{SaturatingAdd, SaturatingSub};
 
-use crate::app::App;
+use crate::app::AppState;
 
-pub fn command_increment<T>(
-    app: &mut App,
+pub(crate) fn command_increment<T>(
+    app_state: &mut AppState,
     current_val: T,
     args: Vec<&str>,
     min: T,
@@ -16,7 +16,7 @@ where
 {
     // If no args are provided, just display the current value
     if args.is_empty() {
-        app.log_info(format!(
+        app_state.log_info(format!(
             "The value is currently set to <acc {}>",
             current_val
         ));
@@ -31,7 +31,7 @@ where
         let parsed = args[0].parse::<T>();
         match parsed {
             Err(_) => {
-                app.log_error("The value you provided could not be interpreted.");
+                app_state.log_error("The value you provided could not be interpreted.");
                 return None;
             }
             Ok(val) => new_val = val,
@@ -46,7 +46,7 @@ where
         let parsed = increment.parse::<T>();
         match parsed {
             Err(_) => {
-                app.log_error("The given increment value could not be interpreted.");
+                app_state.log_error("The given increment value could not be interpreted.");
                 return None;
             }
             Ok(val) => {
@@ -55,7 +55,8 @@ where
                     "+" => new_val.saturating_add(&val),
                     "-" => new_val.saturating_sub(&val),
                     _ => {
-                        app.log_error("The first argument must be either <acc +> or <acc ->.");
+                        app_state
+                            .log_error("The first argument must be either <acc +> or <acc ->.");
                         return None;
                     }
                 }
@@ -64,10 +65,10 @@ where
     }
 
     if new_val < min || new_val > max {
-        app.log_error(format!("The value must stay remain {min} and {max}"));
+        app_state.log_error(format!("The value must stay remain {min} and {max}"));
         return None;
     }
 
-    app.log_success(format!("Value successfully set to <acc {new_val}>."));
+    app_state.log_success(format!("Value successfully set to <acc {new_val}>."));
     Some(new_val)
 }

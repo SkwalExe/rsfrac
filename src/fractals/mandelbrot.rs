@@ -37,7 +37,7 @@ fn get_mandelbrot(p: Complex, render_settings: &RenderSettings) -> i32 {
     n
 }
 
-pub const MANDELBROT: Fractal = Fractal {
+pub(crate) const MANDELBROT: Fractal = Fractal {
     get: &get_mandelbrot,
     name: "Mandelbrot",
     details: concat!(
@@ -47,6 +47,5 @@ pub const MANDELBROT: Fractal = Fractal {
         "Where <acc P> is the complex number at the position of the pixel, ",
         "and <acc U₀> is a constant that can be modified, set to <acc 0+0j> by default.\n",
     ),
-    default_pos: (-0.5, 0.0)
+    default_pos: (-0.5, 0.0),
 };
-

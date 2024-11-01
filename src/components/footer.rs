@@ -6,15 +6,15 @@ use ratatui::{
 };
 use tui_markup::compile_with;
 
-use crate::{app::App, helpers::markup::get_ratatui_generator};
+use crate::{app::AppState, helpers::markup::get_ratatui_generator};
 
-pub struct Footer<'a> {
-    app: &'a App,
+pub(crate) struct Footer<'a> {
+    app_state: &'a AppState,
 }
 
 impl<'a> Footer<'a> {
-    pub fn new(app: &'a App) -> Self {
-        Self { app }
+    pub(crate) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
 }
 
@@ -22,7 +22,7 @@ impl<'a> Widget for Footer<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let mut content = String::from(" Actions:");
         let mut line_len = content.len();
-        for seg in self.app.footer_text() {
+        for seg in self.app_state.footer_text() {
             if line_len + seg.len() > area.width as usize - 2 {
                 content += "\n";
                 line_len = 0;
