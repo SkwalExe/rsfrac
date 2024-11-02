@@ -1,19 +1,19 @@
-use crate::app::AppState;
-
+use crate::AppState;
 use super::{command_increment::command_increment, Command};
+
 pub(crate) const MIN_DECIMAL_PREC: u32 = 8;
 pub(crate) const MAX_DECIMAL_PREC: u32 = 10000;
 
-pub(crate) fn execute_prec(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) {
     if let Some(val) = command_increment(
-        app_state,
-        app_state.render_settings.prec,
+        state,
+        state.render_settings.prec,
         args,
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     ) {
-        app_state.render_settings.prec = val;
-        app_state.redraw_canvas = true;
+        state.render_settings.prec = val;
+        state.redraw_canvas = true;
     }
 }
 pub(crate) const PREC: Command = Command {

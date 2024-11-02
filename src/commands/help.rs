@@ -1,10 +1,9 @@
-use crate::app::AppState;
-
+use crate::AppState;
 use super::{get_commands, Command};
 
-pub(crate) fn execute_help(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) {
     if args.is_empty() {
-        app_state.log_info_title(
+        state.log_info_title(
             "Available commands",
             format!(
                 concat!(
@@ -23,7 +22,7 @@ pub(crate) fn execute_help(app_state: &mut AppState, args: Vec<&str>) {
     }
 
     if args[0] == "+" {
-        app_state.log_info_title(
+        state.log_info_title(
             "Available commands",
             format!(
                 "{}\n<green Use <command help command_name> to get more info about a command.>",
@@ -40,7 +39,7 @@ pub(crate) fn execute_help(app_state: &mut AppState, args: Vec<&str>) {
 
     let command_name = args[0];
     if let Some(command) = get_commands().get(command_name) {
-        app_state.log_info_title(
+        state.log_info_title(
             command.name,
             format!(
                 "{}\n{}",
@@ -49,7 +48,7 @@ pub(crate) fn execute_help(app_state: &mut AppState, args: Vec<&str>) {
             ),
         );
     } else {
-        app_state.log_error(format!(
+        state.log_error(format!(
             concat!(
                 "Command not found: <bgred,white {}>. ",
                 "Use <command help> for an overview of available commands."

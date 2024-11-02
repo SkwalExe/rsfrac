@@ -1,19 +1,19 @@
-use crate::app::AppState;
-
+use crate::AppState;
 use super::{command_increment::command_increment, Command};
+
 pub(crate) const MIN_MAX_ITER: i32 = 8;
 pub(crate) const MAX_MAX_ITER: i32 = 10000;
 
-pub(crate) fn execute_max_iter(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) {
     if let Some(val) = command_increment(
-        app_state,
-        app_state.render_settings.max_iter,
+        state,
+        state.render_settings.max_iter,
         args,
         MIN_MAX_ITER,
         MAX_MAX_ITER,
     ) {
-        app_state.render_settings.max_iter = val;
-        app_state.redraw_canvas = true;
+        state.render_settings.max_iter = val;
+        state.redraw_canvas = true;
     }
 }
 pub(crate) const MAX_ITER: Command = Command {

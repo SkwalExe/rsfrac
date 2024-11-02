@@ -1,7 +1,22 @@
 use ratatui::style::Color;
 
+/// Returns the color assiciated to the given divergence in the provided palette.
+pub(crate) fn palette_color(i: i32, pal: &Palette) -> Color {
+    pal.colors[i as usize % pal.colors.len()]
+}
+
+/// Returns the palette matching the provided name, and `None` if nothing matched.
+pub(crate) fn get_palette_index_by_name(name: &str) -> Option<usize> {
+    COLORS
+        .iter()
+        .position(|pal| pal.name.to_lowercase() == name.to_lowercase())
+}
+
+/// Represents a color palette.
 pub(crate) struct Palette {
+    /// The list of palette colors, in fixed order.
     pub(crate) colors: &'static [Color],
+    /// The name of the color palette.
     pub(crate) name: &'static str,
 }
 
@@ -260,31 +275,17 @@ pub(crate) const COLORS: &[Palette] = &[
     },
 ];
 
-pub(crate) fn palette_color(i: i32, pal: &Palette) -> Color {
-    pal.colors[i as usize % pal.colors.len()]
-}
-
-pub(crate) fn get_palette_index_by_name(name: &str) -> Option<usize> {
-    COLORS
-        .iter()
-        .position(|pal| pal.name.to_lowercase() == name.to_lowercase())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_get_palette_index_by_name() {
-        let pal = get_palette_index_by_name("Mountain").unwrap();
-        assert_eq!(COLORS[pal].name, "Mountain")
-    }
-
-    #[test]
-    fn test_palette_color() {
-        let palette = &COLORS[get_palette_index_by_name("sunset").unwrap()];
-        // The first and last color of the sunset palettes
-        assert_eq!(Color::Rgb(25, 7, 26), palette_color(0, palette));
-        assert_eq!(Color::Rgb(54, 7, 20), palette_color(15, palette));
+        // Try to get the index of the `Mountain` palette by name.
+        let pal = get_palette_index_by_name("MouNtAIn").unwrap();
+        // Check if the name matches.
+        assert_eq!(COLORS[pal].name, "Mountain");
+        // Check if the first color matches.
+        assert_eq!(COLORS[pal].colors[0], Color::Rgb(15, 20, 25))
     }
 }

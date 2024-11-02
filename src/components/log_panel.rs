@@ -1,3 +1,5 @@
+//! Contains the `LogPanel` widget.
+
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{KeyCode, MouseEvent},
@@ -9,24 +11,25 @@ use tui_markup::compile_with;
 use tui_scrollview::ScrollView;
 
 use crate::{
-    app::AppState,
     helpers::{markup::get_ratatui_generator, Focus},
+    AppState,
 };
 
 pub(crate) struct LogPanel<'a> {
-    app_state: &'a AppState,
+    state: &'a AppState,
 }
+
 impl<'a> LogPanel<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] =
         &["ScrollUp[k/up]", "ScrollDown[j/down]"];
-    pub(crate) fn new(app_state: &'a AppState) -> Self {
-        Self { app_state }
+    pub(crate) fn new(state: &'a AppState) -> Self {
+        Self { state }
     }
     pub(crate) fn handle_mouse_event(app: &mut AppState, _event: MouseEvent) {
         app.focused = Focus::LogPanel;
     }
-    pub(crate) fn handle_event(app_state: &mut AppState, code: KeyCode) {
-        let mut scroll_state = app_state.log_panel_scroll_state.lock().unwrap();
+    pub(crate) fn handle_event(state: &mut AppState, code: KeyCode) {
+        let mut scroll_state = state.log_panel_scroll_state.lock().unwrap();
         match code {
             KeyCode::Up | KeyCode::Char('k') => scroll_state.scroll_up(),
             KeyCode::Down | KeyCode::Char('j') => scroll_state.scroll_down(),
@@ -39,7 +42,7 @@ impl<'a> LogPanel<'a> {
 
 impl<'a> Widget for LogPanel<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let block_style = Style::default().fg(if self.app_state.focused == Focus::LogPanel {
+        let block_style = Style::default().fg(if self.state.focused == Focus::LogPanel {
             Color::LightBlue
         } else {
             Color::DarkGray
@@ -54,8 +57,7 @@ impl<'a> Widget for LogPanel<'a> {
         let area = area.inner(Margin::new(1, 1));
 
         // Vec storing each paragraph
-        let mut lines: Vec<(Paragraph, Rect)> =
-            Vec::with_capacity(self.app_state.log_messages.len());
+        let mut lines: Vec<(Paragraph, Rect)> = Vec::with_capacity(self.state.log_messages.len());
 
         // -2 -> Space for the scrollbar on the right and some padding
         let para_width = area.width - 2;
@@ -66,7 +68,7 @@ impl<'a> Widget for LogPanel<'a> {
         // The height of all the paragraphs
         let mut scrollable_height = 0u16;
 
-        for message in &self.app_state.log_messages {
+        for message in &self.state.log_messages {
             // Create a ganerator with custom tags
             let gen = get_ratatui_generator();
             // Create a paragraph, using the generator to parse markup syntax
@@ -134,7 +136,7 @@ impl<'a> Widget for LogPanel<'a> {
             scroll_view.render_widget(line.0, line.1);
         }
 
-        let state = &mut self.app_state.log_panel_scroll_state.lock().unwrap();
+        let state = &mut self.state.log_panel_scroll_state.lock().unwrap();
         scroll_view.render(area, buf, state);
     }
 }

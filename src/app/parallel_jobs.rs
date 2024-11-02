@@ -1,32 +1,65 @@
-use super::AppState;
+use chrono::Utc;
+use image::ImageBuffer;
+use ratatui::style::Color;
 
-pub(crate) trait ParallelJob {
-    fn run(&self, app: &mut AppState) -> bool;
-}
+use crate::{app_state::DivergMatrix, helpers::Vec2, AppState};
+
+const LINES_PER_PASS: i32 = 64;
 
 #[derive(Clone)]
-pub(crate) struct Screenshot {}
+pub(crate) struct Screenshot {
+    size: Vec2<i32>,
+    current_line: i32,
+    diverg_matrix: DivergMatrix,
+}
 impl Screenshot {
-    pub(crate) fn new() -> Self {
-        Self {}
+    pub(crate) fn new(size: Vec2<i32>) -> Self {
+        Self {
+            size,
+            current_line: 0,
+            diverg_matrix: Default::default(),
+        }
     }
 }
-impl ParallelJob for Screenshot {
-    fn run(&self, state: &mut AppState) -> bool {
-        // let diverg_matrix = app.get_diverg_matrix(Vec2::new(CAP_W as i32, CAP_H as i32));
-        // let buf = ImageBuffer::from_fn(CAP_W, CAP_H, |x, y| {
-        //     let color = app.color_from_div(&diverg_matrix[y as usize][x as usize]);
-        //     if let RatatuiColor::Rgb(r, g, b) = color {
-        //         image::Rgb([r, g, b])
-        //     } else {
-        //         image::Rgb([0, 0, 0])
-        //     }
-        // });
-        // let _ = buf.save_with_format("a.png", image::ImageFormat::Png);
+impl Screenshot {
+    pub(crate) fn run(&mut self, state: &mut AppState) -> bool {
+        let _current_line = self.size.y.min(self.current_line + LINES_PER_PASS);
 
-        // for now the screenshot jobs just return true
-        // to indicate that it has finished, without doing anything
-        state.log_error("The capture command is under development and for now not available.");
-        true
+        self.diverg_matrix.append(&mut state.get_diverg_lines(
+            &self.size,
+            self.current_line,
+            _current_line - 1,
+        ));
+
+        if _current_line >= self.size.y - 1 {
+            let buf = ImageBuffer::from_fn(self.size.x as u32, self.size.y as u32, |x, y| {
+                let color = state.color_from_div(&self.diverg_matrix[y as usize][x as usize]);
+                if let Color::Rgb(r, g, b) = color {
+                    image::Rgb([r, g, b])
+                } else {
+                    image::Rgb([0, 0, 0])
+                }
+            });
+            let filename = format!(
+                "{}{}.png",
+                state.render_settings.get_frac_obj().name,
+                Utc::now().timestamp()
+            );
+
+            let _ = buf.save_with_format(&filename, image::ImageFormat::Png);
+
+            state.log_success(format!(
+                "Screenshot ({}x{}) saved to <acc {}>",
+                self.size.x, self.size.y, filename
+            ));
+
+            return true;
+        }
+        self.current_line = _current_line;
+        state.log_info(format!(
+            "Screenshot progression: [<acc {}%>]",
+            self.current_line * 100 / self.size.y
+        ));
+        false
     }
 }

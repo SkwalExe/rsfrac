@@ -1,15 +1,12 @@
-use crate::{
-    app::AppState,
-    colors::{get_palette_index_by_name, COLORS},
-};
-
+use crate::colors::{get_palette_index_by_name, COLORS};
+use crate::AppState;
 use super::Command;
 
-pub(crate) fn execute_color(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) {
     if args.is_empty() {
-        app_state.log_raw(format!(
+        state.log_raw(format!(
             "Current colors: <acc {}>\nAvailable colors: {}",
-            app_state.get_palette().name,
+            state.get_palette().name,
             COLORS
                 .iter()
                 .map(|col| format!("<acc {}>", col.name))
@@ -21,11 +18,11 @@ pub(crate) fn execute_color(app_state: &mut AppState, args: Vec<&str>) {
 
     let palette = get_palette_index_by_name(args[0]);
     match palette {
-        None => app_state.log_error(format!("Could not find palette: <red {}>", args[0])),
+        None => state.log_error(format!("Could not find palette: <red {}>", args[0])),
         Some(pal) => {
-            app_state.palette_index = pal;
-            app_state.log_success(format!("Selected color scheme: <acc {}>", COLORS[pal].name,));
-            app_state.redraw_canvas = true
+            state.palette_index = pal;
+            state.log_success(format!("Selected color scheme: <acc {}>", COLORS[pal].name,));
+            state.redraw_canvas = true
         }
     }
 }

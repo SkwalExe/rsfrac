@@ -1,9 +1,11 @@
+//! Contains the Julia set rendering information.
+
 use std::ops::AddAssign;
 
 use rug::ops::{CompleteRound, PowAssign};
 use rug::Complex;
 
-use crate::app::RenderSettings;
+use crate::frac_logic::RenderSettings;
 use crate::fractals::Fractal;
 
 /// Implement the formula for the julia set,

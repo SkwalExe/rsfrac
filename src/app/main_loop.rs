@@ -1,14 +1,14 @@
+use ratatui::{
+    crossterm::event::{self, Event, KeyEventKind},
+    DefaultTerminal,
+};
 use std::{
     io,
     time::{Duration, Instant},
 };
 
-use ratatui::{
-    crossterm::event::{self, Event, KeyEventKind},
-    DefaultTerminal,
-};
+use crate::{frac_logic::CanvasCoords, helpers::Chunks, App};
 
-use super::{fractal_logic::CanvasCoords, parallel_jobs::ParallelJob, App};
 const FRAME_DELAY: i32 = 100;
 
 impl App {
@@ -19,13 +19,14 @@ impl App {
             let start = Instant::now();
 
             term.draw(|frame| {
-                self.build_chunks(frame.area());
+                self.chunks = Chunks::from(frame.area());
 
                 self.app_state.render_settings.canvas_size = CanvasCoords::new(
-                    self.chunks.canvas_inner.width,
-                    self.chunks.canvas_inner.height * 2,
+                    self.chunks.canvas_inner().width,
+                    self.chunks.canvas_inner().height * 2,
                 );
 
+                // TODO: Do this before starting the main loop
                 // We need to already know the canvas size to set the correct initial cell size
                 // and render the canvas for the first time
                 if self.app_state.render_settings.cell_size == 0 {
@@ -47,7 +48,7 @@ impl App {
                 && start.elapsed().as_millis() < FRAME_DELAY as u128
             {
                 self.parallel_jobs
-                    .retain(|job| !job.run(&mut self.app_state));
+                    .retain_mut(|job| !job.run(&mut self.app_state));
             }
 
             let delay = 0.max(FRAME_DELAY - start.elapsed().as_millis() as i32) as u64;

@@ -1,3 +1,6 @@
+//! Contains the ratatui and ansi markup generator logic.
+// LATER: Find a way to remove the repetition here...
+
 use ansi_term::{Color as ANSIColor, Style as ANSIStyle};
 use ratatui::style::{Color, Style};
 use tui_markup::generator::{ANSIStringsGenerator, RatatuiTextGenerator};
@@ -8,6 +11,7 @@ const GREEN: MyOwnColorType = MyOwnColorType(88, 224, 178);
 const DIM: MyOwnColorType = MyOwnColorType(42, 42, 42);
 const COMMAND_BG: MyOwnColorType = MyOwnColorType(34, 40, 39);
 const COMMAND_FG: MyOwnColorType = MyOwnColorType(217, 214, 207);
+const BLACK: MyOwnColorType = MyOwnColorType(0, 0, 0);
 
 struct MyOwnColorType(u8, u8, u8);
 
@@ -23,6 +27,7 @@ impl From<MyOwnColorType> for ANSIColor {
     }
 }
 
+/// Returns an markup generator for ansi output.
 pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSIStyle>> {
     ANSIStringsGenerator::new(|tag: &str| match tag {
         "acc" => Some(ANSIStyle::default().fg(ACCENT_COLOR.into())),
@@ -30,7 +35,7 @@ pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSI
         "bgred" => Some(ANSIStyle::default().on(RED.into())),
         "red" => Some(ANSIStyle::default().fg(RED.into())),
         "green" => Some(ANSIStyle::default().fg(GREEN.into())),
-        "bggreen" => Some(ANSIStyle::default().on(GREEN.into())),
+        "bggreen" => Some(ANSIStyle::default().fg(BLACK.into()).on(GREEN.into())),
         "command" => Some(
             ANSIStyle::default()
                 .fg(COMMAND_FG.into())
@@ -41,6 +46,7 @@ pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSI
     })
 }
 
+/// Returns a markup generator for ratatui widget output.
 pub fn get_ratatui_generator() -> RatatuiTextGenerator<impl Fn(&str) -> Option<Style>> {
     RatatuiTextGenerator::new(|tag: &str| match tag {
         "acc" => Some(Style::default().fg(ACCENT_COLOR.into())),
@@ -48,7 +54,7 @@ pub fn get_ratatui_generator() -> RatatuiTextGenerator<impl Fn(&str) -> Option<S
         "bgred" => Some(Style::default().bg(RED.into())),
         "red" => Some(Style::default().fg(RED.into())),
         "green" => Some(Style::default().fg(GREEN.into())),
-        "bggreen" => Some(Style::default().bg(GREEN.into())),
+        "bggreen" => Some(Style::default().fg(BLACK.into()).bg(GREEN.into())),
         "command" => Some(Style::default().fg(COMMAND_FG.into()).bg(COMMAND_BG.into())),
         "dim" => Some(Style::default().fg(DIM.into())),
         _ => None,

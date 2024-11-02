@@ -1,17 +1,37 @@
-mod julia;
-mod mandelbrot;
-pub(crate) use julia::JULIA;
-pub(crate) use mandelbrot::MANDELBROT;
 use rug::Complex;
 
-use crate::app::RenderSettings;
+mod julia;
+mod mandelbrot;
+
+pub(crate) use julia::JULIA;
+pub(crate) use mandelbrot::MANDELBROT;
 
 pub(crate) type FractalClos = &'static dyn Fn(Complex, &RenderSettings) -> i32;
+
+use crate::frac_logic::RenderSettings;
+
+
+/// Represents a fractal type.
 pub(crate) struct Fractal {
+    /// A closure that takes in `RenderSettings`, a complex and
+    /// returns the number of iterations before it diverged,
+    /// and `-1` if it reached the maximum number of iterations.
     pub(crate) get: FractalClos,
+    /// The fractal display name.
     pub(crate) name: &'static str,
+    /// Some details to display about the fractal (formula, etc).
     pub(crate) details: &'static str,
+    /// The default position of the canvas when first rendering the fractal.
     pub(crate) default_pos: (f64, f64),
+}
+
+impl RenderSettings {
+    /// Returns the index of a fractal which name matches, or `None`.
+    pub(crate) fn get_frac_index_by_name(&self, name: &str) -> Option<usize> {
+        FRACTALS
+            .iter()
+            .position(|f| f.name.to_lowercase() == name.to_lowercase())
+    }
 }
 
 pub(crate) const FRACTALS: &[Fractal] = &[MANDELBROT, JULIA];
