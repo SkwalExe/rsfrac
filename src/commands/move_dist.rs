@@ -1,19 +1,19 @@
-use crate::app::AppState;
+use crate::AppState;
 
 use super::{command_increment::command_increment, Command};
 pub(crate) const MIN_MOVE_DIST: i32 = 1;
 pub(crate) const MAX_MOVE_DIST: i32 = 100;
 
-pub(crate) fn execute_move_dist(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_move_dist(state: &mut AppState, args: Vec<&str>) {
     if let Some(val) = command_increment(
-        app_state,
-        app_state.move_dist,
+        state,
+        state.move_dist,
         args,
         MIN_MOVE_DIST,
         MAX_MOVE_DIST,
     ) {
-        app_state.move_dist = val;
-        app_state.redraw_canvas = true;
+        state.move_dist = val;
+        state.redraw_canvas = true;
     }
 }
 pub(crate) const MOVE_DIST: Command = Command {

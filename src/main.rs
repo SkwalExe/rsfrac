@@ -2,7 +2,7 @@ use ratatui::crossterm::{
     event::{DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture},
     execute,
 };
-use rsfrac::app::App;
+use rsfrac::App;
 use std::io::{self, stdout};
 
 fn main() -> io::Result<()> {

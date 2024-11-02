@@ -1,9 +1,8 @@
-use crate::{app::AppState, app::VERSION};
-
+use crate::{AppState, VERSION};
 use super::Command;
 
-pub(crate) fn execute_version(app_state: &mut AppState, _args: Vec<&str>) {
-    app_state.log_info_title(
+pub(crate) fn execute_version(state: &mut AppState, _args: Vec<&str>) {
+    state.log_info_title(
         "Rsfrac version",
         format!("Rsfrac is running version <acc {}>", VERSION),
     )

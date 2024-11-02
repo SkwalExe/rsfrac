@@ -1,7 +1,9 @@
+//! Contains the Mandelbrot set rendering information.
+
 use rug::ops::{CompleteRound, Pow};
 use rug::Complex;
 
-use crate::app::RenderSettings;
+use crate::frac_logic::RenderSettings;
 use crate::fractals::Fractal;
 
 /// Implement the formula for the mandelbrot set,

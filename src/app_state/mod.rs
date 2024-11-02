@@ -1,23 +1,24 @@
+use rand::{thread_rng, Rng};
+use rayon::prelude::*;
+use ratatui::style::Color;
 use std::sync::Mutex;
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
+mod stats;
+pub(crate) use stats::Stats;
+
 use crate::{
+    app::Screenshot,
     colors::{self, Palette},
     commands::{
         max_iter::{MAX_MAX_ITER, MIN_MAX_ITER},
         prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
     },
-    components::{canvas::Canvas, input::Input, log_panel::LogPanel},
-    helpers::{Focus, ZoomDirection},
+    components::{Canvas, Input, LogPanel},
+    frac_logic::{CanvasCoords, RenderSettings},
+    helpers::{void_fills, Focus, Vec2, VoidFill, ZoomDirection},
 };
-
-use super::{
-    fractal_logic::CanvasCoords, logging::VERSION, parallel_jobs::Screenshot, stats::Stats,
-    RenderSettings,
-};
-
-const LOG_MESSAGE_LIMIT: usize = 500;
 
 pub(crate) struct AppState {
     pub(crate) redraw_canvas: bool,
@@ -58,8 +59,77 @@ impl Default for AppState {
         }
     }
 }
+const BLACK: Color = Color::Rgb(0, 0, 0);
+const WHITE: Color = Color::Rgb(255, 255, 255);
+
+pub(crate) type DivergMatrix = Vec<Vec<i32>>;
 
 impl AppState {
+    /// Returns divergence lines from `first_line` to `last_line` included.
+    pub(crate) fn get_diverg_lines(
+        &self,
+        size: &Vec2<i32>,
+        first_line: i32,
+        last_line: i32,
+    ) -> DivergMatrix {
+        // Get the canvas coordinates of each row
+        let half_x = size.x / 2;
+        let half_y = size.y / 2;
+        let cell_size = self.render_settings.get_plane_wid() / size.x;
+        let render_settings = &self.render_settings;
+
+        (-half_y + first_line..=-half_y + last_line)
+            .into_par_iter()
+            .map(|y| {
+                (-half_x..=-half_x + size.x)
+                    .into_par_iter()
+                    .map(|x| {
+                        (render_settings.get_frac_clos())(
+                            render_settings
+                                .coord_to_c_with_cell_size(CanvasCoords::new(x, y), &cell_size),
+                            render_settings,
+                        )
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+    /// Returns a divergence matrix of the specified size.
+    pub(crate) fn get_diverg_matrix(&self, size: Vec2<i32>) -> DivergMatrix {
+        let last_line = size.y - 1;
+        self.get_diverg_lines(&size, 0, last_line)
+    }
+    pub(crate) fn get_palette(&self) -> &'static Palette {
+        &colors::COLORS[self.palette_index]
+    }
+    pub(crate) fn color_from_div(&self, diverg: &i32) -> Color {
+        let palette = self.get_palette();
+        let mut rng = thread_rng();
+        let void_fills_ = void_fills();
+
+        if *diverg == -1 {
+            // Return void color
+
+            match void_fills_[self.void_fill_index] {
+                VoidFill::Transparent => Color::Reset,
+                VoidFill::Black => BLACK,
+                VoidFill::White => WHITE,
+                VoidFill::ColorScheme => {
+                    colors::palette_color(*diverg + self.color_scheme_offset, palette)
+                }
+                VoidFill::RGBNoise => Color::Rgb(
+                    rng.gen_range(0..255),
+                    rng.gen_range(0..255),
+                    rng.gen_range(0..255),
+                ),
+                VoidFill::RedNoise => Color::Rgb(rng.gen_range(0..255), 0, 0),
+                VoidFill::GreenNoise => Color::Rgb(0, rng.gen_range(0..255), 0),
+                VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
+            }
+        } else {
+            colors::palette_color(*diverg + self.color_scheme_offset, palette)
+        }
+    }
     /// Return the text to display in the footer
     pub(crate) fn footer_text(&self) -> &'static [&'static str] {
         match self.focused {
@@ -105,55 +175,5 @@ impl AppState {
             ZoomDirection::In => self.render_settings.cell_size /= scaling_factor,
             ZoomDirection::Out => self.render_settings.cell_size *= scaling_factor,
         }
-    }
-    pub(crate) fn log_raw(&mut self, message: impl Into<String>) {
-        self.log_messages.push(message.into());
-        if self.log_messages.len() > LOG_MESSAGE_LIMIT {
-            self.log_messages.remove(0);
-        }
-        let state = &mut self.log_panel_scroll_state.lock().unwrap();
-        state.scroll_to_bottom();
-    }
-
-    pub(crate) fn log_success_title(
-        &mut self,
-        title: impl Into<String>,
-        message: impl Into<String>,
-    ) {
-        self.log_raw(format!("<bggreen  {} >\n{}", title.into(), message.into()))
-    }
-    pub(crate) fn log_success(&mut self, message: impl Into<String>) {
-        self.log_success_title("Success", message.into())
-    }
-    pub(crate) fn log_info_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
-        self.log_raw(format!("<bgacc  {} >\n{}", title.into(), message.into()))
-    }
-    pub(crate) fn log_info(&mut self, message: impl Into<String>) {
-        self.log_info_title("Info", message.into())
-    }
-
-    pub(crate) fn log_error(&mut self, message: impl Into<String>) {
-        self.log_error_title("Error", message);
-    }
-    pub(crate) fn log_error_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
-        self.log_raw(format!(
-            "<bgred  {} >\n<red {}>",
-            title.into(),
-            message.into()
-        ))
-    }
-
-    /// Print the initial log messages
-    pub(crate) fn initial_message(&mut self) {
-        self.log_raw(format!(
-            "<bgacc Welcome to Rsfrac v{VERSION}>\nAuthor: <acc Léopold Koprivnik>\nGithub Repo: <acc SkwalExe/rsfrac>",
-        ));
-        self.log_raw(
-            "If you are experiencing slow rendering, try to reduce the size of your terminal.",
-        );
-        self.log_raw("You can switch between the canvas, the log panel and the command input using <acc tab>. Use the <acc help> command for more information.");
-    }
-    pub(crate) fn get_palette(&self) -> &'static Palette {
-        &colors::COLORS[self.palette_index]
     }
 }

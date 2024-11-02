@@ -1,18 +1,16 @@
 use rug::{Assign, Float};
-
-use crate::app::AppState;
-
+use crate::AppState;
 use super::Command;
 
-pub(crate) fn execute_pos(app_state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
     // If no args are provided, show the current positino
     if args.is_empty() {
-        app_state.log_info_title(
+        state.log_info_title(
             "Current Position",
             format!(
                 "Real: {:e}\nImag: {:e}\n<green Use the following command to go back to the same position:>\n<command pos {0} {1} >",
-                app_state.render_settings.pos.real(),
-                app_state.render_settings.pos.imag()
+                state.render_settings.pos.real(),
+                state.render_settings.pos.imag()
             ),
         );
         return;
@@ -27,26 +25,26 @@ pub(crate) fn execute_pos(app_state: &mut AppState, args: Vec<&str>) {
     let parsed_imag = Float::parse(imag);
 
     if (set_real && parsed_real.is_err()) || (set_imag && parsed_imag.is_err()) {
-        app_state
+        state
             .log_error("The provided real and imaginary parts must be valid floats or <acc ~>.");
         return;
     }
 
     if set_real {
-        app_state
+        state
             .render_settings
             .pos
             .mut_real()
             .assign(parsed_real.unwrap());
     }
     if set_imag {
-        app_state
+        state
             .render_settings
             .pos
             .mut_imag()
             .assign(parsed_imag.unwrap());
     }
-    app_state.redraw_canvas = true;
+    state.redraw_canvas = true;
 }
 
 pub(crate) const POS: Command = Command {

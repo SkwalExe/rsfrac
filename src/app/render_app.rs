@@ -1,11 +1,10 @@
 use ratatui::{buffer::Buffer, layout::Rect, widgets::Widget, Frame};
 
 use crate::{
-    components::{canvas::Canvas, footer::Footer, input::Input, log_panel::LogPanel},
+    components::{Canvas, Footer, Input, LogPanel},
     helpers::Focus,
+    App,
 };
-
-use super::App;
 
 impl App {
     pub(crate) fn render_frame(&self, frame: &mut Frame) {
