@@ -1,10 +1,18 @@
+use std::sync::mpsc;
+
 use super::Command;
-use crate::{app::Screenshot, helpers::Vec2, AppState};
+use crate::{
+    app::{ScreenshotMaster, ScreenshotSlave},
+    helpers::Vec2,
+    AppState,
+};
 
 pub(crate) fn execute_capture(state: &mut AppState, _args: Vec<&str>) {
-    state
-        .requested_jobs
-        .push(Screenshot::new(Vec2::new(1920, 1080)))
+    let (tx, rx) = mpsc::channel();
+    let size = Vec2::new(1920, 1080);
+    let screenshot = ScreenshotSlave::new(size.clone(), tx, &state.render_settings);
+    let handle = ScreenshotSlave::start(screenshot);
+    state.requested_jobs.push(ScreenshotMaster::new(size, rx, handle));
 }
 
 pub(crate) const CAPTURE: Command = Command {

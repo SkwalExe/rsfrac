@@ -1,6 +1,3 @@
-use rand::{thread_rng, Rng};
-use rayon::prelude::*;
-use ratatui::style::Color;
 use std::sync::Mutex;
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
@@ -9,15 +6,14 @@ mod stats;
 pub(crate) use stats::Stats;
 
 use crate::{
-    app::Screenshot,
-    colors::{self, Palette},
+    app::ScreenshotMaster,
     commands::{
         max_iter::{MAX_MAX_ITER, MIN_MAX_ITER},
         prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
     },
     components::{Canvas, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
-    helpers::{void_fills, Focus, Vec2, VoidFill, ZoomDirection},
+    helpers::{Focus, ZoomDirection},
 };
 
 pub(crate) struct AppState {
@@ -31,11 +27,8 @@ pub(crate) struct AppState {
     pub(crate) marker: Option<CanvasCoords>,
     pub(crate) move_dist: i32,
     pub(crate) scaling_factor: i32,
-    pub(crate) palette_index: usize,
-    pub(crate) color_scheme_offset: i32,
-    pub(crate) void_fill_index: usize,
     pub(crate) render_settings: RenderSettings,
-    pub(crate) requested_jobs: Vec<Screenshot>,
+    pub(crate) requested_jobs: Vec<ScreenshotMaster>,
 }
 
 impl Default for AppState {
@@ -52,84 +45,12 @@ impl Default for AppState {
             scaling_factor: 20,
             move_dist: 8,
             marker: Default::default(),
-            color_scheme_offset: Default::default(),
-            palette_index: 0,
-            void_fill_index: Default::default(),
             requested_jobs: Default::default(),
         }
     }
 }
-const BLACK: Color = Color::Rgb(0, 0, 0);
-const WHITE: Color = Color::Rgb(255, 255, 255);
-
-pub(crate) type DivergMatrix = Vec<Vec<i32>>;
 
 impl AppState {
-    /// Returns divergence lines from `first_line` to `last_line` included.
-    pub(crate) fn get_diverg_lines(
-        &self,
-        size: &Vec2<i32>,
-        first_line: i32,
-        last_line: i32,
-    ) -> DivergMatrix {
-        // Get the canvas coordinates of each row
-        let half_x = size.x / 2;
-        let half_y = size.y / 2;
-        let cell_size = self.render_settings.get_plane_wid() / size.x;
-        let render_settings = &self.render_settings;
-
-        (-half_y + first_line..=-half_y + last_line)
-            .into_par_iter()
-            .map(|y| {
-                (-half_x..=-half_x + size.x)
-                    .into_par_iter()
-                    .map(|x| {
-                        (render_settings.get_frac_clos())(
-                            render_settings
-                                .coord_to_c_with_cell_size(CanvasCoords::new(x, y), &cell_size),
-                            render_settings,
-                        )
-                    })
-                    .collect()
-            })
-            .collect()
-    }
-    /// Returns a divergence matrix of the specified size.
-    pub(crate) fn get_diverg_matrix(&self, size: Vec2<i32>) -> DivergMatrix {
-        let last_line = size.y - 1;
-        self.get_diverg_lines(&size, 0, last_line)
-    }
-    pub(crate) fn get_palette(&self) -> &'static Palette {
-        &colors::COLORS[self.palette_index]
-    }
-    pub(crate) fn color_from_div(&self, diverg: &i32) -> Color {
-        let palette = self.get_palette();
-        let mut rng = thread_rng();
-        let void_fills_ = void_fills();
-
-        if *diverg == -1 {
-            // Return void color
-
-            match void_fills_[self.void_fill_index] {
-                VoidFill::Transparent => Color::Reset,
-                VoidFill::Black => BLACK,
-                VoidFill::White => WHITE,
-                VoidFill::ColorScheme => {
-                    colors::palette_color(*diverg + self.color_scheme_offset, palette)
-                }
-                VoidFill::RGBNoise => Color::Rgb(
-                    rng.gen_range(0..255),
-                    rng.gen_range(0..255),
-                    rng.gen_range(0..255),
-                ),
-                VoidFill::RedNoise => Color::Rgb(rng.gen_range(0..255), 0, 0),
-                VoidFill::GreenNoise => Color::Rgb(0, rng.gen_range(0..255), 0),
-                VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
-            }
-        } else {
-            colors::palette_color(*diverg + self.color_scheme_offset, palette)
-        }
-    }
     /// Return the text to display in the footer
     pub(crate) fn footer_text(&self) -> &'static [&'static str] {
         match self.focused {

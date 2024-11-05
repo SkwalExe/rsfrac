@@ -1,12 +1,12 @@
+use super::Command;
 use crate::colors::{get_palette_index_by_name, COLORS};
 use crate::AppState;
-use super::Command;
 
 pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) {
     if args.is_empty() {
         state.log_raw(format!(
             "Current colors: <acc {}>\nAvailable colors: {}",
-            state.get_palette().name,
+            state.render_settings.get_palette().name,
             COLORS
                 .iter()
                 .map(|col| format!("<acc {}>", col.name))
@@ -20,7 +20,7 @@ pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) {
     match palette {
         None => state.log_error(format!("Could not find palette: <red {}>", args[0])),
         Some(pal) => {
-            state.palette_index = pal;
+            state.render_settings.palette_index = pal;
             state.log_success(format!("Selected color scheme: <acc {}>", COLORS[pal].name,));
             state.redraw_canvas = true
         }

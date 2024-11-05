@@ -4,7 +4,7 @@ use rug::Float;
 use crate::frac_logic::RenderSettings;
 
 /// Groups statistics about the last render pass.
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub(crate) struct Stats {
     /// The average divergence.
     pub(crate) avg_diverg: f64,
