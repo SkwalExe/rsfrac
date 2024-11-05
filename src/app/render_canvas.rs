@@ -14,7 +14,7 @@ impl App {
 
         self.points = HashMap::default();
 
-        let line_divergs = self.app_state.get_diverg_matrix(Vec2::new(
+        let line_divergs = self.app_state.render_settings.get_diverg_matrix(&Vec2::new(
             self.app_state.render_settings.canvas_size.x,
             self.app_state.render_settings.canvas_size.y,
         ));
@@ -26,7 +26,7 @@ impl App {
             for (x, diverg) in line.iter().enumerate() {
                 let x: i32 = x.try_into().unwrap();
 
-                let color = self.app_state.color_from_div(diverg);
+                let color = self.app_state.render_settings.color_from_div(diverg);
                 self.points
                     .entry(color)
                     .or_default()

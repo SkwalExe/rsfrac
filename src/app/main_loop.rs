@@ -7,9 +7,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::{frac_logic::CanvasCoords, helpers::Chunks, App};
+use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Chunks, App};
 
-const FRAME_DELAY: i32 = 100;
+/// The delay listening for key events before each terminal redraw.
+const FRAME_DELAY: i32 = 80;
 
 impl App {
     /// Run the main application loop, perform rendering and event passing
@@ -44,14 +45,37 @@ impl App {
                 self.parallel_jobs.push(requested_job);
             }
 
-            while !self.parallel_jobs.is_empty()
-                && start.elapsed().as_millis() < FRAME_DELAY as u128
-            {
-                self.parallel_jobs
-                    .retain_mut(|job| !job.run(&mut self.app_state));
-            }
+            // Cycle through all the running jobs, non-blockingly handle messages
+            // and remove finished ones.
+            self.parallel_jobs.retain_mut(|job| {
+                for message in job.receiver.try_iter() {
+                    match message {
+                        SlaveMessage::LineRender => {
+                            job.rendered_lines += 1;
+                        }
+                        SlaveMessage::JobFinished => {
+                            let result = job.handle.take().unwrap().join().unwrap();
+                            job.finished(&mut self.app_state, result);
+                            return false;
+                        }
+                    }
 
+                    // Overwrite the latest log message to the current progression
+                    // TODO: Create a floating pane for this instead.
+                    // WARN: This will override any message
+                    // sent to the log panel after the job creation
+                    // and panic when using `clear`
+                    *self.app_state.log_messages.last_mut().unwrap() = format!(
+                        "Screenshot progression: <command {:?}%>",
+                        job.rendered_lines * 100 / job.size.y
+                    );
+                }
+                true
+            });
+
+            // Try not to sleep if the previous operations took some time.
             let delay = 0.max(FRAME_DELAY - start.elapsed().as_millis() as i32) as u64;
+
             // Wait 100ms for event and handle it
             if event::poll(Duration::from_millis(delay)).unwrap() {
                 // Catch the event

@@ -145,28 +145,33 @@ impl<'a> Canvas<'a> {
             }
             // Increment the color palette index
             KeyCode::Char('c') => {
-                state.palette_index = (state.palette_index + 1) % colors::COLORS.len();
+                state.render_settings.palette_index =
+                    (state.render_settings.palette_index + 1) % colors::COLORS.len();
             }
             // Todo: remove duplication for + and -
             // Increment color scheme offset
             KeyCode::Char('-') => {
-                state.color_scheme_offset =
-                    (state.color_scheme_offset + state.get_palette().colors.len() as i32 - 1)
-                        % state.get_palette().colors.len() as i32
+                state.render_settings.color_scheme_offset =
+                    (state.render_settings.color_scheme_offset
+                        + state.render_settings.get_palette().colors.len() as i32
+                        - 1)
+                        % state.render_settings.get_palette().colors.len() as i32
             }
             // Increment color scheme offset
             KeyCode::Char('+') => {
-                state.color_scheme_offset =
-                    (state.color_scheme_offset + 1) % state.get_palette().colors.len() as i32
+                state.render_settings.color_scheme_offset =
+                    (state.render_settings.color_scheme_offset + 1)
+                        % state.render_settings.get_palette().colors.len() as i32
             }
             // Cycle through the void fills
             KeyCode::Char('v') => {
-                state.void_fill_index = (state.void_fill_index + 1) % void_fills().len();
+                state.render_settings.void_fill_index =
+                    (state.render_settings.void_fill_index + 1) % void_fills().len();
                 state.log_info_title(
                     "Void Fill",
                     format!(
                         "Void fill is now: <acc {}>",
-                        void_fills()[state.void_fill_index]
+                        void_fills()[state.render_settings.void_fill_index]
                     ),
                 )
             }
@@ -203,11 +208,18 @@ impl<'a> Widget for Canvas<'a> {
                 Line::from(format!("AvgDiv[{:.2}]", self.state.stats.avg_diverg)).left_aligned(),
             )
             .title_bottom(
-                Line::from(format!("PalOffset[{}]", self.state.color_scheme_offset))
-                    .right_aligned(),
+                Line::from(format!(
+                    "PalOffset[{}]",
+                    self.state.render_settings.color_scheme_offset
+                ))
+                .right_aligned(),
             )
             .title_bottom(
-                Line::from(format!("Colors[{}]", self.state.get_palette().name)).right_aligned(),
+                Line::from(format!(
+                    "Colors[{}]",
+                    self.state.render_settings.get_palette().name
+                ))
+                .right_aligned(),
             )
             .title_bottom(
                 Line::from(format!("HighDiv[{}]", self.state.stats.highest_diverg)).left_aligned(),
