@@ -35,6 +35,10 @@ impl<'a> LogPanel<'a> {
             KeyCode::Down | KeyCode::Char('j') => scroll_state.scroll_down(),
             KeyCode::Left | KeyCode::Char('h') => scroll_state.scroll_left(),
             KeyCode::Right | KeyCode::Char('l') => scroll_state.scroll_right(),
+            KeyCode::End => scroll_state.scroll_to_bottom(),
+            KeyCode::Home => scroll_state.scroll_to_top(),
+            KeyCode::PageUp => scroll_state.scroll_page_up(),
+            KeyCode::PageDown => scroll_state.scroll_page_down(),
             _ => {}
         }
     }
