@@ -27,6 +27,7 @@ pub(crate) struct Canvas<'a> {
 
 impl<'a> Canvas<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
+        "Move[arrow/Vim keys]",
         "Zoom-[s]",
         "Zoom+[d]",
         "PalOffset+[+]",
@@ -75,7 +76,7 @@ impl<'a> Canvas<'a> {
         match code {
             // When H is pressed move the position of the canvas
             // to the left by r times the cell size.
-            KeyCode::Char('h') => {
+            KeyCode::Char('h') | KeyCode::Left => {
                 state
                     .render_settings
                     .pos
@@ -87,7 +88,7 @@ impl<'a> Canvas<'a> {
             }
             // When L is pressed move the position of the canvas
             // to the right by n times the cell size.
-            KeyCode::Char('l') => {
+            KeyCode::Char('l') | KeyCode::Right => {
                 state
                     .render_settings
                     .pos
@@ -99,7 +100,7 @@ impl<'a> Canvas<'a> {
             }
             // When J is pressed move the position of the canvas
             // down by n times the cell size.
-            KeyCode::Char('j') => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 state
                     .render_settings
                     .pos
@@ -111,7 +112,7 @@ impl<'a> Canvas<'a> {
             }
             // When K is pressed move the position of the canvas
             // up by n times the cell size.
-            KeyCode::Char('k') => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 state
                     .render_settings
                     .pos
