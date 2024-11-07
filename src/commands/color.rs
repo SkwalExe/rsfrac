@@ -22,7 +22,7 @@ pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) {
         Some(pal) => {
             state.render_settings.palette_index = pal;
             state.log_success(format!("Selected color scheme: <acc {}>", COLORS[pal].name,));
-            state.redraw_canvas = true
+            state.request_repaint();
         }
     }
 }

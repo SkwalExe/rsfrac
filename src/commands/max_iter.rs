@@ -13,7 +13,7 @@ pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) {
         MAX_MAX_ITER,
     ) {
         state.render_settings.max_iter = val;
-        state.redraw_canvas = true;
+        state.request_redraw();
     }
 }
 pub(crate) const MAX_ITER: Command = Command {

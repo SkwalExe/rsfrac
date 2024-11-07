@@ -33,7 +33,8 @@ impl App {
                 if self.app_state.render_settings.cell_size == 0 {
                     self.app_state.render_settings.reset_cell_size();
                 }
-                if self.app_state.redraw_canvas {
+
+                if self.app_state.redraw_canvas || self.app_state.repaint_canvas {
                     self.render_canvas();
                 }
 
@@ -91,7 +92,7 @@ impl App {
                         }
                     }
                     Event::Paste(text) => self.handle_paste(text),
-                    Event::Resize(_, _) => self.app_state.redraw_canvas = true,
+                    Event::Resize(_, _) => self.app_state.request_redraw(),
                     Event::Mouse(mouse_ev) => self.handle_mouse_event(mouse_ev),
                     _ => {}
                 }

@@ -44,7 +44,7 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
             .mut_imag()
             .assign(parsed_imag.unwrap());
     }
-    state.redraw_canvas = true;
+    state.request_redraw();
 }
 
 pub(crate) const POS: Command = Command {
