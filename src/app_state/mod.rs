@@ -18,6 +18,7 @@ use crate::{
 
 pub(crate) struct AppState {
     pub(crate) redraw_canvas: bool,
+    pub(crate) repaint_canvas: bool,
     pub(crate) stats: Stats,
     pub(crate) focused: Focus,
     pub(crate) quit: bool,
@@ -36,6 +37,7 @@ impl Default for AppState {
         Self {
             stats: Default::default(),
             redraw_canvas: true,
+            repaint_canvas: true,
             quit: false,
             focused: Default::default(),
             command_input: Default::default(),
@@ -51,6 +53,15 @@ impl Default for AppState {
 }
 
 impl AppState {
+    /// Only repaint the canvas without generating a new divergence matrix.
+    pub(crate) fn request_repaint(&mut self) {
+        self.repaint_canvas = true;
+    }
+    /// Update the divergence matrix and repaint the canvas.
+    pub(crate) fn request_redraw(&mut self) {
+        self.redraw_canvas = true;
+        self.request_repaint();
+    }
     /// Return the text to display in the footer
     pub(crate) fn footer_text(&self) -> &'static [&'static str] {
         match self.focused {
@@ -63,7 +74,7 @@ impl AppState {
     pub(crate) fn increment_max_iter(&mut self, increment: i32) {
         let new_max_iter = self.render_settings.max_iter.saturating_add(increment);
         self.render_settings.max_iter = MIN_MAX_ITER.max(MAX_MAX_ITER.min(new_max_iter));
-        self.redraw_canvas = true;
+        self.request_redraw();
     }
     /// Increment positively or negatively the decimal precision,
     /// and update the precision of existing numeric values.
@@ -80,7 +91,7 @@ impl AppState {
             .set_prec(self.render_settings.prec);
 
         // Ask for canvas redraw
-        self.redraw_canvas = true;
+        self.request_redraw();
     }
     pub(crate) fn zoom_at(&mut self, pos: CanvasCoords, direction: ZoomDirection) {
         let inintial_c_pos = self.render_settings.coord_to_c(pos.clone());

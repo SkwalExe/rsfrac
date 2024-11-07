@@ -13,7 +13,7 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) {
         MAX_DECIMAL_PREC,
     ) {
         state.render_settings.prec = val;
-        state.redraw_canvas = true;
+        state.request_redraw();
     }
 }
 pub(crate) const PREC: Command = Command {

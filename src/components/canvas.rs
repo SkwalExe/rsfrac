@@ -69,7 +69,7 @@ impl<'a> Canvas<'a> {
             _ => {}
         }
 
-        state.redraw_canvas = true;
+        state.request_repaint();
     }
 
     pub(crate) fn handle_key_code(state: &mut AppState, code: KeyCode) {
@@ -148,6 +148,8 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('c') => {
                 state.render_settings.palette_index =
                     (state.render_settings.palette_index + 1) % colors::COLORS.len();
+                state.request_repaint();
+                return;
             }
             // Todo: remove duplication for + and -
             // Increment color scheme offset
@@ -156,13 +158,18 @@ impl<'a> Canvas<'a> {
                     (state.render_settings.color_scheme_offset
                         + state.render_settings.get_palette().colors.len() as i32
                         - 1)
-                        % state.render_settings.get_palette().colors.len() as i32
+                        % state.render_settings.get_palette().colors.len() as i32;
+
+                state.request_repaint();
+                return;
             }
             // Increment color scheme offset
             KeyCode::Char('+') => {
                 state.render_settings.color_scheme_offset =
                     (state.render_settings.color_scheme_offset + 1)
-                        % state.render_settings.get_palette().colors.len() as i32
+                        % state.render_settings.get_palette().colors.len() as i32;
+                state.request_repaint();
+                return;
             }
             // Cycle through the void fills
             KeyCode::Char('v') => {
@@ -174,7 +181,9 @@ impl<'a> Canvas<'a> {
                         "Void fill is now: <acc {}>",
                         void_fills()[state.render_settings.void_fill_index]
                     ),
-                )
+                );
+                state.request_repaint();
+                return;
             }
             // Increment the maximum divergence
             KeyCode::Char('o') => state.increment_max_iter(10),
@@ -187,7 +196,7 @@ impl<'a> Canvas<'a> {
         }
 
         // For now, all events need to redraw the canvas.
-        state.redraw_canvas = true;
+        state.request_redraw();
     }
 }
 impl<'a> Widget for Canvas<'a> {

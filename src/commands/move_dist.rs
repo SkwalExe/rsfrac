@@ -13,7 +13,6 @@ pub(crate) fn execute_move_dist(state: &mut AppState, args: Vec<&str>) {
         MAX_MOVE_DIST,
     ) {
         state.move_dist = val;
-        state.redraw_canvas = true;
     }
 }
 pub(crate) const MOVE_DIST: Command = Command {

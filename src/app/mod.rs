@@ -10,7 +10,7 @@ mod render_canvas;
 pub(crate) use parallel_jobs::{ScreenshotMaster, ScreenshotSlave, SlaveMessage};
 pub(crate) type CanvasPoints = HashMap<Color, Vec<(f64, f64)>>;
 
-use crate::{helpers::Chunks, AppState};
+use crate::{frac_logic::DivergMatrix, helpers::Chunks, AppState};
 
 #[derive(Default)]
 pub struct App {
@@ -19,5 +19,6 @@ pub struct App {
     /// Area for each component to render into.
     pub(crate) chunks: Chunks,
     pub(crate) app_state: AppState,
+    pub(crate) diverg_matrix: DivergMatrix,
     pub(crate) parallel_jobs: Vec<ScreenshotMaster>,
 }
