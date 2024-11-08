@@ -247,7 +247,8 @@ impl<'a> Widget for Canvas<'a> {
             )
             .title_top(
                 Line::from(format!(
-                    "Mandelbrot[x{:.3e}]",
+                    "{}[x{:.3e}]",
+                    self.state.render_settings.get_frac_obj().name,
                     self.state.render_settings.get_zoom()
                 ))
                 .left_aligned()
