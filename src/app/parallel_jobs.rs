@@ -24,6 +24,7 @@ pub(crate) struct ScreenshotMaster {
     /// a percentage in the main process.
     pub(crate) rendered_lines: i32,
     pub(crate) handle: Option<JoinHandle<DivergMatrix>>,
+    pub(crate) id: i64,
 }
 
 /// Represents a message sent from a child process
@@ -48,9 +49,9 @@ impl ScreenshotMaster {
             size,
             rendered_lines: 0,
             handle: Some(handle),
+            id: Utc::now().timestamp(),
         }
     }
-
     /// Handles the output of the screenshot child process:
     /// Save the render to a png file, and print a log message.
     pub(crate) fn finished(&self, state: &mut AppState, result: DivergMatrix) {
