@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{collections::HashMap, sync::Mutex};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
@@ -23,6 +23,7 @@ pub(crate) struct AppState {
     pub(crate) focused: Focus,
     pub(crate) quit: bool,
     pub(crate) log_messages: Vec<String>,
+    pub(crate) prioritized_log_messages: HashMap<i64, String>,
     pub(crate) log_panel_scroll_state: Mutex<ScrollViewState>,
     pub(crate) command_input: TuiInput,
     pub(crate) marker: Option<CanvasCoords>,
@@ -42,6 +43,7 @@ impl Default for AppState {
             focused: Default::default(),
             command_input: Default::default(),
             log_messages: Default::default(),
+            prioritized_log_messages: Default::default(),
             log_panel_scroll_state: Default::default(),
             render_settings: Default::default(),
             scaling_factor: 20,

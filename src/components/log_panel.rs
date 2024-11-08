@@ -72,7 +72,12 @@ impl<'a> Widget for LogPanel<'a> {
         // The height of all the paragraphs
         let mut scrollable_height = 0u16;
 
-        for message in &self.state.log_messages {
+        for message in self
+            .state
+            .log_messages
+            .iter()
+            .chain(self.state.prioritized_log_messages.values())
+        {
             // Create a ganerator with custom tags
             let gen = get_ratatui_generator();
             // Create a paragraph, using the generator to parse markup syntax
