@@ -69,7 +69,7 @@ impl<'a> Canvas<'a> {
             _ => {}
         }
 
-        state.request_repaint();
+        state.request_redraw();
     }
 
     pub(crate) fn handle_key_code(state: &mut AppState, code: KeyCode) {
