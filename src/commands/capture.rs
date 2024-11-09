@@ -45,7 +45,7 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) {
 
     let screenshot = ScreenshotSlave::new(size.clone(), tx, &state.render_settings);
     let handle = ScreenshotSlave::start(screenshot);
-    let master = ScreenshotMaster::new(size, rx, handle);
+    let master = ScreenshotMaster::new(size, rx, handle, state.render_settings.get_frac_obj().name);
     state
         .prioritized_log_messages
         .insert(master.id, String::from("Starting screenshot..."));

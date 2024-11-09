@@ -1,15 +1,16 @@
 use rug::Complex;
 
+mod burning_ship;
 mod julia;
 mod mandelbrot;
 
+pub(crate) use burning_ship::BURNING_SHIP;
 pub(crate) use julia::JULIA;
 pub(crate) use mandelbrot::MANDELBROT;
 
 pub(crate) type FractalClos = &'static dyn Fn(Complex, &RenderSettings) -> i32;
 
 use crate::frac_logic::RenderSettings;
-
 
 /// Represents a fractal type.
 pub(crate) struct Fractal {
@@ -20,6 +21,7 @@ pub(crate) struct Fractal {
     /// The fractal display name.
     pub(crate) name: &'static str,
     /// Some details to display about the fractal (formula, etc).
+    /// https://www.unicodeit.net/
     pub(crate) details: &'static str,
     /// The default position of the canvas when first rendering the fractal.
     pub(crate) default_pos: (f64, f64),
@@ -30,8 +32,8 @@ impl RenderSettings {
     pub(crate) fn get_frac_index_by_name(&self, name: &str) -> Option<usize> {
         FRACTALS
             .iter()
-            .position(|f| f.name.to_lowercase() == name.to_lowercase())
+            .position(|f| f.name.to_lowercase().starts_with(&name.to_lowercase()))
     }
 }
 
-pub(crate) const FRACTALS: &[Fractal] = &[MANDELBROT, JULIA];
+pub(crate) const FRACTALS: &[Fractal] = &[MANDELBROT, BURNING_SHIP, JULIA];

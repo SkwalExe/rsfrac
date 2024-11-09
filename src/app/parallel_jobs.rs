@@ -25,6 +25,7 @@ pub(crate) struct ScreenshotMaster {
     pub(crate) rendered_lines: i32,
     pub(crate) handle: Option<JoinHandle<DivergMatrix>>,
     pub(crate) id: i64,
+    pub(crate) frac_name: &'static str
 }
 
 /// Represents a message sent from a child process
@@ -43,6 +44,7 @@ impl ScreenshotMaster {
         size: Vec2<i32>,
         receiver: Receiver<SlaveMessage>,
         handle: JoinHandle<DivergMatrix>,
+        frac_name: &'static str
     ) -> Self {
         Self {
             receiver,
@@ -50,6 +52,7 @@ impl ScreenshotMaster {
             rendered_lines: 0,
             handle: Some(handle),
             id: Utc::now().timestamp(),
+            frac_name
         }
     }
     /// Handles the output of the screenshot child process:
@@ -58,7 +61,7 @@ impl ScreenshotMaster {
         let buf = ImageBuffer::from_fn(self.size.x as u32, self.size.y as u32, |x, y| {
             let color = state
                 .render_settings
-                .color_from_div(&result[y as usize][x as usize]);
+                .color_from_div(&result[self.size.y as usize - y as usize - 1][x as usize]);
             if let Color::Rgb(r, g, b) = color {
                 image::Rgb([r, g, b])
             } else {
@@ -68,7 +71,7 @@ impl ScreenshotMaster {
 
         let filename = format!(
             "{}{}.png",
-            state.render_settings.get_frac_obj().name,
+            self.frac_name,
             Utc::now().timestamp()
         );
 
