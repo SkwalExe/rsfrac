@@ -1,0 +1,41 @@
+name: 💠 Feature request
+description: File a feature request
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees:
+  - SkwalExe
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      placeholder: ex. I would like to see...
+      value: "I would like to see..."
+    validations:
+      required: false
+  - type: textarea
+    id: problem-solved
+    attributes:
+      label: Problem Solved
+      description: What problem would this feature solve?
+    validations:
+      required: false
+  - type: textarea
+    id: how-to-implement
+    attributes:
+      label: How can we implement this?
+      description: Do you have an idea for how we could implement this?
+    validations:
+      required: false
