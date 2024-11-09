@@ -13,10 +13,6 @@
 
 <p align="center">💠 Terminal based fractal explorer, including Mandelbrot, Burning Ship, and Julia. 💠</p>
 
-> [!WARNING] 
-> Rsfrac is in early development. It will become stable very soon.
-
-
 # Documentation ✨
 
 #### [**✨ ⟼  Please head over to our documentation for more information! ⟻  ✨**](https://rsfrac.skwal.net)
@@ -31,8 +27,27 @@
 
 #### [**✨ ⟼  For up-to-date instructions, please head over to our documentation ⟻  ✨**](https://rsfrac.skwal.net)
 
-> [!WARNING]
-> This program is in early development, installation instructions will be added very soon!
+From [crates.io](https://crates.io/):
+
+```bash
+cargo install rsfrac
+```
+
+From [the Github repo](https://github.com/SkwalExe/rsfrac):
+
+```bash
+cargo install --git https://github.com/SkwalExe/rsfrac
+```
+
+You can now start the application with the `rsfrac` command.
+
+### `cargo` not found?
+
+Cargo is the package manager for rust projects, it can be installed with:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
 # Features 🌟
 
