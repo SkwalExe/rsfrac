@@ -1,0 +1,27 @@
+name: ❇️ Other issue
+description: Other than a bug report or feature request
+title: "[OTHER]:"
+labels: []
+assignees:
+  - SkwalExe
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this issue!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: ex. my issue is...
+      value: "my issue is..."
+    validations:
+      required: false

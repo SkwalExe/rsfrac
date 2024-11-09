@@ -1,0 +1,60 @@
+name: ☢️ Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+assignees:
+  - SkwalExe
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-were-doing
+    attributes:
+      label: What were you trying to do when the bug happened?
+      placeholder: ex. I was trying to do something
+      value: "I was trying to do something"
+    validations:
+      required: false
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What was the expected behavior?
+      placeholder: ex. The program should have....
+      value: "The program should have continued to run normally"
+    validations:
+      required: false
+  - type: textarea
+    id: what-actually-happened
+    attributes:
+      label: What actually happened?
+      placeholder: Tell us what happened
+      value: "A bug happened!"
+    validations:
+      required: false
+  - type: textarea
+    id: how-to-reproduce
+    attributes:
+      label: How can we reproduce this?
+      placeholder: ex. step 1 - step 2...
+      value: "step 1 - step 2..."
+    validations:
+      required: false
+  - type: textarea
+    id: how-to-fix
+    attributes:
+      label: Possible solutions
+      description: Do you have an idea for how we could fix this?
+      placeholder: ex. Replace this line of code with...
+      value: "Replace this line of code with..."
+    validations:
+      required: false
