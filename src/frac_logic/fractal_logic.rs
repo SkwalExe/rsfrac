@@ -42,9 +42,8 @@ impl RenderSettings {
 
                 // Send an update to the parent process,
                 // indicating that one line has been rendered.
-                match sender {
-                    Some(sender) => sender.send(SlaveMessage::LineRender).unwrap(),
-                    None => {}
+                if let Some(sender) = sender {
+                    sender.send(SlaveMessage::LineRender).unwrap();
                 }
 
                 line
@@ -53,9 +52,8 @@ impl RenderSettings {
 
         // Send a message to the parent process indicating that the screenshot finished,
         // and it should now wait for the result transfet throught the `JoinHandle`.
-        match sender {
-            Some(sender) => sender.send(SlaveMessage::JobFinished).unwrap(),
-            None => {}
+        if let Some(sender) = sender {
+            sender.send(SlaveMessage::JobFinished).unwrap()
         }
 
         div_matrix
@@ -68,7 +66,7 @@ impl RenderSettings {
         sender: Option<&Sender<SlaveMessage>>,
     ) -> DivergMatrix {
         let last_line = size.y - 1;
-        self.get_diverg_lines(&size, 0, last_line, sender)
+        self.get_diverg_lines(size, 0, last_line, sender)
     }
 
     /// Returns a divergence matrix, and send an update to the channel

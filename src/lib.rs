@@ -13,4 +13,3 @@ pub use app::App;
 
 mod logging;
 pub use logging::VERSION;
-

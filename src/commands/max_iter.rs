@@ -1,5 +1,5 @@
-use crate::AppState;
 use super::{command_increment::command_increment, Command};
+use crate::AppState;
 
 pub(crate) const MIN_MAX_ITER: i32 = 8;
 pub(crate) const MAX_MAX_ITER: i32 = 10000;

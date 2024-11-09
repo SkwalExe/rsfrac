@@ -1,5 +1,5 @@
-use crate::{fractals::FRACTALS, AppState};
 use super::Command;
+use crate::{fractals::FRACTALS, AppState};
 
 pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) {
     if args.is_empty() {

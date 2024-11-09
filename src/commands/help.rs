@@ -1,5 +1,5 @@
-use crate::AppState;
 use super::{get_commands, Command};
+use crate::AppState;
 
 pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) {
     if args.is_empty() {

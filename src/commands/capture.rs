@@ -10,7 +10,7 @@ use crate::{
 pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) {
     let (tx, rx) = mpsc::channel();
 
-    let size = if args.len() == 0 {
+    let size = if args.is_empty() {
         Vec2::new(1920, 1080)
     } else {
         let width = args[0];
