@@ -19,7 +19,7 @@ cargo install --git https://github.com/SkwalExe/rsfrac
 ## Starting the app
 
 ::: info Caution
-If the command is not found after installation, you may need to add `~/.[cargo](2024-11-09_cargo.md)/bin` to your path. You can do this by adding `export PATH=$PATH:~/.cargo/bin` to your `.bashrc` or `.zshrc` file. You will also need to **open a new shell session**.
+If the command is not found after installation, you may need to add `~/.cargo/bin` to your path. You can do this by adding `export PATH=$PATH:~/.cargo/bin` to your `.bashrc` or `.zshrc` file. You will also need to **open a new shell session**.
 
 ```bash
 # For bash
