@@ -15,7 +15,7 @@ impl<T> Vec2<T> {
     }
 
     /// Converts a `Vec2<T>` into a `Vec2<U>`, where `U: From<T>`
-    pub(crate) fn convert<U>(self) -> Vec2<U>
+    pub(crate) fn _convert<U>(self) -> Vec2<U>
     where
         U: From<T>,
     {
@@ -30,7 +30,7 @@ mod tests {
     #[test]
     fn test_vec2_convert() {
         let vec_i32 = Vec2::new(1, 2);
-        let vec_f64 = vec_i32.convert();
+        let vec_f64 = vec_i32._convert();
         assert_eq!(vec_f64, Vec2::new(1.0, 2.0));
     }
 }

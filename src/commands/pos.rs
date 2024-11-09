@@ -1,6 +1,6 @@
-use rug::{Assign, Float};
-use crate::AppState;
 use super::Command;
+use crate::AppState;
+use rug::{Assign, Float};
 
 pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
     // If no args are provided, show the current positino
@@ -25,8 +25,7 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
     let parsed_imag = Float::parse(imag);
 
     if (set_real && parsed_real.is_err()) || (set_imag && parsed_imag.is_err()) {
-        state
-            .log_error("The provided real and imaginary parts must be valid floats or <acc ~>.");
+        state.log_error("The provided real and imaginary parts must be valid floats or <acc ~>.");
         return;
     }
 

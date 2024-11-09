@@ -16,4 +16,3 @@ pub(crate) enum VoidFill {
 pub(crate) fn void_fills() -> Vec<VoidFill> {
     VoidFill::iter().collect()
 }
-

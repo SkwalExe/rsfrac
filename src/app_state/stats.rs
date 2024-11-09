@@ -1,5 +1,5 @@
-use std::time::Duration;
 use rug::Float;
+use std::time::Duration;
 
 use crate::frac_logic::RenderSettings;
 

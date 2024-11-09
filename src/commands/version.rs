@@ -1,5 +1,5 @@
-use crate::{AppState, VERSION};
 use super::Command;
+use crate::{AppState, VERSION};
 
 pub(crate) fn execute_version(state: &mut AppState, _args: Vec<&str>) {
     state.log_info_title(

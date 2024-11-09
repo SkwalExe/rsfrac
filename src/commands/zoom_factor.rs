@@ -1,5 +1,5 @@
-use crate::AppState;
 use super::Command;
+use crate::AppState;
 
 pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) {
     // If no args are provided, show the current positino

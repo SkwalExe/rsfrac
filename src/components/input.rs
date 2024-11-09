@@ -8,8 +8,8 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-use tui_input::backend::crossterm::EventHandler;
 use crate::{commands::get_commands, helpers::Focus, AppState};
+use tui_input::backend::crossterm::EventHandler;
 
 pub(crate) struct Input<'a> {
     state: &'a AppState,

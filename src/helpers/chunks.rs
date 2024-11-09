@@ -9,9 +9,6 @@ pub(crate) struct Chunks {
     /// The area of the entire canvas.
     /// Contains the borders and the raster data.
     pub(crate) canvas: Rect,
-    /// The area of the sidebar on the right.
-    /// Contains the log panel and the command input.
-    pub(crate) side: Rect,
     /// The area of the log panel, including the borders.
     pub(crate) log_panel: Rect,
     /// The area of the command input.
@@ -19,9 +16,6 @@ pub(crate) struct Chunks {
     /// The area of the footer, which corresponds to the
     /// two lines at the bottom of the screen.
     pub(crate) footer: Rect,
-    /// The area of the application body, which is the whole
-    /// area above the footer.
-    pub(crate) body: Rect,
 }
 
 impl Chunks {
@@ -29,12 +23,6 @@ impl Chunks {
     /// Contains only the raster data.
     pub(crate) fn canvas_inner(&self) -> Rect {
         self.canvas.inner(Margin::new(1, 1))
-    }
-
-    /// The area inside the log panel, ignoring the borders.
-    /// Contains the log messages and the scrollbar.
-    pub(crate) fn log_panel_inner(&self) -> Rect {
-        self.log_panel.inner(Margin::new(1, 1))
     }
 }
 
@@ -75,10 +63,8 @@ impl From<Rect> for Chunks {
         let input = side_chunks[1];
 
         Self {
-            body,
             footer,
             canvas,
-            side,
             log_panel,
             input,
         }
