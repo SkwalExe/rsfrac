@@ -101,10 +101,6 @@ impl AppState {
     }
     /// Creates a new error log message with the provided title and message.
     pub(crate) fn log_error_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
-        self.log_raw(format!(
-            "<bgred  {} >\n<red {}>",
-            title.into(),
-            message.into()
-        ))
+        self.log_raw(format!("<bgred  {} >\n{}", title.into(), message.into()))
     }
 }

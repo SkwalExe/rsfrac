@@ -4,7 +4,7 @@ use crate::AppState;
 pub(crate) const MIN_MAX_ITER: i32 = 8;
 pub(crate) const MAX_MAX_ITER: i32 = 10000;
 
-pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if let Some(val) = command_increment(
         state,
         state.render_settings.max_iter,
@@ -15,6 +15,7 @@ pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) {
         state.render_settings.max_iter = val;
         state.request_redraw();
     }
+    Ok(())
 }
 pub(crate) const MAX_ITER: Command = Command {
     execute: &execute_max_iter,

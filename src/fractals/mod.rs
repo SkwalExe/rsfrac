@@ -27,13 +27,11 @@ pub(crate) struct Fractal {
     pub(crate) default_pos: (f64, f64),
 }
 
-impl RenderSettings {
-    /// Returns the index of a fractal which name matches, or `None`.
-    pub(crate) fn get_frac_index_by_name(&self, name: &str) -> Option<usize> {
-        FRACTALS
-            .iter()
-            .position(|f| f.name.to_lowercase().starts_with(&name.to_lowercase()))
-    }
+/// Returns the index of a fractal which name matches, or `None`.
+pub(crate) fn get_frac_index_by_name(name: &str) -> Option<usize> {
+    FRACTALS
+        .iter()
+        .position(|f| f.name.to_lowercase().starts_with(&name.to_lowercase()))
 }
 
 pub(crate) const FRACTALS: &[Fractal] = &[MANDELBROT, BURNING_SHIP, JULIA];

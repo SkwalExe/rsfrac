@@ -2,7 +2,7 @@ use super::Command;
 use crate::AppState;
 use rug::{Assign, Float};
 
-pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     // If no args are provided, show the current positino
     if args.is_empty() {
         state.log_info_title(
@@ -13,7 +13,7 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
                 state.render_settings.pos.imag()
             ),
         );
-        return;
+        return Ok(());
     }
     // If args were provided, there must be exactly 2 args.
     let real = args[0];
@@ -25,8 +25,9 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
     let parsed_imag = Float::parse(imag);
 
     if (set_real && parsed_real.is_err()) || (set_imag && parsed_imag.is_err()) {
-        state.log_error("The provided real and imaginary parts must be valid floats or <acc ~>.");
-        return;
+        return Err(
+            "The provided real and imaginary parts must be valid floats or <acc ~>.".to_string(),
+        );
     }
 
     if set_real {
@@ -44,6 +45,7 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) {
             .assign(parsed_imag.unwrap());
     }
     state.request_redraw();
+    Ok(())
 }
 
 pub(crate) const POS: Command = Command {

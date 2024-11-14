@@ -125,6 +125,11 @@ impl RenderSettings {
         )
     }
 
+    /// Set the cell size so that the total width of the canvas is set to the specified size.
+    pub(crate) fn set_width(&mut self, width: Float) {
+        self.cell_size = width / self.canvas_size.x;
+    }
+
     /// Set the cell size so that the total width of the canvas is 4 on the real axis.
     pub(crate) fn reset_cell_size(&mut self) {
         self.cell_size = self.get_default_cell_size();

@@ -4,11 +4,12 @@ use super::{command_increment::command_increment, Command};
 pub(crate) const MIN_MOVE_DIST: i32 = 1;
 pub(crate) const MAX_MOVE_DIST: i32 = 100;
 
-pub(crate) fn execute_move_dist(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_move_dist(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if let Some(val) = command_increment(state, state.move_dist, args, MIN_MOVE_DIST, MAX_MOVE_DIST)
     {
         state.move_dist = val;
     }
+    Ok(())
 }
 pub(crate) const MOVE_DIST: Command = Command {
     execute: &execute_move_dist,

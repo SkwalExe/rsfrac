@@ -4,7 +4,7 @@ use crate::AppState;
 pub(crate) const MIN_DECIMAL_PREC: u32 = 8;
 pub(crate) const MAX_DECIMAL_PREC: u32 = 10000;
 
-pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if let Some(val) = command_increment(
         state,
         state.render_settings.prec,
@@ -12,9 +12,9 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) {
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     ) {
-        state.render_settings.prec = val;
-        state.request_redraw();
+        state.set_decimal_prec(val);
     }
+    Ok(())
 }
 pub(crate) const PREC: Command = Command {
     execute: &execute_prec,

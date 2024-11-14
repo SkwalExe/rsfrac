@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use strum::{Display, EnumIter, IntoEnumIterator};
 
-#[derive(EnumIter, Debug, Display)]
+#[derive(PartialEq, EnumIter, Debug, Display, Clone, Deserialize, Serialize)]
 pub(crate) enum VoidFill {
     Transparent,
     Black,

@@ -7,7 +7,7 @@ use crate::{
     AppState,
 };
 
-pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let (tx, rx) = mpsc::channel();
 
     let size = if args.is_empty() {
@@ -16,28 +16,17 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) {
         let width = args[0];
         let height = args[1];
 
-        let parsed_width = match width.parse() {
-            Ok(parsed) => parsed,
-            Err(_) => {
-                state.log_error(
-                    "The provided width could not be parsed, make sure to enter a valid integer.",
-                );
-                return;
-            }
-        };
-        let parsed_height = match height.parse() {
-            Ok(parsed) => parsed,
-            Err(_) => {
-                state.log_error(
-                    "The provided height could not be parsed, make sure to enter a valid integer.",
-                );
-                return;
-            }
-        };
+        let parsed_width = width.parse().map_err(|err| {
+            format!(
+                "The provided width could not be parsed, make sure to enter a valid integer: {err}"
+            )
+        })?;
+        let parsed_height = height.parse().map_err(|err| format!("The provided height could not be parsed, make sure to enter a valid integer: {err}"))?;
 
         if parsed_height < 16 || parsed_width < 16 {
-            state.log_error("The screenshot must be at least 16 pixels in width and height.");
-            return;
+            return Err(
+                "The screenshot must be at least 16 pixels in width and height.".to_string(),
+            );
         }
 
         Vec2::new(parsed_width, parsed_height)
@@ -55,6 +44,8 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) {
         .unwrap()
         .scroll_to_bottom();
     state.requested_jobs.push(master);
+
+    Ok(())
 }
 
 pub(crate) const CAPTURE: Command = Command {

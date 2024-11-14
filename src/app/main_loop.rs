@@ -56,9 +56,11 @@ impl App {
                     .prioritized_log_messages
                     .get_mut(&job.id)
                     .expect("There was no entry in the prioritized log messages corresponding to the current job.") = format!(
-                    "Screenshot progression: <command {:?}%>",
-                    job.rendered_lines * 100 / job.size.y
-                );
+                        "Screenshot progression:\nline {}/{} (<command {:?}%>)",
+                        job.rendered_lines,
+                        job.size.y,
+                        job.rendered_lines * 100 / job.size.y
+                    );
 
                 for message in job.receiver.try_iter() {
                     match message {

@@ -2,13 +2,13 @@
 
 use ratatui::{
     buffer::Buffer,
-    crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent},
+    crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
     layout::Rect,
     style::{Color, Style, Stylize},
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-use crate::{commands::get_commands, helpers::Focus, AppState};
+use crate::{commands::get_commands_map, helpers::Focus, AppState};
 use tui_input::backend::crossterm::EventHandler;
 
 pub(crate) struct Input<'a> {
@@ -27,17 +27,30 @@ fn enumerate_strings(elements: &[usize]) -> String {
 }
 
 impl<'a> Input<'a> {
-    pub(crate) const FOOTER_TEXT: &'static [&'static str] = &["Press [Enter] to run the command"];
+    pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
+        "Execute the command [Enter]",
+        "Repeat the last command [Ctrl+R]",
+    ];
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
     }
     pub(crate) fn handle_mouse_event(app: &mut AppState, _event: MouseEvent) {
         app.focused = Focus::Input;
     }
-    pub(crate) fn run_command(state: &mut AppState) {
+    /// Run the last command that was ran.
+    pub(crate) fn run_last_command(state: &mut AppState) {
+        Input::run_command(state, state.last_command.clone());
+    }
+    /// Runs the command that is currently entered in the command input.
+    pub(crate) fn run_current_command(state: &mut AppState) {
         let input = String::from(state.command_input.value());
         state.command_input.reset();
 
+        Input::run_command(state, input);
+    }
+    /// Run the command gived as argument.
+    pub(crate) fn run_command(state: &mut AppState, input: String) {
+        state.last_command = input.clone();
         let mut args: Vec<_> = input.split_whitespace().collect();
 
         // Do nothing more if the command is empty
@@ -47,7 +60,7 @@ impl<'a> Input<'a> {
 
         // The first argument is the command name
         let command_name = args.remove(0);
-        if let Some(command) = get_commands().get(command_name).copied() {
+        if let Some(command) = get_commands_map().get(command_name).copied() {
             state.log_raw(format!("<command \\> {}>", input));
             if !command.accepted_arg_count.contains(&args.len()) {
                 // If the number of provided arguments in not in the accepted argument
@@ -64,7 +77,10 @@ impl<'a> Input<'a> {
                 );
                 return;
             }
-            (command.execute)(state, args);
+
+            if let Err(err) = (command.execute)(state, args) {
+                state.log_error(err)
+            }
         } else {
             // TODO: centralize this message, that is used in other places
             state.log_error(format!(
@@ -78,7 +94,10 @@ impl<'a> Input<'a> {
     }
     pub(crate) fn handle_event(state: &mut AppState, key: KeyEvent) {
         match key.code {
-            KeyCode::Enter => Input::run_command(state),
+            KeyCode::Enter => Input::run_current_command(state),
+            KeyCode::Char('r') if key.modifiers == KeyModifiers::CONTROL => {
+                Input::run_last_command(state)
+            }
             _ => {
                 state.command_input.handle_event(&Event::Key(key));
             }

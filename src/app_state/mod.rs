@@ -1,3 +1,4 @@
+use rug::{ops::CompleteRound, Complex, Float};
 use std::{collections::HashMap, sync::Mutex};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
@@ -7,13 +8,15 @@ pub(crate) use stats::Stats;
 
 use crate::{
     app::ScreenshotMaster,
+    colors::get_palette_index_by_name,
     commands::{
         max_iter::{MAX_MAX_ITER, MIN_MAX_ITER},
         prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
     },
     components::{Canvas, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
-    helpers::{Focus, ZoomDirection},
+    fractals::get_frac_index_by_name,
+    helpers::{void_fills, Focus, SavedState, ZoomDirection},
 };
 
 pub(crate) struct AppState {
@@ -25,6 +28,7 @@ pub(crate) struct AppState {
     pub(crate) log_messages: Vec<String>,
     pub(crate) prioritized_log_messages: HashMap<i64, String>,
     pub(crate) log_panel_scroll_state: Mutex<ScrollViewState>,
+    pub(crate) last_command: String,
     pub(crate) command_input: TuiInput,
     pub(crate) marker: Option<CanvasCoords>,
     pub(crate) move_dist: i32,
@@ -39,6 +43,7 @@ impl Default for AppState {
             stats: Default::default(),
             redraw_canvas: true,
             repaint_canvas: true,
+            last_command: String::new(),
             quit: false,
             focused: Default::default(),
             command_input: Default::default(),
@@ -55,6 +60,75 @@ impl Default for AppState {
 }
 
 impl AppState {
+    /// Loads the data from a rsf file.
+    pub(crate) fn apply(&mut self, saved: SavedState, filename: &str) {
+        let result = (|| -> Result<(), String> {
+            // Change selected fractal
+            if let Some(frac_name) = saved.frac_name {
+                self.render_settings.frac_index = get_frac_index_by_name(&frac_name)
+                    .ok_or("Invalid fractal name in state file.")?;
+            }
+
+            // Change selected color palette
+            if let Some(color_palette_name) = saved.color_palette_name {
+                self.render_settings.palette_index = get_palette_index_by_name(&color_palette_name)
+                    .ok_or("Invalid color palette name in state file.")?;
+            }
+            // Change the palette offset
+            if let Some(palette_offset) = saved.palette_offset {
+                self.render_settings.color_scheme_offset = palette_offset;
+            }
+
+            // Change the decimal precision
+            if let Some(precision) = saved.precision {
+                self.set_decimal_prec(precision);
+            }
+
+            // Change the canvas position
+            if let Some(pos) = saved.pos {
+                self.render_settings.pos = Complex::parse(pos)
+                    .map_err(|err| format!("Invalid canvas position: {err}"))?
+                    .complete((self.render_settings.prec, self.render_settings.prec));
+            }
+
+            // Change the cell size
+            if let Some(complex_width) = saved.complex_width {
+                self.render_settings.set_width(
+                    Float::parse(complex_width)
+                        .map_err(|err| format!("Invalid canvas width: {err}"))?
+                        .complete(self.render_settings.prec),
+                );
+            }
+
+            // Change the max_iter value
+            if let Some(max_iter) = saved.max_iter {
+                self.render_settings.max_iter = max_iter;
+            }
+
+            // Change the void fill method
+            if let Some(void_fill) = saved.void_fill {
+                self.render_settings.void_fill_index = void_fills()
+                    .iter()
+                    .position(|vf| *vf == void_fill)
+                    .ok_or("Invalid void fill name in state file.")?;
+            }
+
+            Ok(())
+        })();
+
+        self.request_redraw();
+
+        if let Err(err) = result {
+            self.log_error(format!(
+                "Could not finish loading the state file (<command {filename}>) due to an error: <red {err}>"
+            ));
+        } else {
+            self.log_success(format!(
+                "Successfully loaded state file: <command {filename}>.",
+            ));
+        }
+    }
+
     /// Only repaint the canvas without generating a new divergence matrix.
     pub(crate) fn request_repaint(&mut self) {
         self.repaint_canvas = true;
@@ -82,10 +156,13 @@ impl AppState {
     /// and update the precision of existing numeric values.
     pub(crate) fn increment_decimal_prec(&mut self, increment: i32) {
         let new_prec = self.render_settings.prec.saturating_add_signed(increment);
+        self.set_decimal_prec(new_prec);
+    }
 
+    /// Sets the decimal precision and update the precision of existing values.
+    pub(crate) fn set_decimal_prec(&mut self, prec: u32) {
         // Make sure the precision remains within the fixed bounds.
-        self.render_settings.prec = MAX_DECIMAL_PREC.min(MIN_DECIMAL_PREC.max(new_prec));
-
+        self.render_settings.prec = MAX_DECIMAL_PREC.min(MIN_DECIMAL_PREC.max(prec));
         // Update the precision of existing numeric values.
         self.render_settings.pos.set_prec(self.render_settings.prec);
         self.render_settings
