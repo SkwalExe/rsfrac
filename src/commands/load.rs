@@ -92,7 +92,21 @@ pub(crate) const LOAD: Command = Command {
     execute: &execute_load,
     name: "load",
     accepted_arg_count: &[0, 1],
-    detailed_desc: None,
+    detailed_desc: Some(concat!(
+        "<green Usage: <command [no args]>>\n",
+        "When no args are provided, the state files with the <command rsf> extension in the current ",
+        "working directory will be detected and loaded into a list.\n",
+        "<green Usage: <command [integer]>>\n",
+        "Load the state file corresponding to the provided number in the detection list. ",
+        "Must be ran after <command load>.\n",
+        "<green Usage: <command cycle>>\n",
+        "Cycle through the state files detected with <command load>. ",
+        "After running the command one time, ",
+        "you can rapidly cycle through all the state files using ",
+        "<command Ctrl+R>, which repeats the last command. \n",
+        "<green Usage: <command [file path]>>\n",
+        "Load the state from the specified path.\n",
+    )),
     basic_desc: concat!(
         "Restore the app state (canvas size, position...) from a ",
         "file that was previously created with the <command save> command."

@@ -33,6 +33,11 @@ pub(crate) const SAVE: Command = Command {
     execute: &execute_save,
     name: "save",
     accepted_arg_count: &[0, 1],
-    detailed_desc: None,
+    detailed_desc: Some(concat!(
+        "<green Usage: <command [file path]>>\n",
+        "Save the current state using the provided file path.\n",
+        "<green Usage: <command [no args]>>\n",
+        "Save the current state using a generic name.\n",
+    )),
     basic_desc: "Save the current application state to a file that can be loaded back later with the <command load> command.",
 };
