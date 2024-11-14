@@ -46,13 +46,8 @@ impl<'a> Canvas<'a> {
     }
 
     pub(crate) fn handle_mouse_event(state: &mut AppState, event: MouseEvent) {
-        // If the canvas is not already focused, only take focus
-        if state.focused != Focus::Canvas {
-            state.focused = Focus::Canvas;
-            return;
-        }
+        state.focused = Focus::Canvas;
 
-        // If the canvas is already focused, handle the event
         // first, convert the key press position to canvas coordinates
 
         let canvas_pos = state
@@ -175,13 +170,6 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('v') => {
                 state.render_settings.void_fill_index =
                     (state.render_settings.void_fill_index + 1) % void_fills().len();
-                state.log_info_title(
-                    "Void Fill",
-                    format!(
-                        "Void fill is now: <acc {}>",
-                        void_fills()[state.render_settings.void_fill_index]
-                    ),
-                );
                 state.request_repaint();
                 return;
             }
@@ -211,6 +199,13 @@ impl<'a> Widget for Canvas<'a> {
         let canvas_block = Block::bordered()
             .style(border_style)
             .title_bottom(
+                Line::from(format!(
+                    "VoidFill[{}]",
+                    void_fills()[self.state.render_settings.void_fill_index]
+                ))
+                .right_aligned(),
+            )
+            .title_bottom(
                 Line::from(format!("Pts[{}]", self.state.render_settings.point_count()))
                     .left_aligned(),
             )
@@ -219,15 +214,9 @@ impl<'a> Widget for Canvas<'a> {
             )
             .title_bottom(
                 Line::from(format!(
-                    "PalOffset[{}]",
+                    "Colors[{}+{}]",
+                    self.state.render_settings.get_palette().name,
                     self.state.render_settings.color_scheme_offset
-                ))
-                .right_aligned(),
-            )
-            .title_bottom(
-                Line::from(format!(
-                    "Colors[{}]",
-                    self.state.render_settings.get_palette().name
                 ))
                 .right_aligned(),
             )

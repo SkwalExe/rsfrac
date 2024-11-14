@@ -1,7 +1,10 @@
 use super::Command;
-use crate::{fractals::FRACTALS, AppState};
+use crate::{
+    fractals::{get_frac_index_by_name, FRACTALS},
+    AppState,
+};
 
-pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if args.is_empty() {
         state.log_raw(format!(
             "Current fractal: <acc {}>\nAvailable fractals: {}",
@@ -12,42 +15,35 @@ pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) {
                 .collect::<Vec<_>>()
                 .join(", ")
         ));
-        return;
+        return Ok(());
     }
 
     let info = args[0] == "info";
 
     if info && args.len() != 2 {
-        state.log_error("Expected the a fractal name after <command info>");
-        return;
+        return Err("Expected the a fractal name after <command info>".to_string());
     }
 
     if !info && args.len() == 2 {
-        state.log_error(format!(
+        return Err(format!(
             "Expected the first of the two arguments to be <command info>, but got <command {}>",
             args[0]
         ));
-        return;
     }
 
     let frac_name = args[if info { 1 } else { 0 }];
-    let frac_i = state.render_settings.get_frac_index_by_name(frac_name);
-    match frac_i {
-        None => {
-            state.log_error(format!(
-                "Could not find fractal with name: <command {frac_name}>"
-            ));
-        }
-        Some(frac_i) => {
-            if info {
-                let frac_obj = &FRACTALS[frac_i];
-                state.log_info_title(frac_obj.name, frac_obj.details);
-            } else {
-                state.render_settings.frac_index = frac_i;
-                state.log_success(format!("Successfully selected fractal: <acc {frac_name}>."));
-            }
-        }
+    let frac_i = get_frac_index_by_name(frac_name).ok_or(format!(
+        "Could not find fractal with name: <command {frac_name}>"
+    ))?;
+
+    if info {
+        let frac_obj = &FRACTALS[frac_i];
+        state.log_info_title(frac_obj.name, frac_obj.details);
+    } else {
+        state.render_settings.frac_index = frac_i;
+        state.log_success(format!("Successfully selected fractal: <acc {frac_name}>."));
     }
+    Ok(())
 }
 
 pub(crate) const FRAC: Command = Command {

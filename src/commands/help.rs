@@ -1,7 +1,7 @@
-use super::{get_commands, Command};
+use super::{get_commands_list, get_commands_map, Command};
 use crate::AppState;
 
-pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if args.is_empty() {
         state.log_info_title(
             "Available commands",
@@ -11,14 +11,10 @@ pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) {
                     "of all the commands and a basic description. ",
                     "Use <command help command_name> to get more info about a command.>"
                 ),
-                get_commands()
-                    .iter()
-                    .map(|c| c.1.name)
-                    .collect::<Vec<_>>()
-                    .join(", "),
+                get_commands_list().map(|command| command.name).join(", "),
             ),
         );
-        return;
+        return Ok(());
     }
 
     if args[0] == "+" {
@@ -26,36 +22,33 @@ pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) {
             "Available commands",
             format!(
                 "{}\n<green Use <command help command_name> to get more info about a command.>",
-                get_commands()
-                    .iter()
-                    .map(|c| format!("- <acc {}>: {}", c.1.name, c.1.basic_desc))
-                    .collect::<Vec<_>>()
+                get_commands_list()
+                    .map(|c| format!("- <acc {}>: {}", c.name, c.basic_desc))
                     .join("\n")
             ),
         );
 
-        return;
+        return Ok(());
     }
 
     let command_name = args[0];
-    if let Some(command) = get_commands().get(command_name) {
-        state.log_info_title(
-            command.name,
-            format!(
-                "{}\n{}",
-                command.basic_desc,
-                command.detailed_desc.unwrap_or_default()
-            ),
-        );
-    } else {
-        state.log_error(format!(
-            concat!(
-                "Command not found: <bgred,white {}>. ",
-                "Use <command help> for an overview of available commands."
-            ),
-            command_name
-        ))
-    }
+    let command = get_commands_map().remove(command_name).ok_or(format!(
+        concat!(
+            "Command not found: <bgred,white {}>. ",
+            "Use <command help> for an overview of available commands."
+        ),
+        command_name
+    ))?;
+
+    state.log_info_title(
+        command.name,
+        format!(
+            "{}\n{}",
+            command.basic_desc,
+            command.detailed_desc.unwrap_or_default()
+        ),
+    );
+    Ok(())
 }
 pub(crate) const HELP: Command = Command {
     execute: &execute_help,

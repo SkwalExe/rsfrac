@@ -1,7 +1,7 @@
 use super::Command;
 use crate::AppState;
 
-pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) {
+pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     // If no args are provided, show the current positino
     if args.is_empty() {
         state.log_info_title(
@@ -11,22 +11,22 @@ pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) {
                 state.scaling_factor
             ),
         );
-        return;
+        return Ok(());
     }
 
-    if let Ok(new_value) = args[0].parse::<i32>() {
-        if !(1..=500).contains(&new_value) {
-            state.log_error("Please, provide a value between 1 and 500.");
-            return;
-        }
+    let new_value = args[0]
+        .parse::<i32>()
+        .map_err(|err| format!("Please provide a valid integer: {err}"))?;
 
-        state.scaling_factor = new_value;
-        state.log_success(format!(
-            "Scaling factor successfully set to <acc {new_value}%>"
-        ));
-    } else {
-        state.log_error("Please, provide a valid integer.")
+    if !(1..=500).contains(&new_value) {
+        return Err("Please, provide a value between 1 and 500.".to_string());
     }
+
+    state.scaling_factor = new_value;
+    state.log_success(format!(
+        "Scaling factor successfully set to <acc {new_value}%>"
+    ));
+    Ok(())
 }
 
 pub(crate) const ZOOM_FACTOR: Command = Command {
