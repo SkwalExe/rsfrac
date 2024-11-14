@@ -17,10 +17,12 @@ pub(crate) mod save;
 pub(crate) mod version;
 pub(crate) mod zoom_factor;
 
+type CommandClos = &'static dyn Fn(&mut AppState, Vec<&str>) -> Result<(), String>;
+
 /// Represents a rsfrac command.
 pub(crate) struct Command {
     /// Closure to call to execute the command.
-    pub(crate) execute: &'static dyn Fn(&mut AppState, Vec<&str>) -> Result<(), String>,
+    pub(crate) execute: CommandClos,
     /// The name of the command.
     pub(crate) name: &'static str,
     /// A basic description of the command.
