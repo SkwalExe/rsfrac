@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
+use futures::executor;
+
 use crate::{app::App, app_state::Stats, helpers::Vec2};
 
 impl App {
@@ -10,10 +12,29 @@ impl App {
         if self.app_state.redraw_canvas {
             self.app_state.redraw_canvas = false;
 
-            self.diverg_matrix = self.app_state.render_settings.get_diverg_matrix(&Vec2::new(
+            let size = Vec2::new(
                 self.app_state.render_settings.canvas_size.x,
                 self.app_state.render_settings.canvas_size.y,
-            ));
+            );
+
+            self.diverg_matrix = if self.app_state.render_settings.use_gpu {
+                match executor::block_on(
+                    self.app_state
+                        .render_settings
+                        .get_gpu_diverg_matrix(&size, None),
+                ) {
+                    Ok(res) => res,
+                    Err(err) => {
+                        self.app_state.render_settings.use_gpu = false;
+                        self.app_state.log_error(format!(
+                            "Disabling GPU mode, because the render failed with error: {err}",
+                        ));
+                        self.app_state.render_settings.get_diverg_matrix(&size)
+                    }
+                }
+            } else {
+                self.app_state.render_settings.get_diverg_matrix(&size)
+            }
         }
 
         if self.app_state.repaint_canvas {

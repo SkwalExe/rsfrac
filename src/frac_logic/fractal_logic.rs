@@ -13,13 +13,10 @@ const INITIAL_CANVAS_WIDTH: i32 = 5;
 pub(crate) type DivergMatrix = Vec<Vec<i32>>;
 
 impl RenderSettings {
-    /// TODO: This function may be useless, ackshualli
-    /// Returns divergence lines from `first_line` to `last_line` included.
-    pub(crate) fn get_diverg_lines(
+    /// Returns a divergence matrix of the specified size.
+    fn _get_diverg_matrix_with_status(
         &self,
         size: &Vec2<i32>,
-        first_line: i32,
-        last_line: i32,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> DivergMatrix {
         // Get the canvas coordinates of each row
@@ -27,7 +24,7 @@ impl RenderSettings {
         let half_y = size.y / 2;
         let cell_size = self.get_plane_wid() / size.x;
 
-        let div_matrix = (-half_y + first_line..=-half_y + last_line)
+        let div_matrix = (-half_y..=-half_y + size.y - 1)
             .into_par_iter()
             .map(|y| {
                 let line = (-half_x..=-half_x + size.x)
@@ -57,16 +54,6 @@ impl RenderSettings {
         }
 
         div_matrix
-    }
-
-    /// Returns a divergence matrix of the specified size.
-    fn _get_diverg_matrix_with_status(
-        &self,
-        size: &Vec2<i32>,
-        sender: Option<&Sender<SlaveMessage>>,
-    ) -> DivergMatrix {
-        let last_line = size.y - 1;
-        self.get_diverg_lines(size, 0, last_line, sender)
     }
 
     /// Returns a divergence matrix, and send an update to the channel

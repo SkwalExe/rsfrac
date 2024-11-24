@@ -3,7 +3,8 @@ use std::{
     thread::{self, JoinHandle},
 };
 
-use chrono::Utc;
+use chrono::{Local, Utc};
+use futures::executor;
 use image::ImageBuffer;
 use ratatui::style::Color;
 
@@ -23,7 +24,7 @@ pub(crate) struct ScreenshotMaster {
     /// Used to keep track of the progression and display
     /// a percentage in the main process.
     pub(crate) rendered_lines: i32,
-    pub(crate) handle: Option<JoinHandle<DivergMatrix>>,
+    pub(crate) handle: Option<JoinHandle<Result<DivergMatrix, String>>>,
     pub(crate) id: i64,
     pub(crate) frac_name: &'static str,
 }
@@ -35,6 +36,7 @@ pub(crate) struct ScreenshotMaster {
 pub(crate) enum SlaveMessage {
     LineRender,
     JobFinished,
+    SetMessage(String),
 }
 
 /// The struct representing the screenshot job state
@@ -43,7 +45,7 @@ impl ScreenshotMaster {
     pub(crate) fn new(
         size: Vec2<i32>,
         receiver: Receiver<SlaveMessage>,
-        handle: JoinHandle<DivergMatrix>,
+        handle: JoinHandle<Result<DivergMatrix, String>>,
         frac_name: &'static str,
     ) -> Self {
         Self {
@@ -57,26 +59,34 @@ impl ScreenshotMaster {
     }
     /// Handles the output of the screenshot child process:
     /// Save the render to a png file, and print a log message.
-    pub(crate) fn finished(&self, state: &mut AppState, result: DivergMatrix) {
-        let buf = ImageBuffer::from_fn(self.size.x as u32, self.size.y as u32, |x, y| {
-            let color = state
-                .render_settings
-                .color_from_div(&result[self.size.y as usize - y as usize - 1][x as usize]);
-            if let Color::Rgb(r, g, b) = color {
-                image::Rgb([r, g, b])
-            } else {
-                image::Rgb([0, 0, 0])
+    pub(crate) fn finished(&self, state: &mut AppState, result: Result<DivergMatrix, String>) {
+        match result {
+            Ok(result) => {
+                let height = self.size.y as usize;
+                let buf =
+                    ImageBuffer::from_par_fn(self.size.x as u32, self.size.y as u32, |x, y| {
+                        let color = state
+                            .render_settings
+                            .color_from_div(&result[height - y as usize - 1][x as usize]);
+                        if let Color::Rgb(r, g, b) = color {
+                            image::Rgb([r, g, b])
+                        } else {
+                            image::Rgb([0, 0, 0])
+                        }
+                    });
+
+                let filename =
+                    format!("{} {}.png", self.frac_name, Local::now().format("%F %H-%M"));
+
+                let _ = buf.save_with_format(&filename, image::ImageFormat::Png);
+
+                state.log_success(format!(
+                    "Screenshot ({}x{}) saved to <acc {}>",
+                    self.size.x, self.size.y, filename
+                ));
             }
-        });
-
-        let filename = format!("{}{}.png", self.frac_name, Utc::now().timestamp());
-
-        let _ = buf.save_with_format(&filename, image::ImageFormat::Png);
-
-        state.log_success(format!(
-            "Screenshot ({}x{}) saved to <acc {}>",
-            self.size.x, self.size.y, filename
-        ));
+            Err(err) => state.log_error(format!("Could not finish screenshot, reason: {err}")),
+        }
     }
 }
 
@@ -102,11 +112,24 @@ impl ScreenshotSlave {
 }
 impl ScreenshotSlave {
     /// Creates a new process, running the screenshot rendering.
-    pub(crate) fn start(mut screenshot: Self) -> JoinHandle<DivergMatrix> {
+    pub(crate) fn start(mut screenshot: Self) -> JoinHandle<Result<DivergMatrix, String>> {
         thread::spawn(move || screenshot.run())
     }
-    pub(crate) fn run(&mut self) -> DivergMatrix {
-        self.rs_copy
-            .get_diverg_matrix_with_status(&self.size, &self.sender)
+    pub(crate) fn run(&mut self) -> Result<DivergMatrix, String> {
+        if self.rs_copy.use_gpu {
+            executor::block_on(self.rs_copy.initialize_gpu(Some(&self.sender)))?;
+            let result = executor::block_on(
+                self.rs_copy
+                    .get_gpu_diverg_matrix(&self.size, Some(&self.sender)),
+            );
+            self.sender
+                .send(SlaveMessage::JobFinished)
+                .map_err(|err| format!("Could not open message channel: {err}"))?;
+            result
+        } else {
+            Ok(self
+                .rs_copy
+                .get_diverg_matrix_with_status(&self.size, &self.sender))
+        }
     }
 }
