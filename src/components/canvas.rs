@@ -143,7 +143,9 @@ impl<'a> Canvas<'a> {
                     executor::block_on(state.render_settings.update_fractal_shader(None))
                 {
                     state.render_settings.use_gpu = false;
-                    state.log_error(format!("Disabling GPU mode because fractal shader could not be loaded: {err}"));
+                    state.log_error(format!(
+                        "Disabling GPU mode because fractal shader could not be loaded: {err}"
+                    ));
                 };
             }
             // Increment the color palette index

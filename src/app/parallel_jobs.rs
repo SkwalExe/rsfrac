@@ -75,8 +75,11 @@ impl ScreenshotMaster {
                         }
                     });
 
-                let filename =
-                    format!("{} {}.png", self.frac_name, Local::now().format("%F %H-%M-%S"));
+                let filename = format!(
+                    "{} {}.png",
+                    self.frac_name,
+                    Local::now().format("%F %H-%M-%S")
+                );
 
                 let _ = buf.save_with_format(&filename, image::ImageFormat::Png);
 
