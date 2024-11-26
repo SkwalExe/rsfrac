@@ -6,6 +6,7 @@ pub(crate) mod clear;
 pub(crate) mod color;
 pub(crate) mod command_increment;
 pub(crate) mod frac;
+pub(crate) mod gpu;
 pub(crate) mod help;
 pub(crate) mod load;
 pub(crate) mod max_iter;
@@ -33,7 +34,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 14] {
+pub(crate) fn get_commands_list() -> [&'static Command; 15] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -42,6 +43,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 14] {
         &save::SAVE,
         &load::LOAD,
         &capture::CAPTURE,
+        &gpu::GPU,
         &pos::POS,
         &prec::PREC,
         &max_iter::MAX_ITER,

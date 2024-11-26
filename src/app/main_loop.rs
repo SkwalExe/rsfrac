@@ -49,23 +49,21 @@ impl App {
             // Cycle through all the running jobs, non-blockingly handle messages
             // and remove finished ones.
             self.parallel_jobs.retain_mut(|job| {
-
-                // Display the current progression as a prioritized log message.
-                *self
-                    .app_state
-                    .prioritized_log_messages
-                    .get_mut(&job.id)
-                    .expect("There was no entry in the prioritized log messages corresponding to the current job.") = format!(
-                        "Screenshot progression:\nline {}/{} (<command {:?}%>)",
-                        job.rendered_lines,
-                        job.size.y,
-                        job.rendered_lines * 100 / job.size.y
-                    );
-
                 for message in job.receiver.try_iter() {
                     match message {
                         SlaveMessage::LineRender => {
                             job.rendered_lines += 1;
+                            // Display the current progression as a prioritized log message.
+                            *self
+                                .app_state
+                                .prioritized_log_messages
+                                .get_mut(&job.id)
+                                .expect("There was no entry in the prioritized log messages corresponding to the current job.") = format!(
+                                    "Screenshot progression:\nline {}/{} (<command {:?}%>)",
+                                    job.rendered_lines,
+                                    job.size.y,
+                                    job.rendered_lines * 100 / job.size.y
+                                );
                         }
                         SlaveMessage::JobFinished => {
                             // remove the priorotized progression message when the screenshot if
@@ -73,8 +71,17 @@ impl App {
                             self.app_state.prioritized_log_messages.remove(&job.id);
 
                             let result = job.handle.take().unwrap().join().unwrap();
+
                             job.finished(&mut self.app_state, result);
                             return false;
+                        }
+                        SlaveMessage::SetMessage(message) => {
+
+                            *self
+                                .app_state
+                                .prioritized_log_messages
+                                .get_mut(&job.id)
+                                .expect("There was no entry in the prioritized log messages corresponding to the current job.") = message;
                         }
                     }
                 }

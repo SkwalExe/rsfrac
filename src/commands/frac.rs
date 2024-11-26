@@ -1,3 +1,5 @@
+use futures::executor;
+
 use super::Command;
 use crate::{
     fractals::{get_frac_index_by_name, FRACTALS},
@@ -40,8 +42,15 @@ pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         let frac_obj = &FRACTALS[frac_i];
         state.log_info_title(frac_obj.name, frac_obj.details);
     } else {
+        state.request_redraw();
         state.render_settings.frac_index = frac_i;
         state.log_success(format!("Successfully selected fractal: <acc {frac_name}>."));
+        if let Err(err) = executor::block_on(state.render_settings.update_fractal_shader(None)) {
+            state.render_settings.use_gpu = false;
+            return Err(format!(
+                "Disabling GPU mode because fractal shader could not be loaded: {err}"
+            ));
+        };
     }
     Ok(())
 }

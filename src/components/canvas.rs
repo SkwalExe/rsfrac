@@ -1,5 +1,6 @@
 //! Contains the `Canvas` widget.
 
+use futures::executor;
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{KeyCode, MouseButton, MouseEvent, MouseEventKind},
@@ -138,6 +139,14 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('f') => {
                 state.render_settings.frac_index =
                     (state.render_settings.frac_index + 1) % FRACTALS.len();
+                if let Err(err) =
+                    executor::block_on(state.render_settings.update_fractal_shader(None))
+                {
+                    state.render_settings.use_gpu = false;
+                    state.log_error(format!(
+                        "Disabling GPU mode because fractal shader could not be loaded: {err}"
+                    ));
+                };
             }
             // Increment the color palette index
             KeyCode::Char('c') => {
@@ -242,6 +251,17 @@ impl<'a> Widget for Canvas<'a> {
                 ))
                 .left_aligned()
                 .style(Style::default().fg(ratatui::style::Color::LightGreen)),
+            )
+            .title_top(
+                Line::from(format!(
+                    "GpuMode[{}]",
+                    if self.state.render_settings.use_gpu {
+                        "on"
+                    } else {
+                        "off"
+                    }
+                ))
+                .left_aligned(),
             )
             .title_top(
                 Line::from(format!("Prec[{}]", self.state.render_settings.prec)).right_aligned(),

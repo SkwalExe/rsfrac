@@ -9,6 +9,8 @@ use crate::frac_logic::CanvasCoords;
 use crate::fractals::FRACTALS;
 use crate::helpers::{void_fills, VoidFill};
 
+use super::gpu::WgpuState;
+
 const DEFAULT_PREC: u32 = 32;
 const DEFAULT_MAX_ITER: i32 = 32;
 
@@ -33,6 +35,9 @@ pub(crate) struct RenderSettings {
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,
     pub(crate) void_fill_index: usize,
+    /// Whether or not to use the GPU for computations.
+    pub(crate) use_gpu: bool,
+    pub(crate) wgpu_state: WgpuState,
 }
 
 impl Default for RenderSettings {
@@ -47,6 +52,8 @@ impl Default for RenderSettings {
             color_scheme_offset: Default::default(),
             palette_index: 0,
             void_fill_index: Default::default(),
+            use_gpu: false,
+            wgpu_state: WgpuState::default(),
         }
     }
 }

@@ -1,5 +1,6 @@
 mod canvas_coords;
 mod fractal_logic;
+mod gpu;
 mod render_settings;
 
 pub(crate) use canvas_coords::CanvasCoords;
