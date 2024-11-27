@@ -87,6 +87,7 @@ impl App {
                                 .prioritized_log_messages
                                 .get_mut(&job.id)
                                 .expect("There was no entry in the prioritized log messages corresponding to the current job.") = message;
+                            self.app_state.log_panel_scroll_state.lock().unwrap().scroll_to_bottom();
                         }
                     }
                 }
