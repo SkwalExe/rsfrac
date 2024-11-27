@@ -1,19 +1,17 @@
 use super::Command;
 use crate::AppState;
-use futures::executor;
 
 pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), String> {
     if state.render_settings.use_gpu {
         state.render_settings.use_gpu = false;
         state.log_info("GPU mode disabled.");
     } else {
-        match executor::block_on(state.render_settings.initialize_gpu(None)) {
-            Ok(_) => {
-                state.log_success("GPU mode initialized successfully!");
-                state.render_settings.use_gpu = true;
-            }
-            Err(err) => state.log_error(format!("GPU mode could not be initialized: {err}")),
-        };
+        state
+            .render_settings
+            .initialize_gpu_sync(None)
+            .map_err(|err| format!("GPU mode could not be enabled: {err}"))?;
+        state.log_success("GPU mode initialized successfully!");
+        state.render_settings.use_gpu = true;
     }
     state.request_redraw();
     Ok(())

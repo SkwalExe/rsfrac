@@ -1,6 +1,5 @@
 //! Contains the `RenderSettings` struct.
 
-use futures::executor;
 use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
@@ -67,7 +66,7 @@ impl RenderSettings {
     pub(crate) fn select_fractal(&mut self, frac_i: usize) -> Result<(), String> {
         self.frac_index = frac_i;
         if self.use_gpu {
-            if let Err(err) = executor::block_on(self.update_fractal_shader(None)) {
+            if let Err(err) = self.update_fractal_shader_sync(None) {
                 self.use_gpu = false;
                 return Err(format!(
                     "Disabling GPU mode because fractal shader could not be loaded: {err}"

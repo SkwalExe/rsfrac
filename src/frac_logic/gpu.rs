@@ -3,6 +3,7 @@ use std::sync::mpsc::Sender;
 use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Vec2};
 
 use super::{DivergMatrix, RenderSettings};
+use futures::executor;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use wgpu::util::DeviceExt;
 
@@ -38,7 +39,16 @@ fn msg_send(
 }
 
 impl RenderSettings {
-    pub(crate) async fn initialize_gpu(
+    /// Will initialize the global wgpu state synchronously, while sending status messages
+    pub(crate) fn initialize_gpu_sync(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        executor::block_on(self.initialize_gpu_async(sender))
+    }
+
+    /// Will initialize the global wgpu state asynchronously, while sending status messages
+    pub(crate) async fn initialize_gpu_async(
         &mut self,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<(), String> {
@@ -82,12 +92,23 @@ impl RenderSettings {
 
         (self.wgpu_state.device, self.wgpu_state.queue) = (Some(device), Some(queue));
 
-        self.update_fractal_shader(sender).await?;
+        self.update_fractal_shader_async(sender).await?;
         msg_send(sender, "GPU initialization finished")?;
         Ok(())
     }
 
-    pub(crate) async fn update_fractal_shader(
+    /// will initlize the computing pipeline corresponding to the (newly) selected fractal
+    /// synchronously.
+    pub(crate) fn update_fractal_shader_sync(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        executor::block_on(self.update_fractal_shader_async(sender))
+    }
+
+    /// will initlize the computing pipeline corresponding to the (newly) selected fractal
+    /// asynchronously.
+    pub(crate) async fn update_fractal_shader_async(
         &mut self,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<(), String> {
