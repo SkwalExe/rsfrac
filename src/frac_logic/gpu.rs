@@ -96,6 +96,8 @@ impl RenderSettings {
         let cs_descriptor = match self.get_frac_obj().name.to_lowercase().as_ref() {
             // TODO: implement other fractal shaders
             "mandelbrot" => wgpu::include_wgsl!("shaders/mandelbrot.wgsl"),
+            "burningship" => wgpu::include_wgsl!("shaders/burning_ship.wgsl"),
+            "julia" => wgpu::include_wgsl!("shaders/julia.wgsl"),
             _ => {
                 if let Some(sender) = sender {
                     sender
