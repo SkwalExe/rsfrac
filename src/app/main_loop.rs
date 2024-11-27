@@ -7,7 +7,9 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Chunks, App};
+use crate::{
+    app::SlaveMessage, commands::gpu::execute_gpu, frac_logic::CanvasCoords, helpers::Chunks, App,
+};
 
 /// The delay listening for key events before each terminal redraw.
 const FRAME_DELAY: i32 = 80;
@@ -16,6 +18,9 @@ impl App {
     /// Run the main application loop, perform rendering and event passing
     pub fn run(&mut self, term: &mut DefaultTerminal) -> io::Result<()> {
         self.app_state.initial_message();
+        if let Err(err) = execute_gpu(&mut self.app_state, Default::default()) {
+            self.app_state.log_error(err);
+        }
         while !self.app_state.quit {
             let start = Instant::now();
 

@@ -55,7 +55,7 @@ impl AppState {
         ));
         self.log_raw(concat!(
             "If you are experiencing slow rendering, ",
-            "try to reduce the size of your terminal.",
+            "try to enable GPU mode or reduce the size of your terminal.",
         ));
         self.log_raw(concat!(
             "You can switch between the canvas, the log panel and ",
