@@ -189,10 +189,7 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('o') => state.increment_max_iter(10),
             // Decrement the maximum divergence
             KeyCode::Char('y') => state.increment_max_iter(-10),
-            _ => {
-                // Return from the function to avoid setting redraw_canvas
-                return;
-            }
+            _ => {}
         }
     }
 }
