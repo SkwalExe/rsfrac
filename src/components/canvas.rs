@@ -1,6 +1,5 @@
 //! Contains the `Canvas` widget.
 
-use futures::executor;
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{KeyCode, MouseButton, MouseEvent, MouseEventKind},
@@ -81,6 +80,7 @@ impl<'a> Canvas<'a> {
                         state.render_settings.prec,
                         &state.render_settings.cell_size * state.move_dist,
                     ));
+                state.request_redraw();
             }
             // When L is pressed move the position of the canvas
             // to the right by n times the cell size.
@@ -93,6 +93,7 @@ impl<'a> Canvas<'a> {
                         state.render_settings.prec,
                         &state.render_settings.cell_size * state.move_dist,
                     ));
+                state.request_redraw();
             }
             // When J is pressed move the position of the canvas
             // down by n times the cell size.
@@ -105,6 +106,7 @@ impl<'a> Canvas<'a> {
                         state.render_settings.prec,
                         &state.render_settings.cell_size * state.move_dist,
                     ));
+                state.request_redraw();
             }
             // When K is pressed move the position of the canvas
             // up by n times the cell size.
@@ -117,43 +119,47 @@ impl<'a> Canvas<'a> {
                         state.render_settings.prec,
                         &state.render_settings.cell_size * state.move_dist,
                     ));
+                state.request_redraw();
             }
             // When S is pressed increase the cell size, which will zoom out of the canvas
-            KeyCode::Char('s') => state.zoom(ZoomDirection::Out),
+            KeyCode::Char('s') => {
+                state.zoom(ZoomDirection::Out);
+                state.request_redraw();
+            }
             // When D is pressed decrease the cell size, which will zoom into the canvas
-            KeyCode::Char('d') => state.zoom(ZoomDirection::In),
+            KeyCode::Char('d') => {
+                state.zoom(ZoomDirection::In);
+                state.request_redraw();
+            }
             // decrease the decimal precision
             KeyCode::Char('u') => {
                 state.increment_decimal_prec(-10);
+                state.request_redraw();
             }
             // increase the decimal precision
             KeyCode::Char('i') => {
                 state.increment_decimal_prec(10);
+                state.request_redraw();
             }
             // reset the position to the origin and the cell size.
             KeyCode::Char('r') => {
                 state.render_settings.reset_cell_size();
                 state.render_settings.reset_pos();
+                state.request_redraw();
             }
             // Increment the selected frac index
             KeyCode::Char('f') => {
-                state.render_settings.frac_index =
-                    (state.render_settings.frac_index + 1) % FRACTALS.len();
-                if let Err(err) =
-                    executor::block_on(state.render_settings.update_fractal_shader(None))
-                {
-                    state.render_settings.use_gpu = false;
-                    state.log_error(format!(
-                        "Disabling GPU mode because fractal shader could not be loaded: {err}"
-                    ));
-                };
+                let frac_i = (state.render_settings.frac_index + 1) % FRACTALS.len();
+                if let Err(err) = state.render_settings.select_fractal(frac_i) {
+                    state.log_error(err);
+                }
+                state.request_redraw();
             }
             // Increment the color palette index
             KeyCode::Char('c') => {
                 state.render_settings.palette_index =
                     (state.render_settings.palette_index + 1) % colors::COLORS.len();
                 state.request_repaint();
-                return;
             }
             // Todo: remove duplication for + and -
             // Increment color scheme offset
@@ -165,7 +171,6 @@ impl<'a> Canvas<'a> {
                         % state.render_settings.get_palette().colors.len() as i32;
 
                 state.request_repaint();
-                return;
             }
             // Increment color scheme offset
             KeyCode::Char('+') => {
@@ -173,27 +178,19 @@ impl<'a> Canvas<'a> {
                     (state.render_settings.color_scheme_offset + 1)
                         % state.render_settings.get_palette().colors.len() as i32;
                 state.request_repaint();
-                return;
             }
             // Cycle through the void fills
             KeyCode::Char('v') => {
                 state.render_settings.void_fill_index =
                     (state.render_settings.void_fill_index + 1) % void_fills().len();
                 state.request_repaint();
-                return;
             }
             // Increment the maximum divergence
             KeyCode::Char('o') => state.increment_max_iter(10),
             // Decrement the maximum divergence
             KeyCode::Char('y') => state.increment_max_iter(-10),
-            _ => {
-                // Return from the function to avoid setting redraw_canvas
-                return;
-            }
+            _ => {}
         }
-
-        // For now, all events need to redraw the canvas.
-        state.request_redraw();
     }
 }
 impl<'a> Widget for Canvas<'a> {

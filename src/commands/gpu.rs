@@ -14,8 +14,8 @@ pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), 
             }
             Err(err) => state.log_error(format!("GPU mode could not be initialized: {err}")),
         };
-        state.request_redraw();
     }
+    state.request_redraw();
     Ok(())
 }
 pub(crate) const GPU: Command = Command {

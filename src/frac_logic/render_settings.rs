@@ -1,5 +1,6 @@
 //! Contains the `RenderSettings` struct.
 
+use futures::executor;
 use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
@@ -59,9 +60,30 @@ impl Default for RenderSettings {
 }
 
 impl RenderSettings {
+    /// Changes the selected fractal. Will update the GPU render pipeline if GPU mode
+    /// is enabled, if then an error is met, GPU mode will be disabled and an error message will be
+    /// returned. Note that this method will never fail, even though it can return an error
+    /// message.
+    pub(crate) fn select_fractal(&mut self, frac_i: usize) -> Result<(), String> {
+        self.frac_index = frac_i;
+        if self.use_gpu {
+            if let Err(err) = executor::block_on(self.update_fractal_shader(None)) {
+                self.use_gpu = false;
+                return Err(format!(
+                    "Disabling GPU mode because fractal shader could not be loaded: {err}"
+                ));
+            };
+        }
+        Ok(())
+    }
+
+    /// Returns the selected color palette.
     pub(crate) fn get_palette(&self) -> &'static Palette {
         &COLORS[self.palette_index]
     }
+
+    /// Returns a color corresponding to the given iteration count, using
+    /// the currently selected color palette.
     pub(crate) fn color_from_div(&self, diverg: &i32) -> Color {
         let palette = self.get_palette();
         let mut rng = thread_rng();
