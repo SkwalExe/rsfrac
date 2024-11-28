@@ -166,9 +166,6 @@ impl RenderSettings {
         // The byte size of one divergence line in the output buffer.
         let output_buffer_line_size = size.x as u64 * size_of::<u32>() as u64;
 
-        // The total size of the output buffer.
-        let output_buffer_size = output_buffer_line_size * size.y as BufferAddress;
-
         // The size of an input line of coordinates.
         let input_line_size = 2 * size.x as u64 * size_of::<f32>() as u64;
 
@@ -189,7 +186,7 @@ impl RenderSettings {
             output_buffer_line_size * size.y.min(max_lines_per_pass) as u64;
 
         // The final divergence matrix, each render pass will push a chunk.
-        let mut result: Vec<i32> = Vec::with_capacity(output_buffer_size as usize);
+        let mut result: Vec<i32> = Vec::with_capacity((size.y * size.x) as usize);
 
         // If a single input line can not fit in the buffer, then the render pass is too
         // complicated/impossible, so we will abort the render.
