@@ -5,7 +5,7 @@ use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Vec2};
 use super::{DivergMatrix, RenderSettings};
 use futures::executor;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use wgpu::{util::DeviceExt, BufferAddress};
+use wgpu::util::DeviceExt;
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
@@ -185,8 +185,8 @@ impl RenderSettings {
         let output_buffer_chunk_size =
             output_buffer_line_size * size.y.min(max_lines_per_pass) as u64;
 
-        // The final divergence matrix, each render pass will push a chunk.
-        let mut result: Vec<i32> = Vec::with_capacity((size.y * size.x) as usize);
+        // The final divergence matrix, each render pass will push a chunk of lines.
+        let mut result: DivergMatrix = Vec::new();
 
         // If a single input line can not fit in the buffer, then the render pass is too
         // complicated/impossible, so we will abort the render.
@@ -401,7 +401,12 @@ impl RenderSettings {
             let data = buffer_slice.get_mapped_range();
             // Since contents are got in bytes, this converts these bytes back to i32
             msg_send_progress("Parsing output data".to_string())?;
-            result.append(&mut bytemuck::cast_slice(&data).to_vec());
+            let lines_flat = bytemuck::cast_slice(&data).to_vec();
+            let mut lines = lines_flat
+                .chunks(size.x as usize)
+                .map(|chunk| chunk.to_vec())
+                .collect();
+            result.append(&mut lines);
 
             // With the current interface, we have to make sure all mapped views are
             // dropped before we unmap the buffer.
@@ -410,9 +415,6 @@ impl RenderSettings {
         }
 
         msg_send_progress("Finishing capture".to_string())?;
-        Ok(result
-            .chunks(size.x as usize)
-            .map(|chunk| chunk.into())
-            .collect())
+        Ok(result)
     }
 }
