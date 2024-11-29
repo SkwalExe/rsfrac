@@ -1,11 +1,15 @@
-use std::{cell::RefCell, sync::mpsc::Sender};
+use std::{
+    sync::mpsc::Sender,
+    time::{Duration, Instant},
+};
 
 use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Vec2};
 
 use super::{DivergMatrix, RenderSettings};
 use futures::executor;
+use humantime::format_duration;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use wgpu::util::DeviceExt;
+use wgpu::{util::DeviceExt, AdapterInfo};
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
@@ -23,6 +27,84 @@ impl Clone for WgpuState {
     }
 }
 
+pub(crate) struct GpuRenderingTracker<'a> {
+    current_pass: u32,
+    sender: Option<&'a Sender<SlaveMessage>>,
+    size: Vec2<i32>,
+    max_buf_size: u64,
+    begin_time: Instant,
+    adapter: AdapterInfo,
+}
+
+impl<'a> GpuRenderingTracker<'a> {
+    pub(crate) fn new(
+        sender: Option<&'a Sender<SlaveMessage>>,
+        size: &Vec2<i32>,
+        max_buf_size: u64,
+        adapter: AdapterInfo,
+    ) -> Self {
+        Self {
+            sender,
+            adapter,
+            size: size.clone(),
+            current_pass: 0,
+            max_buf_size,
+            begin_time: Instant::now(),
+        }
+    }
+
+    fn input_line_size(&self) -> u64 {
+        2 * self.size.x as u64 * size_of::<f32>() as u64
+    }
+
+    fn max_lines_per_pass(&self) -> i32 {
+        (self.max_buf_size / self.input_line_size()) as i32
+    }
+
+    fn pass_count(&self) -> u32 {
+        1.max((self.size.y as f32 / self.max_lines_per_pass() as f32).ceil() as u32)
+    }
+
+    fn pass_duration(&self) -> Option<Duration> {
+        let finished_passes = self.current_pass - 1;
+        if finished_passes == 0 {
+            None
+        } else {
+            Some(self.begin_time.elapsed() / finished_passes)
+        }
+    }
+
+    fn estimated_duration_tot(&self) -> Option<Duration> {
+        Some(self.pass_duration()? * self.pass_count())
+    }
+
+    fn estimated_duration_left(&self) -> Option<Duration> {
+        Some(self.estimated_duration_tot()? - self.begin_time.elapsed())
+    }
+
+    pub(crate) fn send(&self, msg: impl Into<String>) -> Result<(), String> {
+        msg_send(
+            self.sender,
+            format!(
+                "GPU: <acc {}>\nPass <acc {}/{}>\nLeft: <acc {}>\n<green {}>",
+                self.adapter.name,
+                self.current_pass,
+                self.pass_count(),
+                // Prevent showing ms and ns... should improve this shit
+                match self.estimated_duration_left() {
+                    None => "Estimating...".to_string(),
+                    Some(dur) => format_duration(Duration::from_secs(dur.as_secs())).to_string(),
+                },
+                msg.into(),
+            ),
+        )
+    }
+
+    pub(crate) fn begin_pass(&mut self) {
+        self.current_pass += 1;
+    }
+}
+
 fn msg_send(
     sender: Option<&Sender<SlaveMessage>>,
     message: impl Into<String> + Clone,
@@ -31,7 +113,7 @@ fn msg_send(
     if let Some(sender) = sender {
         sender
             .send(SlaveMessage::SetMessage(format!(
-                "Current status: {}...",
+                "Current status:\n{}",
                 message.into()
             )))
             .map_err(|err| format!("Message channel could not be opened: {err}"))?;
@@ -163,12 +245,6 @@ impl RenderSettings {
         size: &Vec2<i32>,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<DivergMatrix, String> {
-        // The byte size of one divergence line in the output buffer.
-        let output_buffer_line_size = size.x as u64 * size_of::<u32>() as u64;
-
-        // The size of an input line of coordinates.
-        let input_line_size = 2 * size.x as u64 * size_of::<f32>() as u64;
-
         // The maximum buffer size
         let max_buf_size = self
             .wgpu_state
@@ -177,6 +253,19 @@ impl RenderSettings {
             .unwrap()
             .limits()
             .max_storage_buffer_binding_size as u64;
+
+        let mut tracker = GpuRenderingTracker::new(
+            sender,
+            size,
+            max_buf_size,
+            self.wgpu_state.adapter.as_ref().unwrap().get_info(),
+        );
+
+        // The byte size of one divergence line in the output buffer.
+        let output_buffer_line_size = size.x as u64 * size_of::<u32>() as u64;
+
+        // The size of an input line of coordinates.
+        let input_line_size = 2 * size.x as u64 * size_of::<f32>() as u64;
 
         // Maximum number of input lines that can be stored in a buffer.
         let max_lines_per_pass = (max_buf_size / input_line_size) as i32;
@@ -198,26 +287,6 @@ impl RenderSettings {
             ));
         }
 
-        // The number of the current pass.
-        // Is there a way to avoid using RefCell?
-        let current_pass = RefCell::new(0);
-
-        // The total number of passes required to finish the render.
-        let total_pass_count = 1.max((size.y as f32 / max_lines_per_pass as f32).ceil() as i32);
-
-        // Will add the render pass progress before sending the status message.
-        let msg_send_progress = |msg: String| {
-            msg_send(
-                sender,
-                format!(
-                    "Render pass <acc {}/{}>: {}",
-                    current_pass.borrow(),
-                    total_pass_count,
-                    msg
-                ),
-            )
-        };
-
         let half_y = size.y / 2;
         let half_x = size.x / 2;
         let cell_size = self.get_plane_wid() / size.x;
@@ -231,9 +300,9 @@ impl RenderSettings {
             // The last line (not included) of this render pass.
             let last_line = size.y.min(first_line + max_lines_per_pass);
 
-            *current_pass.borrow_mut() += 1;
+            tracker.begin_pass();
 
-            msg_send_progress("Generating GPU input data".to_string())?;
+            tracker.send("Computing point coordinates")?;
             let points: Vec<f32> = (first_line..last_line)
                 .into_par_iter()
                 .flat_map(|y| -> Vec<f32> {
@@ -250,7 +319,7 @@ impl RenderSettings {
 
             current_line += max_lines_per_pass;
 
-            msg_send_progress("Creating the input buffer".to_string())?;
+            tracker.send("Creating the input buffer")?;
             // Instantiates buffer with data (`numbers`).
             // Usage allowing the buffer to be:
             //   A storage buffer (can be bound within a bind group and thus available to a shader).
@@ -264,7 +333,7 @@ impl RenderSettings {
                 },
             );
 
-            msg_send_progress("Creating the output buffer".to_string())?;
+            tracker.send("Creating the output buffer")?;
             let output_buffer =
                 self.wgpu_state
                     .device
@@ -277,7 +346,7 @@ impl RenderSettings {
                         mapped_at_creation: false,
                     });
 
-            msg_send_progress("Creating the staging buffer".to_string())?;
+            tracker.send("Creating the staging buffer")?;
             // Instantiates buffer without data.
             // `usage` of buffer specifies how it can be used:
             //   `BufferUsages::MAP_READ` allows it to be read (outside the shader).
@@ -294,7 +363,7 @@ impl RenderSettings {
                         mapped_at_creation: false,
                     });
 
-            msg_send_progress("Creating the parameter binding buffer".to_string())?;
+            tracker.send("Creating the parameter binding buffer")?;
             let params_binding = self.wgpu_state.device.as_ref().unwrap().create_buffer_init(
                 &wgpu::util::BufferInitDescriptor {
                     label: Some("Params buffer"),
@@ -310,7 +379,7 @@ impl RenderSettings {
                 .unwrap()
                 .get_bind_group_layout(0);
 
-            msg_send_progress("Creating bind group".to_string())?;
+            tracker.send("Creating bind group")?;
             let bind_group = self.wgpu_state.device.as_ref().unwrap().create_bind_group(
                 &wgpu::BindGroupDescriptor {
                     label: None,
@@ -332,7 +401,7 @@ impl RenderSettings {
                 },
             );
 
-            msg_send_progress("Creating a command encoder".to_string())?;
+            tracker.send("Creating a command encoder")?;
             // A command encoder executes one or many pipelines.
             // It is to WebGPU what a command buffer is to Vulkan.
             let mut encoder = self
@@ -343,7 +412,7 @@ impl RenderSettings {
                 .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
             {
-                msg_send_progress("Starting compute pass".to_string())?;
+                tracker.send("Starting compute pass")?;
                 let mut cpass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                     label: None,
                     timestamp_writes: None,
@@ -355,7 +424,7 @@ impl RenderSettings {
             }
             // Sets adds copy operation to command encoder.
             // Will copy data from storage buffer on GPU to staging buffer on CPU.
-            msg_send_progress("Copying output buffer to staging buffer".to_string())?;
+            tracker.send("Copying output buffer to staging buffer")?;
             encoder.copy_buffer_to_buffer(
                 &output_buffer,
                 0,
@@ -365,7 +434,7 @@ impl RenderSettings {
             );
 
             // Submits command encoder for processing
-            msg_send_progress("Sending the command encoder to the job queue".to_string())?;
+            tracker.send("Sending the command encoder to the job queue")?;
             self.wgpu_state
                 .queue
                 .as_ref()
@@ -378,7 +447,7 @@ impl RenderSettings {
             let (sender_, receiver) = flume::bounded(1);
             buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender_.send(v).unwrap());
 
-            msg_send_progress("Waiting for the GPU job to finish".to_string())?;
+            tracker.send("Waiting for the GPU job to finish")?;
             // Poll the device in a blocking manner so that our future resolves.
             // In an actual application, `device.poll(...)` should
             // be called in an event loop or on another thread.
@@ -390,7 +459,7 @@ impl RenderSettings {
                 .panic_on_timeout();
 
             // Awaits until `buffer_future` can be read from
-            msg_send_progress("Receiving output buffer data".to_string())?;
+            tracker.send("Receiving output buffer data")?;
             receiver
                 .recv_async()
                 .await
@@ -400,7 +469,7 @@ impl RenderSettings {
             // Gets contents of buff
             let data = buffer_slice.get_mapped_range();
             // Since contents are got in bytes, this converts these bytes back to i32
-            msg_send_progress("Parsing output data".to_string())?;
+            tracker.send("Parsing output data")?;
             let lines_flat = bytemuck::cast_slice(&data).to_vec();
             let mut lines = lines_flat
                 .chunks(size.x as usize)
@@ -414,7 +483,7 @@ impl RenderSettings {
             staging_buffer.unmap();
         }
 
-        msg_send_progress("Finishing capture".to_string())?;
+        tracker.send("Finishing capture")?;
         Ok(result)
     }
 }
