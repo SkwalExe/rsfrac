@@ -28,7 +28,8 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(
 
         if !size_range.contains(&parsed_height) || !size_range.contains(&parsed_width) {
             return Err(
-                "The screenshot must be at least 16 and at most 65535 pixels in width and height.".to_string(),
+                "The screenshot must be at least 16 and at most 65535 pixels in width and height."
+                    .to_string(),
             );
         }
 

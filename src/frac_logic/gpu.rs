@@ -473,7 +473,9 @@ impl RenderSettings {
             staging_buffer.unmap();
         }
 
-        tracker.send("Saving image to file... The application will be blocked during the time of writing.")?;
+        tracker.send(
+            "Saving image to file... The application will be blocked during the time of writing.",
+        )?;
         tracker.scroll_logs();
         Ok(result)
     }
