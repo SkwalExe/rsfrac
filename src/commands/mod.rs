@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::AppState;
 pub(crate) mod capture;
+pub(crate) mod capture_format;
 pub(crate) mod clear;
 pub(crate) mod color;
 pub(crate) mod command_increment;
@@ -9,7 +10,6 @@ pub(crate) mod frac;
 pub(crate) mod gpu;
 pub(crate) mod help;
 pub(crate) mod load;
-pub(crate) mod capture_format;
 pub(crate) mod max_iter;
 pub(crate) mod move_dist;
 pub(crate) mod pos;

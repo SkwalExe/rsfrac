@@ -7,7 +7,6 @@ use crate::app::SlaveMessage;
 use super::{gpu_util::msg_send, RenderSettings};
 
 impl RenderSettings {
-
     /// Will initialize the global wgpu state synchronously, while sending status messages
     pub(crate) fn initialize_gpu_sync(
         &mut self,
