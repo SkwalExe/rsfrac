@@ -88,12 +88,12 @@ impl ScreenshotMaster {
                     buf.save_with_format(&filename, state.render_settings.image_format)
                 {
                     state.log_error(format!("Could not save screenshot: {err}"));
+                } else {
+                    state.log_success(format!(
+                        "Screenshot ({}x{}) saved to <acc {}>",
+                        self.size.x, self.size.y, filename
+                    ));
                 }
-
-                state.log_success(format!(
-                    "Screenshot ({}x{}) saved to <acc {}>",
-                    self.size.x, self.size.y, filename
-                ));
             }
             Err(err) => state.log_error(format!("Could not finish screenshot, reason: {err}")),
         }
