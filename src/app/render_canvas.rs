@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use futures::executor;
-
 use crate::{app::App, app_state::Stats, helpers::Vec2};
 
 impl App {
@@ -18,11 +16,11 @@ impl App {
             );
 
             self.diverg_matrix = if self.app_state.render_settings.use_gpu {
-                match executor::block_on(
-                    self.app_state
-                        .render_settings
-                        .get_gpu_diverg_matrix(&size, None),
-                ) {
+                match self
+                    .app_state
+                    .render_settings
+                    .get_gpu_diverg_matrix_sync(&size, None)
+                {
                     Ok(res) => res,
                     Err(err) => {
                         self.app_state.render_settings.use_gpu = false;

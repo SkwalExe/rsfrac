@@ -9,6 +9,7 @@ pub(crate) mod frac;
 pub(crate) mod gpu;
 pub(crate) mod help;
 pub(crate) mod load;
+pub(crate) mod capture_format;
 pub(crate) mod max_iter;
 pub(crate) mod move_dist;
 pub(crate) mod pos;
@@ -34,7 +35,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 15] {
+pub(crate) fn get_commands_list() -> [&'static Command; 16] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -43,6 +44,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 15] {
         &save::SAVE,
         &load::LOAD,
         &capture::CAPTURE,
+        &capture_format::CAPTURE_FORMAT,
         &gpu::GPU,
         &pos::POS,
         &prec::PREC,

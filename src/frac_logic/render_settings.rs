@@ -1,5 +1,6 @@
 //! Contains the `RenderSettings` struct.
 
+use image::ImageFormat;
 use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
@@ -9,7 +10,7 @@ use crate::frac_logic::CanvasCoords;
 use crate::fractals::FRACTALS;
 use crate::helpers::{void_fills, VoidFill};
 
-use super::gpu::WgpuState;
+use super::gpu_util::WgpuState;
 
 const DEFAULT_PREC: u32 = 32;
 const DEFAULT_MAX_ITER: i32 = 32;
@@ -38,11 +39,13 @@ pub(crate) struct RenderSettings {
     /// Whether or not to use the GPU for computations.
     pub(crate) use_gpu: bool,
     pub(crate) wgpu_state: WgpuState,
+    pub(crate) image_format: ImageFormat,
 }
 
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
+            image_format: ImageFormat::WebP,
             frac_index: Default::default(),
             pos: Complex::with_val(DEFAULT_PREC, FRACTALS[0].default_pos),
             max_iter: DEFAULT_MAX_ITER,
