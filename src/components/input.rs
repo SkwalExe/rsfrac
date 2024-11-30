@@ -105,7 +105,7 @@ impl<'a> Input<'a> {
     }
 }
 
-impl<'a> Widget for Input<'a> {
+impl Widget for Input<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let border_style = Style::default().fg(if self.state.focused == Focus::Input {
             Color::LightBlue

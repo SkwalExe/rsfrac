@@ -44,7 +44,7 @@ impl<'a> LogPanel<'a> {
     }
 }
 
-impl<'a> Widget for LogPanel<'a> {
+impl Widget for LogPanel<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let block_style = Style::default().fg(if self.state.focused == Focus::LogPanel {
             Color::LightBlue

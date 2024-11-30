@@ -12,8 +12,8 @@ use crate::helpers::{void_fills, VoidFill};
 
 use super::gpu_util::WgpuState;
 
-const DEFAULT_PREC: u32 = 32;
-const DEFAULT_MAX_ITER: i32 = 32;
+const DEFAULT_PREC: u32 = 64;
+const DEFAULT_MAX_ITER: i32 = 128;
 
 const BLACK: Color = Color::Rgb(0, 0, 0);
 const WHITE: Color = Color::Rgb(255, 255, 255);
