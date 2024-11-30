@@ -3,13 +3,24 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::{app::SlaveMessage, frac_logic::CanvasCoords, helpers::Vec2};
+use crate::{app::SlaveMessage, helpers::Vec2};
 
 use super::{DivergMatrix, RenderSettings};
 use futures::executor;
 use humantime::format_duration;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use wgpu::{util::DeviceExt, AdapterInfo};
+
+#[derive(bytemuck::NoUninit, Clone, Copy)]
+#[repr(C)]
+pub(crate) struct ParamsBinding {
+    max_iter: i32,
+    size_x: i32,
+    size_y: i32,
+    pos_real: f32,
+    pos_imag: f32,
+    cell_size: f32,
+    y_offset: i32,
+}
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
@@ -53,12 +64,14 @@ impl<'a> GpuRenderingTracker<'a> {
         }
     }
 
-    fn input_line_size(&self) -> u64 {
-        2 * self.size.x as u64 * size_of::<f32>() as u64
+    fn scroll_logs(&self) {
+        if let Some(sender) = self.sender {
+            let _ = sender.send(SlaveMessage::ScrollLogs);
+        }
     }
 
     fn max_lines_per_pass(&self) -> i32 {
-        (self.max_buf_size / self.input_line_size()) as i32
+        (self.max_buf_size / self.output_buffer_line_size()) as i32
     }
 
     fn pass_count(&self) -> u32 {
@@ -80,6 +93,33 @@ impl<'a> GpuRenderingTracker<'a> {
 
     fn estimated_duration_left(&self) -> Option<Duration> {
         Some(self.estimated_duration_tot()? - self.begin_time.elapsed())
+    }
+    fn output_buffer_line_size(&self) -> u64 {
+        // The byte size of one divergence line in the output buffer.
+        self.size.x as u64 * size_of::<u32>() as u64
+    }
+
+    fn output_buffer_chunk_size(&self) -> u64 {
+        // The size of the output buffer when the input lines are limited, see above.
+        self.output_buffer_line_size() * self.size.y.min(self.max_lines_per_pass()) as u64
+    }
+
+    fn render_finished(&self) -> bool {
+        self.current_pass >= self.pass_count()
+    }
+
+    fn pass_line_count(&self) -> i32 {
+        self.pass_last_line() - self.pass_first_line()
+    }
+
+    fn pass_first_line(&self) -> i32 {
+        (self.current_pass as i32 - 1) * self.max_lines_per_pass()
+    }
+
+    fn pass_last_line(&self) -> i32 {
+        self.size
+            .y
+            .min(self.pass_first_line() + self.max_lines_per_pass())
     }
 
     pub(crate) fn send(&self, msg: impl Into<String>) -> Result<(), String> {
@@ -261,77 +301,23 @@ impl RenderSettings {
             self.wgpu_state.adapter.as_ref().unwrap().get_info(),
         );
 
-        // The byte size of one divergence line in the output buffer.
-        let output_buffer_line_size = size.x as u64 * size_of::<u32>() as u64;
-
-        // The size of an input line of coordinates.
-        let input_line_size = 2 * size.x as u64 * size_of::<f32>() as u64;
-
-        // Maximum number of input lines that can be stored in a buffer.
-        let max_lines_per_pass = (max_buf_size / input_line_size) as i32;
-
-        // The size of the output buffer when the input lines are limited, see above.
-        let output_buffer_chunk_size =
-            output_buffer_line_size * size.y.min(max_lines_per_pass) as u64;
-
         // The final divergence matrix, each render pass will push a chunk of lines.
         let mut result: DivergMatrix = Vec::new();
 
         // If a single input line can not fit in the buffer, then the render pass is too
         // complicated/impossible, so we will abort the render.
-        if input_line_size > max_buf_size {
+        if tracker.output_buffer_line_size() > max_buf_size {
             return Err(format!(
-                "Input buffer line size ({}MB) would exceed maximum GPU buffer size ({}MB).",
-                input_line_size / 1000000,
+                "Output buffer line size ({}MB) would exceed maximum GPU buffer size ({}MB).",
+                tracker.output_buffer_line_size() / 1000000,
                 max_buf_size / 1000000
             ));
         }
 
-        let half_y = size.y / 2;
-        let half_x = size.x / 2;
         let cell_size = self.get_plane_wid() / size.x;
 
-        // The first line of the next render pass.
-        let mut current_line = 0;
-
-        while current_line < size.y {
-            // The first line of this render pass.
-            let first_line = -half_y + current_line;
-            // The last line (not included) of this render pass.
-            let last_line = size.y.min(first_line + max_lines_per_pass);
-
+        while !tracker.render_finished() {
             tracker.begin_pass();
-
-            tracker.send("Computing point coordinates")?;
-            let points: Vec<f32> = (first_line..last_line)
-                .into_par_iter()
-                .flat_map(|y| -> Vec<f32> {
-                    (-half_x..-half_x + size.x)
-                        .into_par_iter()
-                        .flat_map(|x| {
-                            let point =
-                                self.coord_to_c_with_cell_size(CanvasCoords::new(x, y), &cell_size);
-                            vec![point.real().to_f32(), point.imag().to_f32()]
-                        })
-                        .collect()
-                })
-                .collect();
-
-            current_line += max_lines_per_pass;
-
-            tracker.send("Creating the input buffer")?;
-            // Instantiates buffer with data (`numbers`).
-            // Usage allowing the buffer to be:
-            //   A storage buffer (can be bound within a bind group and thus available to a shader).
-            //   The destination of a copy.
-            //   The source of a copy.
-            let input_buffer = self.wgpu_state.device.as_ref().unwrap().create_buffer_init(
-                &wgpu::util::BufferInitDescriptor {
-                    label: Some("Input Buffer"),
-                    contents: bytemuck::cast_slice(&points),
-                    usage: wgpu::BufferUsages::STORAGE,
-                },
-            );
 
             tracker.send("Creating the output buffer")?;
             let output_buffer =
@@ -341,7 +327,7 @@ impl RenderSettings {
                     .unwrap()
                     .create_buffer(&wgpu::BufferDescriptor {
                         label: Some("Output Buffer"),
-                        size: output_buffer_chunk_size,
+                        size: tracker.output_buffer_chunk_size(),
                         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
                         mapped_at_creation: false,
                     });
@@ -358,16 +344,24 @@ impl RenderSettings {
                     .unwrap()
                     .create_buffer(&wgpu::BufferDescriptor {
                         label: Some("Staging buffer"),
-                        size: output_buffer_chunk_size,
+                        size: tracker.output_buffer_chunk_size(),
                         usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
                         mapped_at_creation: false,
                     });
 
-            tracker.send("Creating the parameter binding buffer")?;
+            tracker.send("Creating the parameter binding buffers")?;
             let params_binding = self.wgpu_state.device.as_ref().unwrap().create_buffer_init(
                 &wgpu::util::BufferInitDescriptor {
                     label: Some("Params buffer"),
-                    contents: bytemuck::cast_slice(&[self.max_iter, size.x]),
+                    contents: bytemuck::bytes_of(&ParamsBinding {
+                        max_iter: self.max_iter,
+                        size_x: size.x,
+                        size_y: size.y,
+                        pos_real: self.pos.real().to_f32(),
+                        pos_imag: self.pos.imag().to_f32(),
+                        cell_size: cell_size.to_f32(),
+                        y_offset: tracker.pass_first_line(),
+                    }),
                     usage: wgpu::BufferUsages::UNIFORM,
                 },
             );
@@ -387,14 +381,10 @@ impl RenderSettings {
                     entries: &[
                         wgpu::BindGroupEntry {
                             binding: 0,
-                            resource: input_buffer.as_entire_binding(),
-                        },
-                        wgpu::BindGroupEntry {
-                            binding: 1,
                             resource: output_buffer.as_entire_binding(),
                         },
                         wgpu::BindGroupEntry {
-                            binding: 2,
+                            binding: 1,
                             resource: params_binding.as_entire_binding(),
                         },
                     ],
@@ -420,7 +410,7 @@ impl RenderSettings {
                 cpass.set_pipeline(self.wgpu_state.compute_pipeline.as_ref().unwrap());
                 cpass.set_bind_group(0, &bind_group, &[]);
                 cpass.insert_debug_marker("compute mandelbrot iterations");
-                cpass.dispatch_workgroups(size.x as u32, (last_line - first_line) as u32, 1);
+                cpass.dispatch_workgroups(size.x as u32, tracker.pass_line_count() as u32, 1);
             }
             // Sets adds copy operation to command encoder.
             // Will copy data from storage buffer on GPU to staging buffer on CPU.
@@ -430,11 +420,11 @@ impl RenderSettings {
                 0,
                 &staging_buffer,
                 0,
-                output_buffer_chunk_size,
+                tracker.output_buffer_chunk_size(),
             );
 
             // Submits command encoder for processing
-            tracker.send("Sending the command encoder to the job queue")?;
+            tracker.send("Sending the command encoder")?;
             self.wgpu_state
                 .queue
                 .as_ref()
@@ -483,7 +473,8 @@ impl RenderSettings {
             staging_buffer.unmap();
         }
 
-        tracker.send("Finishing capture")?;
+        tracker.send("Saving image to file... The application will be blocked during the time of writing.")?;
+        tracker.scroll_logs();
         Ok(result)
     }
 }

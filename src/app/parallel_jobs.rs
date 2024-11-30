@@ -27,6 +27,7 @@ pub(crate) struct ScreenshotMaster {
     pub(crate) handle: Option<JoinHandle<Result<DivergMatrix, String>>>,
     pub(crate) id: i64,
     pub(crate) frac_name: &'static str,
+    pub(crate) finished: bool,
 }
 
 /// Represents a message sent from a child process
@@ -37,6 +38,7 @@ pub(crate) enum SlaveMessage {
     LineRender,
     JobFinished,
     SetMessage(String),
+    ScrollLogs,
 }
 
 /// The struct representing the screenshot job state
@@ -49,6 +51,7 @@ impl ScreenshotMaster {
         frac_name: &'static str,
     ) -> Self {
         Self {
+            finished: false,
             receiver,
             size,
             rendered_lines: 0,
@@ -76,12 +79,14 @@ impl ScreenshotMaster {
                     });
 
                 let filename = format!(
-                    "{} {}.png",
+                    "{} {}.webp",
                     self.frac_name,
                     Local::now().format("%F %H-%M-%S")
                 );
 
-                let _ = buf.save_with_format(&filename, image::ImageFormat::Png);
+                if let Err(err) = buf.save_with_format(&filename, image::ImageFormat::WebP) {
+                    state.log_error(format!("Could not save screenshot: {err}"));
+                }
 
                 state.log_success(format!(
                     "Screenshot ({}x{}) saved to <acc {}>",

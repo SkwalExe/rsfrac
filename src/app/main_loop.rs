@@ -54,6 +54,14 @@ impl App {
             // Cycle through all the running jobs, non-blockingly handle messages
             // and remove finished ones.
             self.parallel_jobs.retain_mut(|job| {
+                if job.finished {
+                        // remove the priorotized progression message when the screenshot if
+                        // finished
+                        self.app_state.prioritized_log_messages.remove(&job.id);
+                        let result = job.handle.take().unwrap().join().unwrap();
+                        job.finished(&mut self.app_state, result);
+                        return false;
+                }
                 for message in job.receiver.try_iter() {
                     match message {
                         SlaveMessage::LineRender => {
@@ -71,14 +79,7 @@ impl App {
                                 );
                         }
                         SlaveMessage::JobFinished => {
-                            // remove the priorotized progression message when the screenshot if
-                            // finished
-                            self.app_state.prioritized_log_messages.remove(&job.id);
-
-                            let result = job.handle.take().unwrap().join().unwrap();
-
-                            job.finished(&mut self.app_state, result);
-                            return false;
+                            job.finished = true;
                         }
                         SlaveMessage::SetMessage(message) => {
 
@@ -87,6 +88,8 @@ impl App {
                                 .prioritized_log_messages
                                 .get_mut(&job.id)
                                 .expect("There was no entry in the prioritized log messages corresponding to the current job.") = message;
+                        },
+                        SlaveMessage::ScrollLogs => {
                             self.app_state.log_panel_scroll_state.lock().unwrap().scroll_to_bottom();
                         }
                     }
