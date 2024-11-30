@@ -21,11 +21,15 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(
                 "The provided width could not be parsed, make sure to enter a valid integer: {err}"
             )
         })?;
-        let parsed_height = height.parse().map_err(|err| format!("The provided height could not be parsed, make sure to enter a valid integer: {err}"))?;
 
-        if parsed_height < 16 || parsed_width < 16 {
+        let parsed_height: i32 = height.parse().map_err(|err| format!("The provided height could not be parsed, make sure to enter a valid integer: {err}"))?;
+
+        let size_range = 16..u16::MAX as i32 + 1;
+
+        if !size_range.contains(&parsed_height) || !size_range.contains(&parsed_width) {
             return Err(
-                "The screenshot must be at least 16 pixels in width and height.".to_string(),
+                "The screenshot must be at least 16 and at most 65535 pixels in width and height."
+                    .to_string(),
             );
         }
 
