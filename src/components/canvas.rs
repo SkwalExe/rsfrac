@@ -193,7 +193,7 @@ impl<'a> Canvas<'a> {
         }
     }
 }
-impl<'a> Widget for Canvas<'a> {
+impl Widget for Canvas<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         // We need a ternary operator pleasssssse
         let border_style = Style::default().fg(if self.state.focused == Focus::Canvas {

@@ -21,7 +21,7 @@ impl<'a> Footer<'a> {
     }
 }
 
-impl<'a> Widget for Footer<'a> {
+impl Widget for Footer<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let mut content = String::from(" Actions:");
         let mut line_len = content.len();

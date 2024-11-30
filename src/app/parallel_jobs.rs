@@ -4,7 +4,6 @@ use std::{
 };
 
 use chrono::{Local, Utc};
-use futures::executor;
 use image::ImageBuffer;
 use ratatui::style::Color;
 
@@ -79,12 +78,15 @@ impl ScreenshotMaster {
                     });
 
                 let filename = format!(
-                    "{} {}.webp",
+                    "{} {}.{}",
                     self.frac_name,
-                    Local::now().format("%F %H-%M-%S")
+                    Local::now().format("%F %H-%M-%S"),
+                    state.render_settings.image_format.extensions_str()[0]
                 );
 
-                if let Err(err) = buf.save_with_format(&filename, image::ImageFormat::WebP) {
+                if let Err(err) =
+                    buf.save_with_format(&filename, state.render_settings.image_format)
+                {
                     state.log_error(format!("Could not save screenshot: {err}"));
                 }
 
@@ -126,10 +128,9 @@ impl ScreenshotSlave {
     pub(crate) fn run(&mut self) -> Result<DivergMatrix, String> {
         if self.rs_copy.use_gpu {
             self.rs_copy.initialize_gpu_sync(Some(&self.sender))?;
-            let result = executor::block_on(
-                self.rs_copy
-                    .get_gpu_diverg_matrix(&self.size, Some(&self.sender)),
-            );
+            let result = self
+                .rs_copy
+                .get_gpu_diverg_matrix_sync(&self.size, Some(&self.sender));
             self.sender
                 .send(SlaveMessage::JobFinished)
                 .map_err(|err| format!("Could not open message channel: {err}"))?;

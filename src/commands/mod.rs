@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::AppState;
 pub(crate) mod capture;
+pub(crate) mod capture_format;
 pub(crate) mod clear;
 pub(crate) mod color;
 pub(crate) mod command_increment;
@@ -34,7 +35,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 15] {
+pub(crate) fn get_commands_list() -> [&'static Command; 16] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -43,6 +44,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 15] {
         &save::SAVE,
         &load::LOAD,
         &capture::CAPTURE,
+        &capture_format::CAPTURE_FORMAT,
         &gpu::GPU,
         &pos::POS,
         &prec::PREC,
