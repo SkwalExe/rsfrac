@@ -40,10 +40,9 @@ pub(crate) const JULIA: Fractal = Fractal {
     get: &get_julia,
     name: "Julia",
     details: concat!(
-        "Default Formula: \n<acc Uₙ₊₁ = Uₙ²-1 >\n",
+        "Formula: \n<acc Uₙ₊₁ = Uₙ² + C >\n",
         // Todo: allow custom exp
-        "General case: \n<acc Uₙ₊₁ = Uₙ²+C >\n",
         "Where <acc U₀> is the complex number at the position of the pixel, ",
-        "and <acc C> is a constant that can be modified, set to <acc -1+0j> by default.\n",
+        "and <acc C> is a constant that can be modified.\n",
     ),
 };

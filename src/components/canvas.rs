@@ -14,6 +14,7 @@ use std::ops::{AddAssign, SubAssign};
 
 use crate::{
     app::CanvasPoints,
+    app_state::ClickMode,
     colors,
     fractals::FRACTALS,
     helpers::{void_fills, Focus, ZoomDirection},
@@ -54,14 +55,25 @@ impl<'a> Canvas<'a> {
             .render_settings
             .ratatui_to_canvas_coords(event.column, event.row);
 
-        match event.kind {
-            MouseEventKind::Down(MouseButton::Left) => {
-                state.zoom_at(canvas_pos, ZoomDirection::In);
+        let action = match event.kind {
+            MouseEventKind::Down(MouseButton::Left) => &state.click_config.left,
+            MouseEventKind::Down(MouseButton::Right) => &state.click_config.right,
+            MouseEventKind::Down(MouseButton::Middle) => &state.click_config.right,
+            _ => return,
+        };
+        match action {
+            ClickMode::Move => {
+                state.render_settings.pos = state.render_settings.coord_to_c(canvas_pos)
             }
-            MouseEventKind::Down(MouseButton::Right) => {
+            ClickMode::ZoomOut => {
                 state.zoom_at(canvas_pos, ZoomDirection::Out);
             }
-            _ => {}
+            ClickMode::ZoomIn => {
+                state.zoom_at(canvas_pos, ZoomDirection::In);
+            }
+            ClickMode::JuliaConstant => {
+                state.render_settings.julia_constant = state.render_settings.coord_to_c(canvas_pos)
+            }
         }
 
         state.request_redraw();
@@ -193,6 +205,7 @@ impl<'a> Canvas<'a> {
         }
     }
 }
+
 impl Widget for Canvas<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         // We need a ternary operator pleasssssse

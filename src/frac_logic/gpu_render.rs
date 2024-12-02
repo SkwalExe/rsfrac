@@ -11,12 +11,11 @@ use super::{gpu_util::GpuRenderingTracker, DivergMatrix, RenderSettings};
 #[repr(C)]
 pub(crate) struct ParamsBinding {
     max_iter: i32,
-    size_x: i32,
-    size_y: i32,
-    pos_real: f32,
-    pos_imag: f32,
+    size: [i32; 2],
+    pos: [f32; 2],
     cell_size: f32,
     y_offset: i32,
+    julia_constant: [f32; 2],
 }
 
 impl RenderSettings {
@@ -102,12 +101,14 @@ impl RenderSettings {
                     label: Some("Params buffer"),
                     contents: bytemuck::bytes_of(&ParamsBinding {
                         max_iter: self.max_iter,
-                        size_x: size.x,
-                        size_y: size.y,
-                        pos_real: self.pos.real().to_f32(),
-                        pos_imag: self.pos.imag().to_f32(),
+                        size: [size.x, size.y],
+                        pos: [self.pos.real().to_f32(), self.pos.imag().to_f32()],
                         cell_size: cell_size.to_f32(),
                         y_offset: tracker.pass_first_line(),
+                        julia_constant: [
+                            self.julia_constant.real().to_f32(),
+                            self.julia_constant.imag().to_f32(),
+                        ],
                     }),
                     usage: wgpu::BufferUsages::UNIFORM,
                 },
