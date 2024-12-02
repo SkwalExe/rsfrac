@@ -14,6 +14,7 @@ pub(crate) struct SavedState {
     pub(crate) precision: Option<u32>,
     pub(crate) max_iter: Option<i32>,
     pub(crate) void_fill: Option<VoidFill>,
+    pub(crate) julia_constant: Option<String>,
 }
 
 impl From<&AppState> for SavedState {
@@ -27,6 +28,7 @@ impl From<&AppState> for SavedState {
             max_iter: Some(state.render_settings.max_iter),
             precision: Some(state.render_settings.prec),
             void_fill: Some(void_fills()[state.render_settings.void_fill_index].clone()),
+            julia_constant: Some(state.render_settings.julia_constant.to_string()),
         }
     }
 }

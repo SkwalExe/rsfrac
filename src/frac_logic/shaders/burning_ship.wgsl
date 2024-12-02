@@ -6,6 +6,8 @@ struct Params {
     pos_imag: f32,
     cell_size: f32,
     y_offset: i32,
+    julia_constant_real: f32,
+    julia_constant_imag: f32,
 }
 
 

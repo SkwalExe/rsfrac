@@ -3,7 +3,9 @@ use std::{collections::HashMap, sync::Mutex};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
+mod click_modes;
 mod stats;
+pub(crate) use click_modes::{ClickConfig, ClickMode};
 pub(crate) use stats::Stats;
 
 use crate::{
@@ -35,6 +37,7 @@ pub(crate) struct AppState {
     pub(crate) scaling_factor: i32,
     pub(crate) render_settings: RenderSettings,
     pub(crate) requested_jobs: Vec<ScreenshotMaster>,
+    pub(crate) click_config: ClickConfig,
 }
 
 impl Default for AppState {
@@ -55,6 +58,7 @@ impl Default for AppState {
             move_dist: 8,
             marker: Default::default(),
             requested_jobs: Default::default(),
+            click_config: Default::default(),
         }
     }
 }
@@ -88,6 +92,13 @@ impl AppState {
             if let Some(pos) = saved.pos {
                 self.render_settings.pos = Complex::parse(pos)
                     .map_err(|err| format!("Invalid canvas position: {err}"))?
+                    .complete((self.render_settings.prec, self.render_settings.prec));
+            }
+
+            // Change the julia constant
+            if let Some(c) = saved.julia_constant {
+                self.render_settings.julia_constant = Complex::parse(c)
+                    .map_err(|err| format!("Invalid julia constant: {err}"))?
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 

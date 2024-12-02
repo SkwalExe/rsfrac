@@ -4,6 +4,7 @@ use crate::AppState;
 pub(crate) mod capture;
 pub(crate) mod capture_format;
 pub(crate) mod clear;
+pub(crate) mod click_mode;
 pub(crate) mod color;
 pub(crate) mod command_increment;
 pub(crate) mod frac;
@@ -35,7 +36,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 16] {
+pub(crate) fn get_commands_list() -> [&'static Command; 17] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -53,6 +54,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 16] {
         &frac::FRAC,
         &zoom_factor::ZOOM_FACTOR,
         &move_dist::MOVE_DIST,
+        &click_mode::CLICK_MODE,
     ]
 }
 
