@@ -5,6 +5,7 @@ pub(crate) enum ClickMode {
     ZoomIn,
     ZoomOut,
     JuliaConstant,
+    MandelConstant,
     Move,
 }
 
@@ -19,13 +20,16 @@ impl ClickMode {
     }
 
     pub fn from(str_: &str) -> Option<Self> {
-        Some(match str_.to_lowercase().as_str() {
-            "zoomin" => Self::ZoomIn,
-            "zoomout" => Self::ZoomOut,
-            "move" => Self::Move,
-            "juliaconstant" => Self::JuliaConstant,
-            _ => return None,
-        })
+        [
+            ("zoomin", Self::ZoomIn),
+            ("zoomout", Self::ZoomOut),
+            ("move", Self::Move),
+            ("juliaconstant", Self::JuliaConstant),
+            ("mandelconstant", Self::MandelConstant),
+        ]
+        .iter()
+        .find(|x| x.0.starts_with(&str_.to_lowercase().replace("_", "")))
+        .map(|x| x.1.clone())
     }
 }
 

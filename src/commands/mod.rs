@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::AppState;
 pub(crate) mod capture;
 pub(crate) mod capture_format;
@@ -28,6 +26,7 @@ pub(crate) struct Command {
     pub(crate) execute: CommandClos,
     /// The name of the command.
     pub(crate) name: &'static str,
+    pub(crate) aliases: &'static [&'static str],
     /// A basic description of the command.
     pub(crate) basic_desc: &'static str,
     /// An optional detailed description of the command.
@@ -58,7 +57,10 @@ pub(crate) fn get_commands_list() -> [&'static Command; 17] {
     ]
 }
 
-/// Returns a `HashMap` associating each command's name to itself.
-pub(crate) fn get_commands_map() -> HashMap<&'static str, &'static Command> {
-    HashMap::from(get_commands_list().map(|command| (command.name, command)))
+pub(crate) fn get_command_by_name(name: &str) -> Option<&'static Command> {
+    let name = name.to_lowercase();
+    get_commands_list()
+        .iter()
+        .find(|c| c.name == name || c.aliases.contains(&name.as_str()))
+        .map(|c| &**c)
 }

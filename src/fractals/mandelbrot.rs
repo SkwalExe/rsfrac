@@ -15,9 +15,7 @@ fn get_mandelbrot(p: Complex, render_settings: &RenderSettings) -> i32 {
     let mut n: i32 = 0;
     // Current term of the series
 
-    // Todo: allow to change this
-    let mandelbrot_u0 = (0, 0);
-    let mut z: Complex = Complex::with_val(render_settings.prec, mandelbrot_u0);
+    let mut z: Complex = render_settings.mandel_constant.clone();
 
     // Compute the next term while z is not beyond 2
     // from the origin and the maximum divergence is not passed

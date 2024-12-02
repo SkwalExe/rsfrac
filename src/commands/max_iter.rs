@@ -20,6 +20,7 @@ pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) -> Result<
 pub(crate) const MAX_ITER: Command = Command {
     execute: &execute_max_iter,
     name: "max_iter",
+    aliases: &["mi"],
     accepted_arg_count: &[0, 1, 2],
 
     detailed_desc: Some(concat!(

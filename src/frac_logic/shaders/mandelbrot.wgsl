@@ -8,6 +8,8 @@ struct Params {
     y_offset: i32,
     julia_constant_real: f32,
     julia_constant_imag: f32,
+    mandel_constant_real: f32,
+    mandel_constant_imag: f32,
 }
 
 
@@ -41,11 +43,11 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
 fn iterations(point: vec2<f32>) -> i32 {
     var iter: i32 = 0i;
-    var z: vec2<f32> = vec2<f32>(0f, 0f);
+    var z: vec2<f32> = vec2<f32>(params.mandel_constant_real, params.mandel_constant_imag);
 
     while length(z) < 2f && iter < params.max_iter {
         z = vec2<f32>(
-            z.x * z.x - z.y * z.y + point.x,
+            pow(z.x, 2f) - pow(z.y, 2f) + point.x,
             2f * z.x * z.y + point.y
         );
         iter = iter + 1i;

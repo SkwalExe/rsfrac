@@ -95,6 +95,13 @@ impl AppState {
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 
+            // Change the mandelbrot constant
+            if let Some(c) = saved.mandel_constant {
+                self.render_settings.mandel_constant = Complex::parse(c)
+                    .map_err(|err| format!("Invalid mandelbrot constant: {err}"))?
+                    .complete((self.render_settings.prec, self.render_settings.prec));
+            }
+
             // Change the julia constant
             if let Some(c) = saved.julia_constant {
                 self.render_settings.julia_constant = Complex::parse(c)

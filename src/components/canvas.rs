@@ -74,6 +74,9 @@ impl<'a> Canvas<'a> {
             ClickMode::JuliaConstant => {
                 state.render_settings.julia_constant = state.render_settings.coord_to_c(canvas_pos)
             }
+            ClickMode::MandelConstant => {
+                state.render_settings.mandel_constant = state.render_settings.coord_to_c(canvas_pos)
+            }
         }
 
         state.request_redraw();

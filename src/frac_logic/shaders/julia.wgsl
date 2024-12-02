@@ -8,6 +8,8 @@ struct Params {
     y_offset: i32,
     julia_constant_real: f32,
     julia_constant_imag: f32,
+    mandel_constant_real: f32,
+    mandel_constant_imag: f32,
 }
 
 

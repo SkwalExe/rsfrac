@@ -9,6 +9,7 @@ pub(crate) fn execute_clear(state: &mut AppState, _args: Vec<&str>) -> Result<()
 pub(crate) const CLEAR: Command = Command {
     execute: &execute_clear,
     name: "clear",
+    aliases: &["c"],
     accepted_arg_count: &[0],
     detailed_desc: None,
     basic_desc: "Clear all messages from the log panel.",

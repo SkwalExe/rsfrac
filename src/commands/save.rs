@@ -32,6 +32,7 @@ pub(crate) fn execute_save(state: &mut AppState, args: Vec<&str>) -> Result<(), 
 pub(crate) const SAVE: Command = Command {
     execute: &execute_save,
     name: "save",
+    aliases: &[],
     accepted_arg_count: &[0, 1],
     detailed_desc: Some(concat!(
         "<green Usage: <command [file path]>>\n",

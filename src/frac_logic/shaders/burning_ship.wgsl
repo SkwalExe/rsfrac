@@ -8,7 +8,10 @@ struct Params {
     y_offset: i32,
     julia_constant_real: f32,
     julia_constant_imag: f32,
+    mandel_constant_real: f32,
+    mandel_constant_imag: f32,
 }
+
 
 
 @group(0) @binding(0) var<storage, read_write> output_buf: array<i32>; 

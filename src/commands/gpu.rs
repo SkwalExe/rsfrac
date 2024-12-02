@@ -19,6 +19,7 @@ pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), 
 pub(crate) const GPU: Command = Command {
     execute: &execute_gpu,
     name: "gpu",
+    aliases: &[],
     accepted_arg_count: &[0],
     detailed_desc: None,
     basic_desc: concat!(

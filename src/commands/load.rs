@@ -91,6 +91,7 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
 pub(crate) const LOAD: Command = Command {
     execute: &execute_load,
     name: "load",
+    aliases: &["l"],
     accepted_arg_count: &[0, 1],
     detailed_desc: Some(concat!(
         "<green Usage: <command [no args]>>\n",

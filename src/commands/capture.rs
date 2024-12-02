@@ -55,6 +55,7 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(
 pub(crate) const CAPTURE: Command = Command {
     execute: &execute_capture,
     name: "capture",
+    aliases: &["cp"],
     accepted_arg_count: &[0, 2],
     detailed_desc: Some(concat!(
         "<green Usage: <command [width] [height]>>\n",

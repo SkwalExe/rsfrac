@@ -51,6 +51,7 @@ pub(crate) fn execute_pos(state: &mut AppState, args: Vec<&str>) -> Result<(), S
 pub(crate) const POS: Command = Command {
     execute: &execute_pos,
     name: "pos",
+    aliases: &[],
     accepted_arg_count: &[0, 2],
     basic_desc: "View or set the position of the canvas in the complex plane.",
     detailed_desc: Some(concat!(

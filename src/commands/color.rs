@@ -29,6 +29,7 @@ pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) -> Result<(),
 pub(crate) const COLOR: Command = Command {
     execute: &execute_color,
     name: "color",
+    aliases: &[],
     accepted_arg_count: &[0, 1],
     detailed_desc: Some(concat!(
         "<green Usage: <command [color]>>\n",

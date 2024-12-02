@@ -19,6 +19,7 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), 
 pub(crate) const PREC: Command = Command {
     execute: &execute_prec,
     name: "prec",
+    aliases: &[],
     accepted_arg_count: &[0, 1, 2],
 
     detailed_desc: Some(concat!(

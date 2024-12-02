@@ -14,6 +14,7 @@ pub(crate) fn execute_move_dist(state: &mut AppState, args: Vec<&str>) -> Result
 pub(crate) const MOVE_DIST: Command = Command {
     execute: &execute_move_dist,
     name: "move_dist",
+    aliases: &["md"],
     accepted_arg_count: &[0, 1, 2],
 
     detailed_desc: Some(concat!(

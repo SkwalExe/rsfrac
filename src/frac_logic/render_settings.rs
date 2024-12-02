@@ -18,6 +18,7 @@ const DEFAULT_MAX_ITER: i32 = 128;
 const BLACK: Color = Color::Rgb(0, 0, 0);
 const WHITE: Color = Color::Rgb(255, 255, 255);
 const DEFAULT_JULIA_CONSTANT: (f32, f32) = (-9.9418604e-1, 2.61627e-1);
+const DEFAULT_MANDEL_CONSTANT: (f32, f32) = (0.0, 0.0);
 
 /// Used to group values related to fractal rendering logic.
 #[derive(Clone)]
@@ -42,6 +43,7 @@ pub(crate) struct RenderSettings {
     pub(crate) wgpu_state: WgpuState,
     pub(crate) image_format: ImageFormat,
     pub(crate) julia_constant: Complex,
+    pub(crate) mandel_constant: Complex,
 }
 
 impl Default for RenderSettings {
@@ -60,6 +62,7 @@ impl Default for RenderSettings {
             use_gpu: false,
             wgpu_state: WgpuState::default(),
             julia_constant: Complex::with_val(DEFAULT_PREC, DEFAULT_JULIA_CONSTANT),
+            mandel_constant: Complex::with_val(DEFAULT_PREC, DEFAULT_MANDEL_CONSTANT),
         }
     }
 }
