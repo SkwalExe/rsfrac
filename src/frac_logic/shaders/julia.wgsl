@@ -50,8 +50,8 @@ fn iterations(point: vec2<f32>) -> i32 {
         //     2f * z.x * z.y + imag
         // );
         z = vec2<f32>(
-            pow(z.x, 2f) - pow(z.y, 2f) - params.julia_constant_real,
-            2f * z.x * z.y - params.julia_constant_imag
+            pow(z.x, 2f) - pow(z.y, 2f) + params.julia_constant_real,
+            2f * z.x * z.y + params.julia_constant_imag
         );
         iter = iter + 1i;
     }

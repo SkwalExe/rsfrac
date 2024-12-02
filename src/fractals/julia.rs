@@ -13,9 +13,6 @@ fn get_julia(mut p: Complex, render_settings: &RenderSettings) -> i32 {
     // iteration counter
     let mut n: i32 = 0;
 
-    // Todo: allow to change this
-    let julia_cst = Complex::with_val(render_settings.prec, (-1, 0));
-
     while *p
         .abs_ref()
         .complete((render_settings.prec, render_settings.prec))
@@ -24,7 +21,7 @@ fn get_julia(mut p: Complex, render_settings: &RenderSettings) -> i32 {
         && n < render_settings.max_iter
     {
         p.pow_assign(2);
-        p.add_assign(&julia_cst);
+        p.add_assign(&render_settings.julia_constant);
         n += 1;
     }
 
