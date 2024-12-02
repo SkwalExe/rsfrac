@@ -12,6 +12,7 @@ pub(crate) fn execute_version(state: &mut AppState, _args: Vec<&str>) -> Result<
 pub(crate) const VERSION_COMMAND: Command = Command {
     execute: &execute_version,
     name: "version",
+    aliases: &["v"],
     accepted_arg_count: &[0],
     detailed_desc: None,
     basic_desc: "Display the version number of Rsfrac.",

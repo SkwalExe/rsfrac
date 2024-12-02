@@ -32,6 +32,7 @@ pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) -> Resu
 pub(crate) const ZOOM_FACTOR: Command = Command {
     execute: &execute_zoom_factor,
     name: "zoom_factor",
+    aliases: &["zf"],
     accepted_arg_count: &[0, 1],
     basic_desc: "View or set the scaling factor used when zooming in or out the canvas.",
     detailed_desc: Some(concat!(

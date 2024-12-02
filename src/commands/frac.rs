@@ -53,6 +53,7 @@ pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) -> Result<(), 
 pub(crate) const FRAC: Command = Command {
     execute: &execute_frac,
     name: "frac",
+    aliases: &["f"],
     accepted_arg_count: &[0, 1, 2],
     detailed_desc: Some(concat!(
         "<green Usage: <command [frac]>>\n",

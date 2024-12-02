@@ -34,6 +34,7 @@ pub(crate) fn execute_click_mode(state: &mut AppState, args: Vec<&str>) -> Resul
 pub(crate) const CLICK_MODE: Command = Command {
     execute: &execute_click_mode,
     name: "click_mode",
+    aliases: &["cm"],
     accepted_arg_count: &[0, 2],
     detailed_desc: Some(concat!(
         "<green Usage: <command [no args]>>\n",

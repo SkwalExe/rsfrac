@@ -27,6 +27,7 @@ pub(crate) fn execute_capture_format(state: &mut AppState, args: Vec<&str>) -> R
 pub(crate) const CAPTURE_FORMAT: Command = Command {
     execute: &execute_capture_format,
     name: "capture_format",
+    aliases: &["cf"],
     accepted_arg_count: &[0, 1],
 
     detailed_desc: Some(concat!(
