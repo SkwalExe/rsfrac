@@ -48,6 +48,7 @@ pub(crate) struct RenderSettings {
     pub(crate) image_format: ImageFormat,
     pub(crate) julia_constant: Complex,
     pub(crate) mandel_constant: Complex,
+    pub(crate) bailout: f32,
 }
 
 impl Default for RenderSettings {
@@ -67,6 +68,7 @@ impl Default for RenderSettings {
             wgpu_state: WgpuState::default(),
             julia_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_JULIA_CONSTANT),
             mandel_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_MANDEL_CONSTANT),
+            bailout: 2.0,
         }
     }
 }

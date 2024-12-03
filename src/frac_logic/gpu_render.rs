@@ -17,6 +17,7 @@ pub(crate) struct ParamsBinding {
     y_offset: i32,
     julia_constant: [f32; 2],
     mandel_constant: [f32; 2],
+    bailout: f32,
 }
 
 impl RenderSettings {
@@ -114,6 +115,7 @@ impl RenderSettings {
                             self.mandel_constant.real().to_f32(),
                             self.mandel_constant.imag().to_f32(),
                         ],
+                        bailout: self.bailout
                     }),
                     usage: wgpu::BufferUsages::UNIFORM,
                 },

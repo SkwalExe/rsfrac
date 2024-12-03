@@ -77,6 +77,14 @@ impl<'a> Canvas<'a> {
             ClickMode::MandelConstant => {
                 state.render_settings.mandel_constant = state.render_settings.coord_to_c(canvas_pos)
             }
+            ClickMode::BailOut => {
+                state.render_settings.bailout = state
+                    .render_settings
+                    .coord_to_c(canvas_pos)
+                    .abs()
+                    .real()
+                    .to_f32()
+            }
         }
 
         state.request_redraw();

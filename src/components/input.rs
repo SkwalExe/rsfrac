@@ -1,7 +1,5 @@
 //! Contains the `Input` widget.
 
-use std::ascii::AsciiExt;
-
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},

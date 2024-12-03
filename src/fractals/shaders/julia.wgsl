@@ -10,6 +10,7 @@ struct Params {
     julia_constant_imag: f32,
     mandel_constant_real: f32,
     mandel_constant_imag: f32,
+    bailout: f32,
 }
 
 
@@ -46,7 +47,7 @@ fn iterations(point: vec2<f32>) -> i32 {
     var z = point;
     var iter: i32 = 0i;
 
-    while length(z) < 4f && iter < params.max_iter {
+    while length(z) < params.bailout && iter < params.max_iter {
         // z = vec2<f32>(
         //     pow(z.x, 2f) - pow(z.y, 2f),
         //     2f * z.x * z.y + imag
