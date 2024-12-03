@@ -118,6 +118,11 @@ impl AppState {
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 
+            // Change the bailout
+            if let Some(b) = saved.bailout {
+                self.render_settings.bailout = b;
+            }
+
             // Change the cell size
             if let Some(complex_width) = saved.complex_width {
                 self.render_settings.set_width(
