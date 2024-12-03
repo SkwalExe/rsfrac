@@ -5,19 +5,18 @@ pub(crate) const MIN_DECIMAL_PREC: u32 = 8;
 pub(crate) const MAX_DECIMAL_PREC: u32 = 10000;
 
 pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    if let Some(val) = command_increment(
+    let val = command_increment(
         state,
         state.render_settings.prec,
         args,
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
-    ) {
-        state.log_info(concat!(
-            "Arbitrary precision if not taken into account when GPU mode is enabled. ",
-            "You can disable GPU mode with the <command gpu> command."
-        ));
-        state.set_decimal_prec(val);
-    }
+    )?;
+    state.log_info(concat!(
+        "Arbitrary precision if not taken into account when GPU mode is enabled. ",
+        "You can disable GPU mode with the <command gpu> command."
+    ));
+    state.set_decimal_prec(val);
     Ok(())
 }
 pub(crate) const PREC: Command = Command {
