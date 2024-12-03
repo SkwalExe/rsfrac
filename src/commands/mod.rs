@@ -66,3 +66,22 @@ pub(crate) fn get_command_by_name(name: &str) -> Option<&'static Command> {
         .find(|c| c.name == name || c.aliases.contains(&name.as_str()))
         .map(|c| &**c)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_command_by_name() {
+        assert_eq!(get_command_by_name("help").unwrap().name, "help");
+        assert_eq!(get_command_by_name("hElP").unwrap().name, "help");
+        assert_eq!(get_command_by_name("h").unwrap().name, "help");
+        assert_eq!(get_command_by_name("Q").unwrap().name, "quit");
+        assert_eq!(get_command_by_name("mi").unwrap().name, "max_iter");
+        assert_eq!(get_command_by_name("cP").unwrap().name, "capture");
+        assert_eq!(get_command_by_name("c").unwrap().name, "clear");
+        assert_eq!(get_command_by_name("cpf").unwrap().name, "capture_fit");
+
+        assert!(get_command_by_name("blabla").is_none());
+    }
+}

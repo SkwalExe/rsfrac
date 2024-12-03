@@ -5,16 +5,16 @@ pub(crate) const MIN_MAX_ITER: i32 = 8;
 pub(crate) const MAX_MAX_ITER: i32 = 10000;
 
 pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    if let Some(val) = command_increment(
+    let val = command_increment(
         state,
         state.render_settings.max_iter,
         args,
         MIN_MAX_ITER,
         MAX_MAX_ITER,
-    ) {
-        state.render_settings.max_iter = val;
-        state.request_redraw();
-    }
+    )?;
+    state.render_settings.max_iter = val;
+    state.request_redraw();
+
     Ok(())
 }
 pub(crate) const MAX_ITER: Command = Command {
@@ -36,3 +36,37 @@ pub(crate) const MAX_ITER: Command = Command {
     basic_desc:
         "Change the iteration limit used to determine if a point is converging or diverging.",
 };
+
+#[cfg(test)]
+mod tests {
+    use crate::{commands::max_iter::execute_max_iter, AppState};
+
+    #[test]
+    fn test_max_iter_command() {
+        let mut state = AppState::default();
+
+        // `mi -1` should return Err
+        assert!(execute_max_iter(&mut state, vec!["-1"]).is_err());
+
+        // `mi 20` should return Ok and set the max iter to 20
+        execute_max_iter(&mut state, vec!["20"]).unwrap();
+        assert_eq!(state.render_settings.max_iter, 20);
+
+        // `mi + 10` should return Ok and set the max iter to 30
+        execute_max_iter(&mut state, vec!["+", "10"]).unwrap();
+        assert_eq!(state.render_settings.max_iter, 30);
+
+        // `mi - 10` should return Ok and set the max iter to 25
+        execute_max_iter(&mut state, vec!["-", "5"]).unwrap();
+        assert_eq!(state.render_settings.max_iter, 25);
+
+        // `mi - 100` should return Err
+        assert!(execute_max_iter(&mut state, vec!["-", "100"]).is_err());
+
+        // `mi blahblah 100` should return Err
+        assert!(execute_max_iter(&mut state, vec!["blahblah", "100"]).is_err());
+
+        // max_iter should have remained to 25
+        assert_eq!(state.render_settings.max_iter, 25);
+    }
+}
