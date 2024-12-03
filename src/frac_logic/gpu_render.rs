@@ -115,7 +115,7 @@ impl RenderSettings {
                             self.mandel_constant.real().to_f32(),
                             self.mandel_constant.imag().to_f32(),
                         ],
-                        bailout: self.bailout
+                        bailout: self.bailout,
                     }),
                     usage: wgpu::BufferUsages::UNIFORM,
                 },
