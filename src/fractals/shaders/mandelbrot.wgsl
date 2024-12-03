@@ -10,6 +10,7 @@ struct Params {
     julia_constant_imag: f32,
     mandel_constant_real: f32,
     mandel_constant_imag: f32,
+    bailout: f32,
 }
 
 
@@ -41,11 +42,12 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
 // ============= Everything above this line should be the same in all fractal shaders
 
+
 fn iterations(point: vec2<f32>) -> i32 {
     var iter: i32 = 0i;
     var z: vec2<f32> = vec2<f32>(params.mandel_constant_real, params.mandel_constant_imag);
 
-    while length(z) < 2f && iter < params.max_iter {
+    while length(z) < params.bailout && iter < params.max_iter {
         z = vec2<f32>(
             pow(z.x, 2f) - pow(z.y, 2f) + point.x,
             2f * z.x * z.y + point.y

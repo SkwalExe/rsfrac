@@ -7,6 +7,7 @@ pub(crate) enum ClickMode {
     JuliaConstant,
     MandelConstant,
     Move,
+    BailOut,
 }
 
 impl ClickMode {
@@ -16,6 +17,8 @@ impl ClickMode {
             ClickMode::ZoomOut,
             ClickMode::Move,
             ClickMode::JuliaConstant,
+            ClickMode::BailOut,
+            ClickMode::MandelConstant,
         ]
     }
 
@@ -26,6 +29,7 @@ impl ClickMode {
             ("move", Self::Move),
             ("juliaconstant", Self::JuliaConstant),
             ("mandelconstant", Self::MandelConstant),
+            ("bailout", Self::BailOut),
         ]
         .iter()
         .find(|x| x.0.starts_with(&str_.to_lowercase().replace("_", "")))
