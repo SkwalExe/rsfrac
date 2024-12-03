@@ -1,3 +1,5 @@
+//! Contains the command system logic, as well as the code for each available command.
+
 use crate::AppState;
 pub(crate) mod capture;
 pub(crate) mod capture_fit;

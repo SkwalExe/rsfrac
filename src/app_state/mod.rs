@@ -1,3 +1,5 @@
+//! Contains the logic state of the application (can be headless).
+
 use rug::{ops::CompleteRound, Complex, Float};
 use std::{collections::HashMap, sync::Mutex};
 use tui_input::Input as TuiInput;

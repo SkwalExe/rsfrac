@@ -1,3 +1,5 @@
+//! Contains useful structs and data structures used across all the codebase.
+
 mod chunks;
 mod focus;
 mod saved_state;
