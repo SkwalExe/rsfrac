@@ -1,3 +1,5 @@
+//! Contains the algorithms for each fractal
+
 use rug::Complex;
 
 mod burning_ship;

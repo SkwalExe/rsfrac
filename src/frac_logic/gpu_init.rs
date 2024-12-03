@@ -84,9 +84,9 @@ impl RenderSettings {
         // Loads the shader from WGSL
         let cs_descriptor = match self.get_frac_obj().name.to_lowercase().as_ref() {
             // TODO: implement other fractal shaders
-            "mandelbrot" => wgpu::include_wgsl!("shaders/mandelbrot.wgsl"),
-            "burningship" => wgpu::include_wgsl!("shaders/burning_ship.wgsl"),
-            "julia" => wgpu::include_wgsl!("shaders/julia.wgsl"),
+            "mandelbrot" => wgpu::include_wgsl!("../fractals/shaders/mandelbrot.wgsl"),
+            "burningship" => wgpu::include_wgsl!("../fractals/shaders/burning_ship.wgsl"),
+            "julia" => wgpu::include_wgsl!("../fractals/shaders/julia.wgsl"),
             _ => {
                 if let Some(sender) = sender {
                     sender

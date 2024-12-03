@@ -1,3 +1,5 @@
+//! Contains the logic for converting a iteration count to a color, as well as each color palette.
+
 use ratatui::style::Color;
 
 /// Returns the color assiciated to the given divergence in the provided palette.

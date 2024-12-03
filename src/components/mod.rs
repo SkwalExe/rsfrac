@@ -1,3 +1,5 @@
+//! Contains component-specific logic
+
 mod canvas;
 mod footer;
 mod input;

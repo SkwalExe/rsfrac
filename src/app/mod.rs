@@ -1,3 +1,5 @@
+//! Contains the state of the application in display
+
 use ratatui::style::Color;
 use std::collections::HashMap;
 

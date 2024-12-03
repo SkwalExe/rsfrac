@@ -1,3 +1,5 @@
+//! Contains all the logic required to render a divergence matrix with the GPU of the CPU.
+
 mod canvas_coords;
 mod fractal_logic;
 pub(crate) mod gpu_init;
