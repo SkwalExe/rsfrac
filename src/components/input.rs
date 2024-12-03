@@ -7,6 +7,7 @@ use ratatui::{
     style::{Color, Style, Stylize},
     widgets::{Block, Borders, Paragraph, Widget},
 };
+use tui_input::Input as TuiInput;
 
 use crate::{commands::get_command_by_name, helpers::Focus, AppState};
 use tui_input::backend::crossterm::EventHandler;
@@ -29,7 +30,8 @@ fn enumerate_strings(elements: &[usize]) -> String {
 impl<'a> Input<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
         "Execute the command [Enter]",
-        "Repeat the last command [Ctrl+R]",
+        "Repeat last command [Ctrl+R]",
+        "Edit last command [Ctrl+E]",
     ];
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
@@ -95,6 +97,9 @@ impl<'a> Input<'a> {
     pub(crate) fn handle_event(state: &mut AppState, key: KeyEvent) {
         match key.code {
             KeyCode::Enter => Input::run_current_command(state),
+            KeyCode::Char('e') if key.modifiers == KeyModifiers::CONTROL => {
+                state.command_input = TuiInput::new(state.last_command.clone());
+            }
             KeyCode::Char('r') if key.modifiers == KeyModifiers::CONTROL => {
                 Input::run_last_command(state)
             }
