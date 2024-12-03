@@ -12,6 +12,10 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     ) {
+        state.log_info(concat!(
+            "Arbitrary precision if not taken into account when GPU mode is enabled. ",
+            "You can disable GPU mode with the <command gpu> command."
+        ));
         state.set_decimal_prec(val);
     }
     Ok(())

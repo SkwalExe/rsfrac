@@ -6,14 +6,18 @@ use ratatui::style::Color;
 use rug::{Complex, Float};
 
 use crate::colors::{self, Palette, COLORS};
+use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
+use crate::commands::prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC};
 use crate::frac_logic::CanvasCoords;
 use crate::fractals::FRACTALS;
 use crate::helpers::{void_fills, VoidFill};
 
 use super::gpu_util::WgpuState;
 
-const DEFAULT_PREC: u32 = 64;
-const DEFAULT_MAX_ITER: i32 = 128;
+const DF_PREC_GPU: u32 = 64;
+const DF_MAX_ITER_GPU: i32 = 128;
+const DF_PREC_CPU: u32 = 32;
+const DF_MAX_ITER_CPU: i32 = 64;
 
 const BLACK: Color = Color::Rgb(0, 0, 0);
 const WHITE: Color = Color::Rgb(255, 255, 255);
@@ -51,23 +55,46 @@ impl Default for RenderSettings {
         Self {
             image_format: ImageFormat::WebP,
             frac_index: Default::default(),
-            pos: Complex::with_val(DEFAULT_PREC, FRACTALS[0].default_pos),
-            max_iter: DEFAULT_MAX_ITER,
-            cell_size: Float::new(DEFAULT_PREC),
+            pos: Complex::with_val(DF_PREC_GPU, FRACTALS[0].default_pos),
+            max_iter: DF_MAX_ITER_GPU,
+            cell_size: Float::new(DF_PREC_GPU),
             canvas_size: Default::default(),
-            prec: DEFAULT_PREC,
+            prec: DF_PREC_GPU,
             color_scheme_offset: Default::default(),
-            palette_index: 0,
+            palette_index: 4,
             void_fill_index: Default::default(),
             use_gpu: false,
             wgpu_state: WgpuState::default(),
-            julia_constant: Complex::with_val(DEFAULT_PREC, DEFAULT_JULIA_CONSTANT),
-            mandel_constant: Complex::with_val(DEFAULT_PREC, DEFAULT_MANDEL_CONSTANT),
+            julia_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_JULIA_CONSTANT),
+            mandel_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_MANDEL_CONSTANT),
         }
     }
 }
 
 impl RenderSettings {
+    /// Load the default settings for CPU mode when GPU init fails at startup.
+    pub(crate) fn cpu_defaults(&mut self) {
+        self.set_decimal_prec(DF_PREC_CPU);
+        self.set_max_iter(DF_MAX_ITER_CPU);
+    }
+    /// Sets the decimal precision and update the precision of existing values.
+    pub(crate) fn set_decimal_prec(&mut self, prec: u32) {
+        // Make sure the precision remains within the fixed bounds.
+        self.prec = MAX_DECIMAL_PREC.min(MIN_DECIMAL_PREC.max(prec));
+        // Update the precision of existing numeric values.
+        self.pos.set_prec(self.prec);
+        self.cell_size.set_prec(self.prec);
+    }
+    /// Increment positively or negatively the maximum divergence
+    pub(crate) fn increment_max_iter(&mut self, increment: i32) {
+        let new_max_iter = self.max_iter.saturating_add(increment);
+        self.set_max_iter(MIN_MAX_ITER.max(MAX_MAX_ITER.min(new_max_iter)));
+    }
+
+    pub(crate) fn set_max_iter(&mut self, max_iter: i32) {
+        self.max_iter = max_iter
+    }
+
     /// Changes the selected fractal. Will update the GPU render pipeline if GPU mode
     /// is enabled, if then an error is met, GPU mode will be disabled and an error message will be
     /// returned. Note that this method will never fail, even though it can return an error

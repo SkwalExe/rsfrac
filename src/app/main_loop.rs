@@ -20,6 +20,7 @@ impl App {
         self.app_state.initial_message();
         if let Err(err) = execute_gpu(&mut self.app_state, Default::default()) {
             self.app_state.log_error(err);
+            self.app_state.cpu_defaults();
         }
         while !self.app_state.quit {
             let start = Instant::now();

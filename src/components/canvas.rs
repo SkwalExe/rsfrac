@@ -139,11 +139,21 @@ impl<'a> Canvas<'a> {
             // When S is pressed increase the cell size, which will zoom out of the canvas
             KeyCode::Char('s') => {
                 state.zoom(ZoomDirection::Out);
+
+                // TODO: mueheheeh
+                // state.render_settings.color_scheme_offset =
+                //     (state.render_settings.color_scheme_offset + 15) % 16;
+                //
                 state.request_redraw();
             }
             // When D is pressed decrease the cell size, which will zoom into the canvas
             KeyCode::Char('d') => {
                 state.zoom(ZoomDirection::In);
+
+                // TODO: mueheheeh
+                // state.render_settings.color_scheme_offset =
+                //     (state.render_settings.color_scheme_offset + 1) % 16;
+
                 state.request_redraw();
             }
             // decrease the decimal precision

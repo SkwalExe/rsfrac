@@ -11,10 +11,6 @@ pub(crate) use stats::Stats;
 use crate::{
     app::ScreenshotMaster,
     colors::get_palette_index_by_name,
-    commands::{
-        max_iter::{MAX_MAX_ITER, MIN_MAX_ITER},
-        prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC},
-    },
     components::{Canvas, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
     fractals::get_frac_index_by_name,
@@ -40,6 +36,11 @@ pub(crate) struct AppState {
     pub(crate) click_config: ClickConfig,
 }
 
+const DF_MOVE_DISTANCE_CPU: i32 = 8;
+const DF_SCALING_FACTOR_CPU: i32 = 20;
+const DF_MOVE_DISTANCE_GPU: i32 = 1;
+const DF_SCALING_FACTOR_GPU: i32 = 8;
+
 impl Default for AppState {
     fn default() -> Self {
         Self {
@@ -54,8 +55,8 @@ impl Default for AppState {
             prioritized_log_messages: Default::default(),
             log_panel_scroll_state: Default::default(),
             render_settings: Default::default(),
-            scaling_factor: 20,
-            move_dist: 8,
+            scaling_factor: DF_SCALING_FACTOR_GPU,
+            move_dist: DF_MOVE_DISTANCE_GPU,
             marker: Default::default(),
             requested_jobs: Default::default(),
             click_config: Default::default(),
@@ -64,6 +65,12 @@ impl Default for AppState {
 }
 
 impl AppState {
+    /// Load default settings for CPU mode when GPU init fails at startup
+    pub(crate) fn cpu_defaults(&mut self) {
+        self.move_dist = DF_MOVE_DISTANCE_CPU;
+        self.scaling_factor = DF_SCALING_FACTOR_CPU;
+        self.render_settings.cpu_defaults();
+    }
     /// Loads the data from a rsf file.
     pub(crate) fn apply(&mut self, saved: SavedState, filename: &str) {
         let result = (|| -> Result<(), String> {
@@ -166,8 +173,7 @@ impl AppState {
     }
     /// Increment positively or negatively the maximum divergence, and ask for canvas redraw
     pub(crate) fn increment_max_iter(&mut self, increment: i32) {
-        let new_max_iter = self.render_settings.max_iter.saturating_add(increment);
-        self.render_settings.max_iter = MIN_MAX_ITER.max(MAX_MAX_ITER.min(new_max_iter));
+        self.render_settings.increment_max_iter(increment);
         self.request_redraw();
     }
     /// Increment positively or negatively the decimal precision,
@@ -179,14 +185,7 @@ impl AppState {
 
     /// Sets the decimal precision and update the precision of existing values.
     pub(crate) fn set_decimal_prec(&mut self, prec: u32) {
-        // Make sure the precision remains within the fixed bounds.
-        self.render_settings.prec = MAX_DECIMAL_PREC.min(MIN_DECIMAL_PREC.max(prec));
-        // Update the precision of existing numeric values.
-        self.render_settings.pos.set_prec(self.render_settings.prec);
-        self.render_settings
-            .cell_size
-            .set_prec(self.render_settings.prec);
-
+        self.render_settings.set_decimal_prec(prec);
         // Ask for canvas redraw
         self.request_redraw();
     }
