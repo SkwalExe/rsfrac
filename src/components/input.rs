@@ -1,5 +1,7 @@
 //! Contains the `Input` widget.
 
+use std::ascii::AsciiExt;
+
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
@@ -52,6 +54,11 @@ impl<'a> Input<'a> {
     }
     /// Run the command gived as argument.
     pub(crate) fn run_command(state: &mut AppState, input: String) {
+        if !input.is_ascii() {
+            state.log_error("Your command cannot contain other than ASCII characters, aborting.");
+            return;
+        }
+
         state.last_command = input.clone();
         let mut args: Vec<_> = input.split_whitespace().collect();
 
