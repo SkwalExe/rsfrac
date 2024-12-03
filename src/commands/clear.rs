@@ -18,7 +18,7 @@ pub(crate) const CLEAR: Command = Command {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_clear_command() {
         let mut state = AppState::default();
