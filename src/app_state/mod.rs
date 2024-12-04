@@ -30,7 +30,6 @@ pub(crate) struct AppState {
     pub(crate) log_panel_scroll_state: Mutex<ScrollViewState>,
     pub(crate) last_command: String,
     pub(crate) command_input: TuiInput,
-    pub(crate) marker: Option<CanvasCoords>,
     pub(crate) move_dist: i32,
     pub(crate) scaling_factor: i32,
     pub(crate) render_settings: RenderSettings,
@@ -40,7 +39,7 @@ pub(crate) struct AppState {
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
 const DF_SCALING_FACTOR_CPU: i32 = 20;
-const DF_MOVE_DISTANCE_GPU: i32 = 1;
+const DF_MOVE_DISTANCE_GPU: i32 = 4;
 const DF_SCALING_FACTOR_GPU: i32 = 8;
 
 impl Default for AppState {
@@ -59,7 +58,6 @@ impl Default for AppState {
             render_settings: Default::default(),
             scaling_factor: DF_SCALING_FACTOR_GPU,
             move_dist: DF_MOVE_DISTANCE_GPU,
-            marker: Default::default(),
             requested_jobs: Default::default(),
             click_config: Default::default(),
         }
@@ -95,6 +93,11 @@ impl AppState {
             // Change the decimal precision
             if let Some(precision) = saved.precision {
                 self.set_decimal_prec(precision);
+            }
+
+            // Change the smoothness
+            if let Some(smoothness) = saved.smoothness {
+                self.render_settings.smoothness = smoothness;
             }
 
             // Change the canvas position

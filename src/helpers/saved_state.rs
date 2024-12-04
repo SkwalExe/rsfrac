@@ -17,6 +17,7 @@ pub(crate) struct SavedState {
     pub(crate) julia_constant: Option<String>,
     pub(crate) mandel_constant: Option<String>,
     pub(crate) bailout: Option<f32>,
+    pub(crate) smoothness: Option<i32>,
 }
 
 impl From<&AppState> for SavedState {
@@ -33,6 +34,7 @@ impl From<&AppState> for SavedState {
             julia_constant: Some(state.render_settings.julia_constant.to_string()),
             mandel_constant: Some(state.render_settings.mandel_constant.to_string()),
             bailout: Some(state.render_settings.bailout),
+            smoothness: Some(state.render_settings.smoothness),
         }
     }
 }

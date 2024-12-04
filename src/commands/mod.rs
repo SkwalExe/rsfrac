@@ -18,6 +18,7 @@ pub(crate) mod pos;
 pub(crate) mod prec;
 pub(crate) mod quit;
 pub(crate) mod save;
+pub(crate) mod smoothness;
 pub(crate) mod version;
 pub(crate) mod zoom_factor;
 
@@ -38,7 +39,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 18] {
+pub(crate) fn get_commands_list() -> [&'static Command; 19] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -54,6 +55,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 18] {
         &prec::PREC,
         &max_iter::MAX_ITER,
         &color::COLOR,
+        &smoothness::SMOOTHNESS,
         &frac::FRAC,
         &zoom_factor::ZOOM_FACTOR,
         &move_dist::MOVE_DIST,
