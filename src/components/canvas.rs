@@ -4,7 +4,7 @@ use ratatui::{
     buffer::Buffer,
     crossterm::event::{KeyCode, MouseButton, MouseEvent, MouseEventKind},
     layout::{Alignment, Rect},
-    style::{Color, Style},
+    style::Style,
     symbols::Marker,
     text::Line,
     widgets::{canvas::Points, Block, Widget},
@@ -84,6 +84,18 @@ impl<'a> Canvas<'a> {
                     .abs()
                     .real()
                     .to_f32()
+            }
+            ClickMode::Info => {
+                let point = state.render_settings.coord_to_c(canvas_pos);
+                state.log_info_title(
+                    "Click Info",
+                    format!(
+                        "Real: <acc {}>\nImag: <acc {}>\nDiverg: <acc {}>",
+                        point.real().to_f32(),
+                        point.imag().to_f32(),
+                        (state.render_settings.get_frac_clos())(point, &state.render_settings),
+                    ),
+                )
             }
         }
 
@@ -197,19 +209,12 @@ impl<'a> Canvas<'a> {
             // Todo: remove duplication for + and -
             // Increment color scheme offset
             KeyCode::Char('-') => {
-                state.render_settings.color_scheme_offset =
-                    (state.render_settings.color_scheme_offset
-                        + state.render_settings.get_palette().colors.len() as i32
-                        - 1)
-                        % state.render_settings.get_palette().colors.len() as i32;
-
+                state.render_settings.decrement_color_offset();
                 state.request_repaint();
             }
             // Increment color scheme offset
             KeyCode::Char('+') => {
-                state.render_settings.color_scheme_offset =
-                    (state.render_settings.color_scheme_offset + 1)
-                        % state.render_settings.get_palette().colors.len() as i32;
+                state.render_settings.increment_color_offset();
                 state.request_repaint();
             }
             // Cycle through the void fills
@@ -317,16 +322,6 @@ impl Widget for Canvas<'_> {
                     ctx.draw(&Points {
                         color: *color,
                         coords: points,
-                    })
-                }
-                if let Some(marker) = &self.state.marker {
-                    // Todo: use a Painter instead
-                    ctx.draw(&Points {
-                        color: Color::Rgb(255, 0, 0),
-                        coords: &[(
-                            (marker.x + self.state.render_settings.canvas_size.x / 2) as f64,
-                            (marker.y + self.state.render_settings.canvas_size.y / 2) as f64,
-                        )],
                     })
                 }
             });

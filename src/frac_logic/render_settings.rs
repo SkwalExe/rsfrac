@@ -23,6 +23,8 @@ const BLACK: Color = Color::Rgb(0, 0, 0);
 const WHITE: Color = Color::Rgb(255, 255, 255);
 const DEFAULT_JULIA_CONSTANT: (f32, f32) = (-9.9418604e-1, 2.61627e-1);
 const DEFAULT_MANDEL_CONSTANT: (f32, f32) = (0.0, 0.0);
+const DEFAULT_SMOOTHNESS: i32 = 7;
+const DEFAULT_BAILOUT: f32 = 2.0;
 
 /// Used to group values related to fractal rendering logic.
 #[derive(Clone)]
@@ -49,6 +51,7 @@ pub(crate) struct RenderSettings {
     pub(crate) julia_constant: Complex,
     pub(crate) mandel_constant: Complex,
     pub(crate) bailout: f32,
+    pub(crate) smoothness: i32,
 }
 
 impl Default for RenderSettings {
@@ -68,12 +71,23 @@ impl Default for RenderSettings {
             wgpu_state: WgpuState::default(),
             julia_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_JULIA_CONSTANT),
             mandel_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_MANDEL_CONSTANT),
-            bailout: 2.0,
+            bailout: DEFAULT_BAILOUT,
+            smoothness: DEFAULT_SMOOTHNESS,
         }
     }
 }
 
 impl RenderSettings {
+    pub(crate) fn increment_color_offset(&mut self) {
+        self.color_scheme_offset = (self.color_scheme_offset + 1)
+            % (self.get_palette().colors.len() as i32 * self.smoothness);
+    }
+    pub(crate) fn decrement_color_offset(&mut self) {
+        self.color_scheme_offset = (self.color_scheme_offset
+            + self.get_palette().colors.len() as i32 * self.smoothness
+            - 1)
+            % (self.get_palette().colors.len() as i32 * self.smoothness);
+    }
     /// Load the default settings for CPU mode when GPU init fails at startup.
     pub(crate) fn cpu_defaults(&mut self) {
         self.set_decimal_prec(DF_PREC_CPU);
@@ -133,9 +147,12 @@ impl RenderSettings {
                 VoidFill::Transparent => Color::Reset,
                 VoidFill::Black => BLACK,
                 VoidFill::White => WHITE,
-                VoidFill::ColorScheme => {
-                    colors::palette_color(*diverg + self.color_scheme_offset, palette)
-                }
+                VoidFill::ColorScheme => colors::palette_color(
+                    *diverg,
+                    self.color_scheme_offset,
+                    palette,
+                    self.smoothness,
+                ),
                 VoidFill::RGBNoise => Color::Rgb(
                     rng.gen_range(0..255),
                     rng.gen_range(0..255),
@@ -146,7 +163,7 @@ impl RenderSettings {
                 VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
             }
         } else {
-            colors::palette_color(*diverg + self.color_scheme_offset, palette)
+            colors::palette_color(*diverg, self.color_scheme_offset, palette, self.smoothness)
         }
     }
 }
