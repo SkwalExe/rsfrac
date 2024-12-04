@@ -16,8 +16,8 @@ hero:
       link: https://github.com/SkwalExe/rsfrac
 
 features:
-  - title: Multi-threaded
-    details: Rsfrac leverages parallel processing for complex arithmetic operations, enabling smooth navigation and rapid rendering.
+  - title: Hardware-accelerated
+    details: Rsfrac leverages GPU capabilities and parallel processing for complex arithmetic operations, enabling smooth navigation and rapid rendering.
     icon: ⚡
   - title: High Precision Arithmetics
     details: "Using GMP, MPFR and MPC, Rsfrac allows you to explore fractals infinitely deep by enabling users to increase the decimal precision for calculations as needed."

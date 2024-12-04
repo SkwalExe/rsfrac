@@ -10,6 +10,12 @@ cargo check
 cargo clippy --fix
 ```
 
+Then run the unit tests to check you didn't break anything.
+
+```bash
+cargo test
+```
+
 Any problem that wasn't automatically corrected must be fixed manually before creating your pull request. If everything is OK, you can commit your changes to your own fork.
 
 ```bash
