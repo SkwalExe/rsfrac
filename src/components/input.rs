@@ -85,9 +85,8 @@ impl<'a> Input<'a> {
                 return;
             }
 
-            if let Err(err) = (command.execute)(state, args) {
-                state.log_error(err)
-            }
+            let res = (command.execute)(state, args);
+            state.handle_res(res);
         } else {
             // TODO: centralize this message, that is used in other places
             state.log_error(format!(

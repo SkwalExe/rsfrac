@@ -64,6 +64,16 @@ impl AppState {
         ));
     }
 
+    /// Receives a result (from a command most of the time), if it is an error, log the error and
+    /// return false.
+    pub(crate) fn handle_res(&mut self, result: Result<(), String>) -> bool {
+        if let Err(err) = result {
+            self.log_error(err);
+            return false;
+        }
+        true
+    }
+
     /// Creates a new log message.
     pub(crate) fn log_raw(&mut self, message: impl Into<String>) {
         self.log_messages.push(message.into());
