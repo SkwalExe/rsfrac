@@ -56,7 +56,7 @@ impl ScreenshotMaster {
             size,
             rendered_lines: 0,
             handle: Some(handle),
-            id: Utc::now().timestamp(),
+            id: Utc::now().timestamp_micros(),
             frac_name,
         }
     }
