@@ -1,6 +1,8 @@
 use super::{get_command_by_name, get_commands_list, Command};
 use crate::AppState;
 
+use regex::Regex;
+
 pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     if args.is_empty() {
         state.log_info_title(
@@ -60,12 +62,16 @@ pub(crate) fn execute_help(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         command.name,
         format!(
             "Aliases: {}\n{}\n{}",
-            command
-                .aliases
-                .iter()
-                .map(|name| format!("<acc {name}>"))
-                .collect::<Vec<String>>()
-                .join(", "),
+            // Regex thingy to display `none` when no aliases are set.
+            Regex::new("^$").unwrap().replace(
+                &command
+                    .aliases
+                    .iter()
+                    .map(|name| format!("<acc {name}>"))
+                    .collect::<Vec<String>>()
+                    .join(", "),
+                "None"
+            ),
             command.basic_desc,
             command.detailed_desc.unwrap_or_default()
         ),
