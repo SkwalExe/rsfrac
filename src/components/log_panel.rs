@@ -66,8 +66,10 @@ impl Widget for LogPanel<'_> {
         // -2 -> Space for the scrollbar on the right and some padding
         let para_width = area.width - 2;
 
+        const BOTTOM_SPACE: u16 = 5;
+
         // the maximum number of lines not to exceed to keep the total surface < u16::MAX.
-        let maximum_height = u16::MAX / para_width;
+        let maximum_height = u16::MAX / para_width - BOTTOM_SPACE;
 
         // The height of all the paragraphs
         let mut scrollable_height = 0u16;
@@ -121,7 +123,7 @@ impl Widget for LogPanel<'_> {
 
         // height + 5 to give some space at the bottom in case a prioritized
         // message changes rapidly of length
-        let size = Size::new(para_width, scrollable_height + 5);
+        let size = Size::new(para_width, scrollable_height + BOTTOM_SPACE as u16);
 
         // ATTENTION
         // After countless hours of debugging, I realized that when

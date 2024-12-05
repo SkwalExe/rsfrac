@@ -1691,6 +1691,7 @@ dependencies = [
  "rand",
  "ratatui",
  "rayon",
+ "regex",
  "rug",
  "serde",
  "strum",

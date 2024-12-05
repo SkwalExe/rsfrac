@@ -29,7 +29,7 @@ pub(crate) fn execute_color(state: &mut AppState, args: Vec<&str>) -> Result<(),
 pub(crate) const COLOR: Command = Command {
     execute: &execute_color,
     name: "color",
-    aliases: &[],
+    aliases: &["co"],
     accepted_arg_count: &[0, 1],
     detailed_desc: Some(concat!(
         "<green Usage: <command [color]>>\n",
@@ -39,3 +39,30 @@ pub(crate) const COLOR: Command = Command {
     )),
     basic_desc: "List available color schemes or select the specified one.",
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_command_color() {
+        let mut state = AppState::default();
+
+        // `color non_exist` should fail.
+        assert!(execute_color(&mut state, vec!["non_exist"]).is_err());
+
+        // `color iceberg` should not fail and the iceberg palette should be selected.
+        execute_color(&mut state, vec!["iceberg"]).unwrap();
+        assert_eq!(
+            state.render_settings.palette_index,
+            get_palette_index_by_name("iceberg").unwrap()
+        );
+
+        // `color for` should not fail and the forest palette should be selected.
+        execute_color(&mut state, vec!["for"]).unwrap();
+        assert_eq!(
+            state.render_settings.palette_index,
+            get_palette_index_by_name("forest").unwrap()
+        );
+    }
+}

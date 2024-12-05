@@ -1,46 +1,4 @@
-//! Contains the logic for converting a iteration count to a color, as well as each color palette.
-
 use ratatui::style::Color;
-
-/// Returns the color assiciated to the given divergence in the provided palette.
-pub(crate) fn palette_color(i: i32, offset: i32, pal: &Palette, smoothing: i32) -> Color {
-    let d = (offset + i) as f32 / smoothing as f32;
-    let min = d.floor() as i32;
-    let max = d.ceil() as i32;
-    interpolate(
-        palette_color_at(min, pal),
-        palette_color_at(max, pal),
-        d % 1.0,
-    )
-}
-
-pub(crate) fn palette_color_at(i: i32, pal: &Palette) -> Color {
-    pal.colors[i as usize % pal.colors.len()]
-}
-
-/// Returns the palette matching the provided name, and `None` if nothing matched.
-pub(crate) fn get_palette_index_by_name(name: &str) -> Option<usize> {
-    COLORS
-        .iter()
-        .position(|pal| pal.name.to_lowercase() == name.to_lowercase())
-}
-
-pub(crate) fn interpolate_byte(b1: u8, b2: u8, p: f32) -> u8 {
-    let d = b2 as f32 - b1 as f32;
-    let incr = d * p;
-    (b1 as f32 + incr) as u8
-}
-pub(crate) fn interpolate(c1: Color, c2: Color, p: f32) -> Color {
-    if let (Color::Rgb(r1, g1, b1), Color::Rgb(r2, g2, b2)) = (c1, c2) {
-        Color::Rgb(
-            interpolate_byte(r1, r2, p),
-            interpolate_byte(g1, g2, p),
-            interpolate_byte(b1, b2, p),
-        )
-    } else {
-        panic!("Invalid color passed to interpolate()");
-    }
-}
 
 /// Represents a color palette.
 pub(crate) struct Palette {
@@ -303,19 +261,67 @@ pub(crate) const COLORS: &[Palette] = &[
         ],
         name: "Mountain",
     },
+    Palette {
+        colors: &[
+            Color::Rgb(0, 10, 20),
+            Color::Rgb(0, 30, 60),
+            Color::Rgb(10, 50, 100),
+            Color::Rgb(30, 80, 150),
+            Color::Rgb(60, 120, 200),
+            Color::Rgb(100, 170, 240),
+            Color::Rgb(140, 200, 255),
+            Color::Rgb(180, 220, 255),
+            Color::Rgb(200, 230, 255),
+            Color::Rgb(220, 240, 255),
+            Color::Rgb(200, 230, 245),
+            Color::Rgb(150, 200, 220),
+            Color::Rgb(100, 150, 190),
+            Color::Rgb(60, 100, 150),
+            Color::Rgb(20, 50, 100),
+            Color::Rgb(5, 20, 40),
+        ],
+        name: "Ocean Deep",
+    },
+    Palette {
+        colors: &[
+            Color::Rgb(10, 0, 0),
+            Color::Rgb(50, 10, 0),
+            Color::Rgb(100, 30, 0),
+            Color::Rgb(150, 50, 0),
+            Color::Rgb(200, 90, 10),
+            Color::Rgb(230, 140, 30),
+            Color::Rgb(255, 190, 50),
+            Color::Rgb(255, 220, 80),
+            Color::Rgb(255, 240, 120),
+            Color::Rgb(255, 255, 180),
+            Color::Rgb(240, 240, 200),
+            Color::Rgb(200, 200, 180),
+            Color::Rgb(150, 150, 140),
+            Color::Rgb(100, 100, 100),
+            Color::Rgb(60, 60, 60),
+            Color::Rgb(20, 20, 20),
+        ],
+        name: "SolarFlame",
+    },
+    Palette {
+        colors: &[
+            Color::Rgb(5, 0, 20),
+            Color::Rgb(20, 10, 50),
+            Color::Rgb(50, 30, 100),
+            Color::Rgb(80, 50, 150),
+            Color::Rgb(120, 80, 200),
+            Color::Rgb(160, 120, 230),
+            Color::Rgb(200, 160, 255),
+            Color::Rgb(220, 190, 255),
+            Color::Rgb(240, 210, 255),
+            Color::Rgb(250, 230, 255),
+            Color::Rgb(230, 210, 245),
+            Color::Rgb(190, 170, 220),
+            Color::Rgb(140, 120, 190),
+            Color::Rgb(100, 80, 150),
+            Color::Rgb(60, 40, 100),
+            Color::Rgb(20, 10, 50),
+        ],
+        name: "Aurora",
+    },
 ];
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_get_palette_index_by_name() {
-        // Try to get the index of the `Mountain` palette by name.
-        let pal = get_palette_index_by_name("MouNtAIn").unwrap();
-        // Check if the name matches.
-        assert_eq!(COLORS[pal].name, "Mountain");
-        // Check if the first color matches.
-        assert_eq!(COLORS[pal].colors[0], Color::Rgb(15, 20, 25))
-    }
-}
