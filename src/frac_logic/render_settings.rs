@@ -40,6 +40,7 @@ pub(crate) struct RenderSettings {
     /// The maximum number of iterations before assuming that a point diverges.
     pub(crate) max_iter: i32,
     /// The index of the currently selected fractal.
+    /// Must not be set directly!!!!!
     pub(crate) frac_index: usize,
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,

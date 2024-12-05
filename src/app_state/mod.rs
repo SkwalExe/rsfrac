@@ -76,8 +76,13 @@ impl AppState {
         let result = (|| -> Result<(), String> {
             // Change selected fractal
             if let Some(frac_name) = saved.frac_name {
-                self.render_settings.frac_index = get_frac_index_by_name(&frac_name)
-                    .ok_or("Invalid fractal name in state file.")?;
+                let _ = self
+                    .render_settings
+                    .select_fractal(
+                        get_frac_index_by_name(&frac_name)
+                            .ok_or("Invalid fractal name in state file.")?,
+                    )
+                    .map_err(|err| self.log_error(err));
             }
 
             // Change selected color palette
