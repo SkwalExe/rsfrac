@@ -5,7 +5,7 @@ use std::{
 };
 
 use super::Command;
-use crate::{helpers::SavedState, AppState};
+use crate::{commands::save::SAVE_EXTENSION, helpers::SavedState, AppState};
 
 pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     static DETECTED_FILES: Mutex<Vec<String>> = Mutex::new(Vec::new());
@@ -25,7 +25,7 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
             // Only keep files with valid unicode names
             .filter_map(|entry| entry.file_name().into_string().ok())
             // Only keep files ending in .rsf
-            .filter(|filename| filename.ends_with(".rsf"))
+            .filter(|filename| filename.ends_with(SAVE_EXTENSION))
             .collect::<Vec<_>>();
 
         locked.sort_unstable();

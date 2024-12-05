@@ -8,6 +8,7 @@ use image::ImageBuffer;
 use ratatui::style::Color;
 
 use crate::{
+    commands::save::execute_save,
     frac_logic::{DivergMatrix, RenderSettings},
     helpers::Vec2,
     AppState,
@@ -77,10 +78,12 @@ impl ScreenshotMaster {
                         }
                     });
 
+                let filename_base =
+                    format!("{} {}", self.frac_name, Local::now().format("%F %H-%M-%S"));
+
                 let filename = format!(
-                    "{} {}.{}",
-                    self.frac_name,
-                    Local::now().format("%F %H-%M-%S"),
+                    "{}.{}",
+                    filename_base,
                     state.render_settings.image_format.extensions_str()[0]
                 );
 
@@ -93,6 +96,10 @@ impl ScreenshotMaster {
                         "Screenshot ({}x{}) saved to <acc {}>",
                         self.size.x, self.size.y, filename
                     ));
+
+                    if let Err(err) = execute_save(state, vec![&filename_base]) {
+                        state.log_error(err);
+                    }
                 }
             }
             Err(err) => state.log_error(format!("Could not finish screenshot, reason: {err}")),

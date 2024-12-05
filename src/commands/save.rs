@@ -5,16 +5,18 @@ use chrono::Local;
 use super::Command;
 use crate::{helpers::SavedState, AppState};
 
+pub(crate) const SAVE_EXTENSION: &str = ".rsf";
+
 pub(crate) fn execute_save(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let filename = if args.is_empty() {
         format!(
-            "{} {}.rsf",
+            "{} {}",
+            state.render_settings.get_frac_obj().name,
             Local::now().format("%F %H-%M-%S"),
-            state.render_settings.get_frac_obj().name
         )
     } else {
-        args[0].to_string() + ".rsf"
-    };
+        args[0].to_string()
+    } + SAVE_EXTENSION;
 
     let saved_state = SavedState::from(&*state);
     let str = toml::to_string_pretty(&saved_state)

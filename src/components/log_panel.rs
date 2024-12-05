@@ -123,7 +123,7 @@ impl Widget for LogPanel<'_> {
 
         // height + 5 to give some space at the bottom in case a prioritized
         // message changes rapidly of length
-        let size = Size::new(para_width, scrollable_height + BOTTOM_SPACE as u16);
+        let size = Size::new(para_width, scrollable_height + BOTTOM_SPACE);
 
         // ATTENTION
         // After countless hours of debugging, I realized that when
