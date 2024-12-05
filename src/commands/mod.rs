@@ -4,6 +4,7 @@ use crate::AppState;
 pub(crate) mod capture;
 pub(crate) mod capture_fit;
 pub(crate) mod capture_format;
+pub(crate) mod capture_hq;
 pub(crate) mod clear;
 pub(crate) mod click_mode;
 pub(crate) mod color;
@@ -39,7 +40,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 19] {
+pub(crate) fn get_commands_list() -> [&'static Command; 20] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -49,6 +50,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 19] {
         &load::LOAD,
         &capture::CAPTURE,
         &capture_fit::CAPTURE_FIT,
+        &capture_hq::CAPTURE_HQ,
         &capture_format::CAPTURE_FORMAT,
         &gpu::GPU,
         &pos::POS,
