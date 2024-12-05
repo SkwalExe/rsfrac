@@ -1,5 +1,6 @@
-use crate::AppState;
+use crate::{frac_logic::RenderSettings, AppState};
 use serde::{Deserialize, Serialize};
+use std::{fs::File, io::Write};
 
 use super::{void_fills, VoidFill};
 
@@ -20,21 +21,37 @@ pub(crate) struct SavedState {
     pub(crate) smoothness: Option<i32>,
 }
 
-impl From<&AppState> for SavedState {
-    fn from(state: &AppState) -> Self {
+impl From<&RenderSettings> for SavedState {
+    fn from(rs: &RenderSettings) -> Self {
         Self {
-            frac_name: Some(state.render_settings.get_frac_obj().name.to_string()),
-            color_palette_name: Some(state.render_settings.get_palette().name.to_string()),
-            palette_offset: Some(state.render_settings.color_scheme_offset),
-            pos: Some(state.render_settings.pos.to_string()),
-            complex_width: Some(state.render_settings.get_plane_wid().to_string()),
-            max_iter: Some(state.render_settings.max_iter),
-            precision: Some(state.render_settings.prec),
-            void_fill: Some(void_fills()[state.render_settings.void_fill_index].clone()),
-            julia_constant: Some(state.render_settings.julia_constant.to_string()),
-            mandel_constant: Some(state.render_settings.mandel_constant.to_string()),
-            bailout: Some(state.render_settings.bailout),
-            smoothness: Some(state.render_settings.smoothness),
+            frac_name: Some(rs.get_frac_obj().name.to_string()),
+            color_palette_name: Some(rs.get_palette().name.to_string()),
+            palette_offset: Some(rs.color_scheme_offset),
+            pos: Some(rs.pos.to_string()),
+            complex_width: Some(rs.get_plane_wid().to_string()),
+            max_iter: Some(rs.max_iter),
+            precision: Some(rs.prec),
+            void_fill: Some(void_fills()[rs.void_fill_index].clone()),
+            julia_constant: Some(rs.julia_constant.to_string()),
+            mandel_constant: Some(rs.mandel_constant.to_string()),
+            bailout: Some(rs.bailout),
+            smoothness: Some(rs.smoothness),
         }
+    }
+}
+
+impl RenderSettings {
+    /// Saves the app state to an rsf file with the provided filename (extension included).
+    pub(crate) fn save(&self, filename: &str) -> Result<(), String> {
+        let saved_state = SavedState::from(self);
+        let str = toml::to_string_pretty(&saved_state)
+            .map_err(|err| format!("Could not save the current state: {err}"))?;
+
+        let mut file = File::create(filename)
+            .map_err(|err| format!("Could not create <command {filename}>: {err}"))?;
+
+        file.write(str.as_bytes())
+            .map_err(|err| format!("Could not write file: {err}"))?;
+        Ok(())
     }
 }

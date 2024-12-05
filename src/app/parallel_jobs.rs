@@ -8,7 +8,7 @@ use image::ImageBuffer;
 use ratatui::style::Color;
 
 use crate::{
-    commands::save::execute_save,
+    commands::save::SAVE_EXTENSION,
     frac_logic::{DivergMatrix, RenderSettings},
     helpers::Vec2,
     AppState,
@@ -26,7 +26,7 @@ pub(crate) struct ScreenshotMaster {
     pub(crate) rendered_lines: i32,
     pub(crate) handle: Option<JoinHandle<Result<DivergMatrix, String>>>,
     pub(crate) id: i64,
-    pub(crate) frac_name: &'static str,
+    pub(crate) rs_copy: RenderSettings,
     pub(crate) finished: bool,
 }
 
@@ -48,7 +48,7 @@ impl ScreenshotMaster {
         size: Vec2<i32>,
         receiver: Receiver<SlaveMessage>,
         handle: JoinHandle<Result<DivergMatrix, String>>,
-        frac_name: &'static str,
+        rs: &RenderSettings,
     ) -> Self {
         Self {
             finished: false,
@@ -57,7 +57,7 @@ impl ScreenshotMaster {
             rendered_lines: 0,
             handle: Some(handle),
             id: Utc::now().timestamp_micros(),
-            frac_name,
+            rs_copy: rs.clone(),
         }
     }
     /// Handles the output of the screenshot child process:
@@ -78,27 +78,35 @@ impl ScreenshotMaster {
                         }
                     });
 
-                let filename_base =
-                    format!("{} {}", self.frac_name, Local::now().format("%F %H-%M-%S"));
+                let filename_base = format!(
+                    "{} {}",
+                    self.rs_copy.get_frac_obj().name,
+                    Local::now().format("%F %H-%M-%S")
+                );
 
-                let filename = format!(
+                let filename_save = format!("{}{}", filename_base, SAVE_EXTENSION);
+                let filename_cap = format!(
                     "{}.{}",
                     filename_base,
                     state.render_settings.image_format.extensions_str()[0]
                 );
 
                 if let Err(err) =
-                    buf.save_with_format(&filename, state.render_settings.image_format)
+                    buf.save_with_format(&filename_cap, state.render_settings.image_format)
                 {
                     state.log_error(format!("Could not save screenshot: {err}"));
                 } else {
                     state.log_success(format!(
                         "Screenshot ({}x{}) saved to <acc {}>",
-                        self.size.x, self.size.y, filename
+                        self.size.x, self.size.y, filename_cap
                     ));
 
-                    if let Err(err) = execute_save(state, vec![&filename_base]) {
-                        state.log_error(err);
+                    match self.rs_copy.save(&filename_save) {
+                        Err(err) => state.log_error(err),
+                        Ok(_) => state.log_info(format!(
+                            "State file containing capture parameters saved to <acc {}>.",
+                            filename_save
+                        )),
                     }
                 }
             }
