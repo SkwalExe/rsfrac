@@ -2,8 +2,9 @@ use super::{capture::execute_capture, Command};
 use crate::AppState;
 
 pub(crate) fn execute_capture_fit(state: &mut AppState, _args: Vec<&str>) -> Result<(), String> {
-    let width = 15360;
-    let height = 8640;
+    let scale = 4;
+    let width = 1920 * scale;
+    let height = 1080 * scale;
     execute_capture(state, vec![&format!("{width}"), &format!("{height}")])
 }
 

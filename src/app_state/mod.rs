@@ -76,8 +76,12 @@ impl AppState {
         let result = (|| -> Result<(), String> {
             // Change selected fractal
             if let Some(frac_name) = saved.frac_name {
-                self.render_settings.frac_index = get_frac_index_by_name(&frac_name)
-                    .ok_or("Invalid fractal name in state file.")?;
+                let res = self.render_settings.select_fractal(
+                    get_frac_index_by_name(&frac_name)
+                        .ok_or("Invalid fractal name in state file.")?,
+                );
+
+                self.handle_res(res);
             }
 
             // Change selected color palette
@@ -153,14 +157,13 @@ impl AppState {
 
         self.request_redraw();
 
-        if let Err(err) = result {
-            self.log_error(format!(
+        match result {
+            Err(err) => self.log_error(format!(
                 "Could not finish loading the state file (<command {filename}>) due to an error: <red {err}>"
-            ));
-        } else {
-            self.log_success(format!(
+            )),
+            Ok(_) => self.log_success(format!(
                 "Successfully loaded state file: <command {filename}>.",
-            ));
+            ))
         }
     }
 

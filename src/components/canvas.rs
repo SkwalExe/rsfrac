@@ -195,9 +195,8 @@ impl<'a> Canvas<'a> {
             // Increment the selected frac index
             KeyCode::Char('f') => {
                 let frac_i = (state.render_settings.frac_index + 1) % FRACTALS.len();
-                if let Err(err) = state.render_settings.select_fractal(frac_i) {
-                    state.log_error(err);
-                }
+                let res = state.render_settings.select_fractal(frac_i);
+                state.handle_res(res);
                 state.request_redraw();
             }
             // Increment the color palette index

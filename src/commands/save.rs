@@ -1,9 +1,7 @@
-use std::{fs::File, io::Write};
-
 use chrono::Local;
 
 use super::Command;
-use crate::{helpers::SavedState, AppState};
+use crate::AppState;
 
 pub(crate) const SAVE_EXTENSION: &str = ".rsf";
 
@@ -18,15 +16,7 @@ pub(crate) fn execute_save(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         args[0].to_string()
     } + SAVE_EXTENSION;
 
-    let saved_state = SavedState::from(&*state);
-    let str = toml::to_string_pretty(&saved_state)
-        .map_err(|err| format!("Could not save the current state: {err}"))?;
-
-    let mut file = File::create(&filename)
-        .map_err(|err| format!("Could not create <command {filename}>: {err}"))?;
-
-    file.write(str.as_bytes())
-        .map_err(|err| format!("Could not write file: {err}"))?;
+    state.render_settings.save(&filename)?;
     state.log_success(format!("State successfully saved as <command {filename}>."));
     Ok(())
 }
