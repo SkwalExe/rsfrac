@@ -1,4 +1,4 @@
-use std::sync::mpsc::Sender;
+use std::{sync::mpsc::Sender, time::Instant};
 
 use futures::executor;
 use wgpu::util::DeviceExt;
@@ -19,6 +19,8 @@ pub(crate) struct ParamsBinding {
     mandel_constant: [f32; 2],
     bailout: f32,
 }
+
+const GPU_JOB_TIMEOUT: u64 = 15;
 
 impl RenderSettings {
     pub(crate) fn get_gpu_diverg_matrix_sync(
@@ -65,6 +67,7 @@ impl RenderSettings {
         let cell_size = self.get_plane_wid() / size.x;
 
         while !tracker.render_finished() {
+            tracker.scroll_logs()?;
             tracker.begin_pass();
 
             tracker.send("Creating the output buffer")?;
@@ -196,12 +199,29 @@ impl RenderSettings {
             // Poll the device in a blocking manner so that our future resolves.
             // In an actual application, `device.poll(...)` should
             // be called in an event loop or on another thread.
+
+            let before_poll = Instant::now();
             self.wgpu_state
                 .device
                 .as_ref()
                 .unwrap()
                 .poll(wgpu::Maintain::wait())
                 .panic_on_timeout();
+            // .panic_on_timeout();
+            // Seems to be unimplemented??????
+
+            if before_poll.elapsed().as_secs() > GPU_JOB_TIMEOUT {
+                tracker.warn(concat!(
+                    "Possible GPU timeout, cannot obtain details because ",
+                    "of an issue on WGPU's end. Trying to reduce chunk size until the job completes..."
+                ))?;
+                tracker.limit_chunk_size();
+                tracker.reset();
+                result = Vec::new();
+                // reinitialize GPU to clear queue, there must be a better way to do this.
+                self.initialize_gpu_async(sender).await?;
+                continue;
+            }
 
             // Awaits until `buffer_future` can be read from
             tracker.send("Receiving output buffer data")?;
@@ -231,7 +251,6 @@ impl RenderSettings {
         tracker.send(
             "Saving image to file... The application will be blocked during the time of writing.",
         )?;
-        tracker.scroll_logs();
         Ok(result)
     }
 }

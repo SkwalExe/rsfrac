@@ -7,6 +7,7 @@ use tui_markup::generator::{ANSIStringsGenerator, RatatuiTextGenerator};
 
 const ACCENT_COLOR: MyOwnColorType = MyOwnColorType(162, 119, 255);
 const RED: MyOwnColorType = MyOwnColorType(255, 109, 109);
+const YELLOW: MyOwnColorType = MyOwnColorType(255, 183, 0);
 const GREEN: MyOwnColorType = MyOwnColorType(88, 224, 178);
 const DIM: MyOwnColorType = MyOwnColorType(42, 42, 42);
 const COMMAND_BG: MyOwnColorType = MyOwnColorType(34, 40, 39);
@@ -35,6 +36,8 @@ pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSI
         "bgred" => Some(ANSIStyle::default().on(RED.into())),
         "red" => Some(ANSIStyle::default().fg(RED.into())),
         "green" => Some(ANSIStyle::default().fg(GREEN.into())),
+        "bgyellow" => Some(ANSIStyle::default().on(YELLOW.into())),
+        "yellow" => Some(ANSIStyle::default().fg(YELLOW.into())),
         "bggreen" => Some(ANSIStyle::default().fg(BLACK.into()).on(GREEN.into())),
         "command" => Some(
             ANSIStyle::default()
@@ -51,6 +54,8 @@ pub fn get_ratatui_generator() -> RatatuiTextGenerator<impl Fn(&str) -> Option<S
     RatatuiTextGenerator::new(|tag: &str| match tag {
         "acc" => Some(Style::default().fg(ACCENT_COLOR.into())),
         "bgacc" => Some(Style::default().bg(ACCENT_COLOR.into())),
+        "bgyellow" => Some(Style::default().bg(YELLOW.into())),
+        "yellow" => Some(Style::default().fg(YELLOW.into())),
         "bgred" => Some(Style::default().bg(RED.into())),
         "red" => Some(Style::default().fg(RED.into())),
         "green" => Some(Style::default().fg(GREEN.into())),

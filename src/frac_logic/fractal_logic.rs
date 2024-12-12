@@ -9,6 +9,8 @@ use rayon::prelude::*;
 use rug::ops::CompleteRound;
 use rug::{Complex, Float};
 
+use super::gpu_util::SendSlaveMessage;
+
 const INITIAL_CANVAS_WIDTH: i32 = 5;
 pub(crate) type DivergMatrix = Vec<Vec<i32>>;
 
@@ -39,19 +41,15 @@ impl RenderSettings {
 
                 // Send an update to the parent process,
                 // indicating that one line has been rendered.
-                if let Some(sender) = sender {
-                    sender.send(SlaveMessage::LineRender).unwrap();
-                }
+                sender.send(SlaveMessage::LineRender).unwrap();
 
                 line
             })
             .collect();
 
         // Send a message to the parent process indicating that the screenshot finished,
-        // and it should now wait for the result transfet throught the `JoinHandle`.
-        if let Some(sender) = sender {
-            sender.send(SlaveMessage::JobFinished).unwrap()
-        }
+        // and it should now wait for the result transfer through the `JoinHandle`.
+        sender.send(SlaveMessage::JobFinished).unwrap();
 
         div_matrix
     }

@@ -39,6 +39,7 @@ pub(crate) enum SlaveMessage {
     JobFinished,
     SetMessage(String),
     ScrollLogs,
+    Warning(String),
 }
 
 /// The struct representing the screenshot job state
@@ -66,11 +67,11 @@ impl ScreenshotMaster {
         match result {
             Ok(result) => {
                 let height = self.size.y as usize;
+                let rs_copy = &self.rs_copy;
                 let buf =
                     ImageBuffer::from_par_fn(self.size.x as u32, self.size.y as u32, |x, y| {
-                        let color = state
-                            .render_settings
-                            .color_from_div(&result[height - y as usize - 1][x as usize]);
+                        let div = &result[height - y as usize - 1][x as usize];
+                        let color = rs_copy.color_from_div(div);
                         if let Color::Rgb(r, g, b) = color {
                             image::Rgb([r, g, b])
                         } else {
@@ -88,12 +89,10 @@ impl ScreenshotMaster {
                 let filename_cap = format!(
                     "{}.{}",
                     filename_base,
-                    state.render_settings.image_format.extensions_str()[0]
+                    self.rs_copy.image_format.extensions_str()[0]
                 );
 
-                if let Err(err) =
-                    buf.save_with_format(&filename_cap, state.render_settings.image_format)
-                {
+                if let Err(err) = buf.save_with_format(&filename_cap, self.rs_copy.image_format) {
                     state.log_error(format!("Could not save screenshot: {err}"));
                 } else {
                     state.log_success(format!(

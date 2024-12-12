@@ -96,6 +96,10 @@ impl AppState {
     pub(crate) fn log_error(&mut self, message: impl Into<String>) {
         self.log_error_title("Error", message);
     }
+    /// Creates a new warning log message with the provided message and a fixed title.
+    pub(crate) fn log_warn(&mut self, message: impl Into<String>) {
+        self.log_warn_title("Warning", message);
+    }
 
     /// Creates a new success log message with the provided title and message.
     pub(crate) fn log_success_title(
@@ -108,6 +112,10 @@ impl AppState {
     /// Creates a new info log message with the provided title and message.
     pub(crate) fn log_info_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
         self.log_raw(format!("<bgacc  {} >\n{}", title.into(), message.into()))
+    }
+    /// Creates a new warning log message with the provided title and message.
+    pub(crate) fn log_warn_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
+        self.log_raw(format!("<bgyellow  {} >\n{}", title.into(), message.into()))
     }
     /// Creates a new error log message with the provided title and message.
     pub(crate) fn log_error_title(&mut self, title: impl Into<String>, message: impl Into<String>) {

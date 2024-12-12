@@ -82,6 +82,7 @@ impl App {
                         SlaveMessage::JobFinished => {
                             job.finished = true;
                         }
+                        SlaveMessage::Warning(warn) => self.app_state.log_warn(warn),
                         SlaveMessage::SetMessage(message) => {
 
                             *self
