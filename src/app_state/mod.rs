@@ -11,7 +11,7 @@ pub(crate) use click_modes::{ClickConfig, ClickMode};
 pub(crate) use stats::Stats;
 
 use crate::{
-    app::ScreenshotMaster,
+    app::WaitingScreenshot,
     colors::get_palette_index_by_name,
     components::{Canvas, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
@@ -33,7 +33,7 @@ pub(crate) struct AppState {
     pub(crate) move_dist: i32,
     pub(crate) scaling_factor: i32,
     pub(crate) render_settings: RenderSettings,
-    pub(crate) requested_jobs: Vec<ScreenshotMaster>,
+    pub(crate) requested_jobs: Vec<WaitingScreenshot>,
     pub(crate) click_config: ClickConfig,
 }
 

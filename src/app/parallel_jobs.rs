@@ -1,5 +1,5 @@
 use std::{
-    sync::mpsc::{Receiver, Sender},
+    sync::mpsc::{self, Receiver, Sender},
     thread::{self, JoinHandle},
 };
 
@@ -13,6 +13,22 @@ use crate::{
     helpers::Vec2,
     AppState,
 };
+
+pub(crate) struct WaitingScreenshot {
+    pub(crate) size: Vec2<i32>,
+    pub(crate) rs: RenderSettings,
+}
+
+impl WaitingScreenshot {
+    pub(crate) fn start(self) -> ScreenshotMaster {
+        let (tx, rx) = mpsc::channel();
+
+        let screenshot = ScreenshotSlave::new(self.size.clone(), tx, self.rs.clone());
+        let handle = ScreenshotSlave::start(screenshot);
+        let master = ScreenshotMaster::new(self.size.clone(), rx, handle, self.rs);
+        master
+    }
+}
 
 pub(crate) struct ScreenshotMaster {
     /// We want to know the size of the screenshot in order
@@ -49,7 +65,7 @@ impl ScreenshotMaster {
         size: Vec2<i32>,
         receiver: Receiver<SlaveMessage>,
         handle: JoinHandle<Result<DivergMatrix, String>>,
-        rs: &RenderSettings,
+        rs: RenderSettings,
     ) -> Self {
         Self {
             finished: false,
@@ -58,7 +74,7 @@ impl ScreenshotMaster {
             rendered_lines: 0,
             handle: Some(handle),
             id: Utc::now().timestamp_micros(),
-            rs_copy: rs.clone(),
+            rs_copy: rs,
         }
     }
     /// Handles the output of the screenshot child process:
@@ -126,11 +142,11 @@ pub(crate) struct ScreenshotSlave {
 }
 
 impl ScreenshotSlave {
-    pub(crate) fn new(size: Vec2<i32>, sender: Sender<SlaveMessage>, rs: &RenderSettings) -> Self {
+    pub(crate) fn new(size: Vec2<i32>, sender: Sender<SlaveMessage>, rs: RenderSettings) -> Self {
         Self {
             size,
             sender,
-            rs_copy: rs.clone(),
+            rs_copy: rs,
         }
     }
 }

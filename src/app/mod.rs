@@ -9,7 +9,7 @@ mod parallel_jobs;
 mod render_app;
 mod render_canvas;
 
-pub(crate) use parallel_jobs::{ScreenshotMaster, ScreenshotSlave, SlaveMessage};
+pub(crate) use parallel_jobs::{ScreenshotMaster, SlaveMessage, WaitingScreenshot};
 pub(crate) type CanvasPoints = HashMap<Color, Vec<(f64, f64)>>;
 
 use crate::{frac_logic::DivergMatrix, helpers::Chunks, AppState};

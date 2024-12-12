@@ -1,15 +1,7 @@
-use std::sync::mpsc;
-
 use super::Command;
-use crate::{
-    app::{ScreenshotMaster, ScreenshotSlave},
-    helpers::Vec2,
-    AppState,
-};
+use crate::{app::WaitingScreenshot, helpers::Vec2, AppState};
 
 pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    let (tx, rx) = mpsc::channel();
-
     let size = if args.is_empty() {
         Vec2::new(1920, 1080)
     } else {
@@ -35,19 +27,10 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(
 
         Vec2::new(parsed_width, parsed_height)
     };
-
-    let screenshot = ScreenshotSlave::new(size.clone(), tx, &state.render_settings);
-    let handle = ScreenshotSlave::start(screenshot);
-    let master = ScreenshotMaster::new(size, rx, handle, &state.render_settings);
-    state
-        .prioritized_log_messages
-        .insert(master.id, String::from("Starting screenshot..."));
-    state
-        .log_panel_scroll_state
-        .lock()
-        .unwrap()
-        .scroll_to_bottom();
-    state.requested_jobs.push(master);
+    state.requested_jobs.push(WaitingScreenshot {
+        size,
+        rs: state.render_settings.clone(),
+    });
 
     Ok(())
 }
