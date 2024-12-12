@@ -53,6 +53,8 @@ pub(crate) struct RenderSettings {
     pub(crate) mandel_constant: Complex,
     pub(crate) bailout: f32,
     pub(crate) smoothness: i32,
+    /// The limit of size (in lines) for a render pass.
+    pub(crate) chunk_size_limit: Option<i32>,
 }
 
 impl Default for RenderSettings {
@@ -74,6 +76,7 @@ impl Default for RenderSettings {
             mandel_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_MANDEL_CONSTANT),
             bailout: DEFAULT_BAILOUT,
             smoothness: DEFAULT_SMOOTHNESS,
+            chunk_size_limit: None,
         }
     }
 }

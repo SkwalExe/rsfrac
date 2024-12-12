@@ -28,7 +28,6 @@ impl SendSlaveMessage for Option<&Sender<SlaveMessage>> {
 #[derive(Default)]
 pub(crate) struct WgpuState {
     pub(crate) instance: Option<wgpu::Instance>,
-    pub(crate) restart_count: i32,
     pub(crate) adapter: Option<wgpu::Adapter>,
     pub(crate) device: Option<wgpu::Device>,
     pub(crate) queue: Option<wgpu::Queue>,
@@ -66,6 +65,7 @@ impl<'a> GpuRenderingTracker<'a> {
         size: &Vec2<i32>,
         max_buf_size: u64,
         adapter: AdapterInfo,
+        chunk_size_limit: Option<i32>,
     ) -> Self {
         Self {
             sender,
@@ -75,7 +75,7 @@ impl<'a> GpuRenderingTracker<'a> {
             max_buf_size,
             begin_time: Instant::now(),
             restart_count: 0,
-            lines_per_chunk_limit: size.y,
+            lines_per_chunk_limit: chunk_size_limit.unwrap_or(size.y),
         }
     }
 
