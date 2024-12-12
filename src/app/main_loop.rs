@@ -13,6 +13,7 @@ use crate::{
 
 /// The delay listening for key events before each terminal redraw.
 const FRAME_DELAY: i32 = 80;
+const WAITING_JOBS_MESSAGE_ID: i64 = 0x1;
 
 impl App {
     /// Run the main application loop, perform rendering and event passing
@@ -47,52 +48,72 @@ impl App {
                 self.render_frame(frame);
             })?;
 
-            // Move all the requested jobs to the top level running jobs tracker
-            for requested_job in self.app_state.requested_jobs.drain(..) {
-                self.parallel_jobs.push(requested_job);
+            if self.parallel_jobs.is_empty() && !self.app_state.requested_jobs.is_empty() {
+                self.parallel_jobs
+                    .push(self.app_state.requested_jobs.remove(0).start());
+            }
+
+            match (
+                self.parallel_jobs.is_empty(),
+                self.app_state.requested_jobs.is_empty(),
+            ) {
+                (false, false) => {
+                    self.app_state.prioritized_log_messages.insert(
+                        WAITING_JOBS_MESSAGE_ID,
+                        format!(
+                            "<yellow {}> jobs waiting in queue.",
+                            self.app_state.requested_jobs.len()
+                        ),
+                    );
+                }
+                _ => {
+                    self.app_state
+                        .prioritized_log_messages
+                        .remove(&WAITING_JOBS_MESSAGE_ID);
+                }
             }
 
             // Cycle through all the running jobs, non-blockingly handle messages
             // and remove finished ones.
             self.parallel_jobs.retain_mut(|job| {
                 if job.finished {
-                        // remove the priorotized progression message when the screenshot if
-                        // finished
-                        self.app_state.prioritized_log_messages.remove(&job.id);
-                        let result = job.handle.take().unwrap().join().unwrap();
-                        job.finished(&mut self.app_state, result);
-                        return false;
+                    // remove the priorotized progression message when the screenshot if
+                    // finished
+                    self.app_state.prioritized_log_messages.remove(&job.id);
+                    let result = job.handle.take().unwrap().join().unwrap();
+                    job.finished(&mut self.app_state, result);
+                    return false;
                 }
                 for message in job.receiver.try_iter() {
                     match message {
                         SlaveMessage::LineRender => {
                             job.rendered_lines += 1;
                             // Display the current progression as a prioritized log message.
-                            *self
-                                .app_state
-                                .prioritized_log_messages
-                                .get_mut(&job.id)
-                                .expect("There was no entry in the prioritized log messages corresponding to the current job.") = format!(
+                            self.app_state.prioritized_log_messages.insert(
+                                job.id,
+                                format!(
                                     "Screenshot progression:\nline {}/{} (<command {:?}%>)",
                                     job.rendered_lines,
                                     job.size.y,
                                     job.rendered_lines * 100 / job.size.y
-                                );
+                                ),
+                            );
                         }
                         SlaveMessage::JobFinished => {
                             job.finished = true;
                         }
                         SlaveMessage::Warning(warn) => self.app_state.log_warn(warn),
                         SlaveMessage::SetMessage(message) => {
-
-                            *self
-                                .app_state
+                            self.app_state
                                 .prioritized_log_messages
-                                .get_mut(&job.id)
-                                .expect("There was no entry in the prioritized log messages corresponding to the current job.") = message;
-                        },
+                                .insert(job.id, message);
+                        }
                         SlaveMessage::ScrollLogs => {
-                            self.app_state.log_panel_scroll_state.lock().unwrap().scroll_to_bottom();
+                            self.app_state
+                                .log_panel_scroll_state
+                                .lock()
+                                .unwrap()
+                                .scroll_to_bottom();
                         }
                     }
                 }

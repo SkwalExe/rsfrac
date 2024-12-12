@@ -28,6 +28,7 @@ impl SendSlaveMessage for Option<&Sender<SlaveMessage>> {
 #[derive(Default)]
 pub(crate) struct WgpuState {
     pub(crate) instance: Option<wgpu::Instance>,
+    pub(crate) restart_count: i32,
     pub(crate) adapter: Option<wgpu::Adapter>,
     pub(crate) device: Option<wgpu::Device>,
     pub(crate) queue: Option<wgpu::Queue>,
@@ -56,6 +57,7 @@ pub(crate) struct GpuRenderingTracker<'a> {
     begin_time: Instant,
     adapter: AdapterInfo,
     lines_per_chunk_limit: i32,
+    restart_count: i32,
 }
 
 impl<'a> GpuRenderingTracker<'a> {
@@ -72,6 +74,7 @@ impl<'a> GpuRenderingTracker<'a> {
             current_pass: 0,
             max_buf_size,
             begin_time: Instant::now(),
+            restart_count: 0,
             lines_per_chunk_limit: size.y,
         }
     }
@@ -156,11 +159,16 @@ impl<'a> GpuRenderingTracker<'a> {
         msg_send(
             self.sender,
             format!(
-                "GPU: <acc {}>\nChunk Size: <acc {}>\nPass <acc {}/{}>\nLeft: <acc {}>\n<green {}>",
+                "GPU: <acc {}>\nChunk Size: <acc {}>\nPass: <acc {}/{}>\n{}Left: <acc {}>\n<green {}>",
                 self.adapter.name,
                 self.max_lines_per_pass(),
                 self.current_pass,
                 self.pass_count(),
+                if self.restart_count == 0 {
+                    "".to_string()
+                } else {
+                    format!("Restarted: <acc {}>\n", self.restart_count)
+                },
                 // Prevent showing ms and ns... should improve this shit
                 match self.estimated_duration_left() {
                     None => "Estimating...".to_string(),
@@ -178,6 +186,7 @@ impl<'a> GpuRenderingTracker<'a> {
 
     /// When a render is repeated from the beginning because of a GPU timeout.
     pub(crate) fn reset(&mut self) {
+        self.restart_count += 1;
         self.current_pass = 0;
         self.begin_time = Instant::now();
     }
