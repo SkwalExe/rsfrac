@@ -1,4 +1,4 @@
-use crate::{frac_logic::RenderSettings, AppState};
+use crate::frac_logic::RenderSettings;
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::Write};
 

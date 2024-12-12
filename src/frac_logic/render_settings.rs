@@ -27,7 +27,7 @@ const DEFAULT_SMOOTHNESS: i32 = 7;
 const DEFAULT_BAILOUT: f32 = 2.0;
 
 /// Used to group values related to fractal rendering logic.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct RenderSettings {
     /// The size of one canvas cell.
     pub(crate) cell_size: Float,

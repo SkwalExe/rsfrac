@@ -4,7 +4,10 @@ use futures::executor;
 
 use crate::app::SlaveMessage;
 
-use super::{gpu_util::msg_send, RenderSettings};
+use super::{
+    gpu_util::{msg_send, SendSlaveMessage},
+    RenderSettings,
+};
 
 impl RenderSettings {
     /// Will initialize the global wgpu state synchronously, while sending status messages
@@ -88,11 +91,7 @@ impl RenderSettings {
             "burningship" => wgpu::include_wgsl!("../fractals/shaders/burning_ship.wgsl"),
             "julia" => wgpu::include_wgsl!("../fractals/shaders/julia.wgsl"),
             _ => {
-                if let Some(sender) = sender {
-                    sender
-                        .send(SlaveMessage::JobFinished)
-                        .map_err(|err| format!("Could not open message channel: {err}"))?;
-                }
+                sender.send(SlaveMessage::JobFinished)?;
                 return Err(format!(
                     "Fractal shader not yet implemented for: {}",
                     self.get_frac_obj().name,

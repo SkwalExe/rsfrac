@@ -1,4 +1,5 @@
 use std::{
+    fmt::Debug,
     sync::mpsc::Sender,
     time::{Duration, Instant},
 };
@@ -7,6 +8,22 @@ use humantime::format_duration;
 use wgpu::AdapterInfo;
 
 use crate::{app::SlaveMessage, helpers::Vec2};
+
+pub(crate) trait SendSlaveMessage {
+    fn send(&self, msg: SlaveMessage) -> Result<(), String>;
+}
+
+impl SendSlaveMessage for Option<&Sender<SlaveMessage>> {
+    fn send(&self, msg: SlaveMessage) -> Result<(), String> {
+        if let Some(sender) = self {
+            sender
+                .send(msg)
+                .map_err(|err| format!("Could not open message channel: {err}"))?;
+        }
+
+        Ok(())
+    }
+}
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
@@ -25,6 +42,12 @@ impl Clone for WgpuState {
     }
 }
 
+impl Debug for WgpuState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("{WgpuState}")
+    }
+}
+
 pub(crate) struct GpuRenderingTracker<'a> {
     current_pass: u32,
     sender: Option<&'a Sender<SlaveMessage>>,
@@ -32,6 +55,7 @@ pub(crate) struct GpuRenderingTracker<'a> {
     max_buf_size: u64,
     begin_time: Instant,
     adapter: AdapterInfo,
+    lines_per_chunk_limit: i32,
 }
 
 impl<'a> GpuRenderingTracker<'a> {
@@ -48,19 +72,20 @@ impl<'a> GpuRenderingTracker<'a> {
             current_pass: 0,
             max_buf_size,
             begin_time: Instant::now(),
+            lines_per_chunk_limit: size.y,
         }
     }
 
     /// Send a message to scroll the logs panel to the bottom.
-    pub(crate) fn scroll_logs(&self) {
-        if let Some(sender) = self.sender {
-            let _ = sender.send(SlaveMessage::ScrollLogs);
-        }
+    pub(crate) fn scroll_logs(&self) -> Result<(), String> {
+        self.sender.send(SlaveMessage::ScrollLogs)
     }
 
     /// Calculate the maximum number of lines that can be rendered per pass.
     pub(crate) fn max_lines_per_pass(&self) -> i32 {
-        (self.max_buf_size / self.output_buffer_line_size()) as i32
+        ((self.max_buf_size / self.output_buffer_line_size()) as i32)
+            .min(self.size.y)
+            .min(self.lines_per_chunk_limit)
     }
 
     /// Calculate the number of passes required to fininsh the render.
@@ -123,12 +148,17 @@ impl<'a> GpuRenderingTracker<'a> {
     }
 
     /// Report the capture progress to the main thread.
+    pub(crate) fn warn(&self, msg: impl Into<String>) -> Result<(), String> {
+        self.sender.send(SlaveMessage::Warning(msg.into()))
+    }
+    /// Report the capture progress to the main thread.
     pub(crate) fn send(&self, msg: impl Into<String>) -> Result<(), String> {
         msg_send(
             self.sender,
             format!(
-                "GPU: <acc {}>\nPass <acc {}/{}>\nLeft: <acc {}>\n<green {}>",
+                "GPU: <acc {}>\nChunk Size: <acc {}>\nPass <acc {}/{}>\nLeft: <acc {}>\n<green {}>",
                 self.adapter.name,
+                self.max_lines_per_pass(),
                 self.current_pass,
                 self.pass_count(),
                 // Prevent showing ms and ns... should improve this shit
@@ -141,9 +171,21 @@ impl<'a> GpuRenderingTracker<'a> {
         )
     }
 
+    /// Decrease the maximum number of lines to render per pass after a GPU timeout.
+    pub(crate) fn limit_chunk_size(&mut self) {
+        self.lines_per_chunk_limit = self.max_lines_per_pass() / 4;
+    }
+
+    /// When a render is repeated from the beginning because of a GPU timeout.
+    pub(crate) fn reset(&mut self) {
+        self.current_pass = 0;
+        self.begin_time = Instant::now();
+    }
+
     /// Inform the tracker that a new render pass was just begun.
     pub(crate) fn begin_pass(&mut self) {
         self.current_pass += 1;
+        // eprintln!("Begin pass: {}", self.current_pass);
     }
 }
 
@@ -151,14 +193,9 @@ pub(crate) fn msg_send(
     sender: Option<&Sender<SlaveMessage>>,
     message: impl Into<String> + Clone,
 ) -> Result<(), String> {
-    // eprintln!("{:?}", message.clone().into());
-    if let Some(sender) = sender {
-        sender
-            .send(SlaveMessage::SetMessage(format!(
-                "Current status:\n{}",
-                message.into()
-            )))
-            .map_err(|err| format!("Message channel could not be opened: {err}"))?;
-    }
-    Ok(())
+    // eprintln!("{}\n\n", message.clone().into());
+    sender.send(SlaveMessage::SetMessage(format!(
+        "Current status:\n{}",
+        message.into()
+    )))
 }
