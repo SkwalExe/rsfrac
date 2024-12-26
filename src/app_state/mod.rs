@@ -35,6 +35,7 @@ pub(crate) struct AppState {
     pub(crate) render_settings: RenderSettings,
     pub(crate) requested_jobs: Vec<WaitingScreenshot>,
     pub(crate) click_config: ClickConfig,
+    pub(crate) remove_jobs: bool,
 }
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
@@ -47,6 +48,7 @@ impl Default for AppState {
         Self {
             stats: Default::default(),
             redraw_canvas: true,
+            remove_jobs: false,
             repaint_canvas: true,
             last_command: String::new(),
             quit: false,

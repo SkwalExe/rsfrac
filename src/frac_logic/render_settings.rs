@@ -60,7 +60,7 @@ pub(crate) struct RenderSettings {
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
-            image_format: ImageFormat::WebP,
+            image_format: ImageFormat::Jpeg,
             frac_index: Default::default(),
             pos: Complex::with_val(DF_PREC_GPU, FRACTALS[0].default_pos),
             max_iter: DF_MAX_ITER_GPU,
