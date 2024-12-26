@@ -25,8 +25,7 @@ impl WaitingScreenshot {
 
         let screenshot = ScreenshotSlave::new(self.size.clone(), tx, self.rs.clone());
         let handle = ScreenshotSlave::start(screenshot);
-        let master = ScreenshotMaster::new(self.size.clone(), rx, handle, self.rs);
-        master
+        ScreenshotMaster::new(self.size.clone(), rx, handle, self.rs)
     }
 }
 
