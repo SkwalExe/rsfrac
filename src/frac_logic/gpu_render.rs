@@ -49,6 +49,7 @@ impl RenderSettings {
             size,
             max_buf_size,
             self.wgpu_state.adapter.as_ref().unwrap().get_info(),
+            self.chunk_size_limit,
         );
 
         // The final divergence matrix, each render pass will push a chunk of lines.

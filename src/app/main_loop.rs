@@ -48,6 +48,15 @@ impl App {
                 self.render_frame(frame);
             })?;
 
+            if self.app_state.remove_jobs {
+                self.app_state.remove_jobs = false;
+                self.app_state.requested_jobs = Vec::new();
+                while !self.parallel_jobs.is_empty() {
+                    let job = self.parallel_jobs.remove(0);
+                    self.app_state.prioritized_log_messages.remove(&job.id);
+                }
+            }
+
             if self.parallel_jobs.is_empty() && !self.app_state.requested_jobs.is_empty() {
                 self.parallel_jobs
                     .push(self.app_state.requested_jobs.remove(0).start());

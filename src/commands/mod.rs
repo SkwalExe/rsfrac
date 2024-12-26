@@ -5,6 +5,7 @@ pub(crate) mod capture;
 pub(crate) mod capture_fit;
 pub(crate) mod capture_format;
 pub(crate) mod capture_hq;
+pub(crate) mod chunk_size;
 pub(crate) mod clear;
 pub(crate) mod click_mode;
 pub(crate) mod color;
@@ -20,6 +21,7 @@ pub(crate) mod prec;
 pub(crate) mod quit;
 pub(crate) mod save;
 pub(crate) mod smoothness;
+pub(crate) mod stop;
 pub(crate) mod version;
 pub(crate) mod zoom_factor;
 
@@ -40,7 +42,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 20] {
+pub(crate) fn get_commands_list() -> [&'static Command; 22] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -48,6 +50,8 @@ pub(crate) fn get_commands_list() -> [&'static Command; 20] {
         &version::VERSION_COMMAND,
         &save::SAVE,
         &load::LOAD,
+        &stop::STOP,
+        &chunk_size::CHUNK_SIZE,
         &capture::CAPTURE,
         &capture_fit::CAPTURE_FIT,
         &capture_hq::CAPTURE_HQ,
