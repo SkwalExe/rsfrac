@@ -1,0 +1,12 @@
+frac_name = "Mandelbrot"
+color_palette_name = "Underground"
+palette_offset = 232
+pos = "(-7.99602800581495847627e-1 1.66246724719479880747e-1)"
+complex_width = "4.54368541436453404102e-3"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-9.94186043739318847656e-1 2.61626988649368286133e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 20

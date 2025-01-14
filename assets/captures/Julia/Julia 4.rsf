@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "Galaxy"
+palette_offset = 151
+pos = "(0 0)"
+complex_width = "2.31596744042342087867"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-3.15728732223931064175e-1 -6.31457464447862128350e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 10

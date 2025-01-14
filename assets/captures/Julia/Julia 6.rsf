@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "SolarFlame"
+palette_offset = 236
+pos = "(1.52161566983475283481e-1 4.84865370734447142056e-1)"
+complex_width = "4.60080243286116524602e-1"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(3.68449365521907867057e-1 3.15813741875921028890e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 20

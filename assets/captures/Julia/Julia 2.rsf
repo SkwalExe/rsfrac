@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "Autumn"
+palette_offset = 361
+pos = "(-8.37287844118399430572e-1 7.00983256313712889009e-2)"
+complex_width = "6.22036603856131897743e-2"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-9.94186043739318847656e-1 2.61626988649368286133e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 24

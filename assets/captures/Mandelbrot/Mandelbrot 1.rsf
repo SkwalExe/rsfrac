@@ -1,0 +1,12 @@
+frac_name = "Mandelbrot"
+color_palette_name = "Neon"
+palette_offset = 69
+pos = "(-1.18658262447811721767 -3.03139101994694123347e-1)"
+complex_width = "7.78707833283747147627e-3"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-9.94186043739318847656e-1 2.61626988649368286133e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 7

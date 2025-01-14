@@ -1,0 +1,12 @@
+frac_name = "Mandelbrot"
+color_palette_name = "Aurora"
+palette_offset = 288
+pos = "(-1.24589915614799607126 1.22002289968282047936e-1)"
+complex_width = "4.93792711235688613791e-2"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(5.11363636363636363627e-1 6.81818181818181818187e-1)"
+mandel_constant = "(-3.09355998651705881518e-1 -7.73389996629264703796e-2)"
+bailout = 2.0
+smoothness = 20

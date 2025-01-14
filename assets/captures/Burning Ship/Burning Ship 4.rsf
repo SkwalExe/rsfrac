@@ -1,0 +1,12 @@
+frac_name = "BurningShip"
+color_palette_name = "Ocean Deep"
+palette_offset = 352
+pos = "(-6.33286021815183931068e-1 1.19154124787802436153)"
+complex_width = "3.65226530576922688302e-1"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-9.94186043739318847656e-1 2.61626988649368286133e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 24
