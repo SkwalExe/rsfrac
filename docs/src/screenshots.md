@@ -1,6 +1,7 @@
 # Screenshots 🌟
 
 Here is some eye candy that I generated while creating this app!
+These screenshots are **ULTRA-HIGH QUALITY (7680x4320)** and can therefore be downloaded and used as wallpaper, etc.
 The state files can be used to go to the place of the screenshot in the app!!!
 
 ## Mandelbrot 💠
