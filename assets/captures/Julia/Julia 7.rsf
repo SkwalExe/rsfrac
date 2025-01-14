@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "Ocean Deep"
+palette_offset = 52
+pos = "(0 0)"
+complex_width = "2.14441429668835252553"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-4.99579124579124513386e-1 6.05218855218855211915e-1)"
+mandel_constant = "(1.31734006734006758215e-1 1.84343434343434364200e-1)"
+bailout = 1.2588810920715332
+smoothness = 10

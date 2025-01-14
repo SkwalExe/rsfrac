@@ -1,0 +1,12 @@
+frac_name = "Mandelbrot"
+color_palette_name = "Twilight"
+palette_offset = 102
+pos = "(-8.56477651141550950847e-1 -2.21585870989108994192e-1)"
+complex_width = "7.16536178771982109200e-4"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-4.99579124579124513386e-1 6.05218855218855211915e-1)"
+mandel_constant = "(1.31734006734006758215e-1 1.84343434343434364200e-1)"
+bailout = 1.2588810920715332
+smoothness = 10

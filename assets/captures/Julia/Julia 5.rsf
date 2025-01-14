@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "Sunset"
+palette_offset = 156
+pos = "(0 0)"
+complex_width = "3.40291598516876469638"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(3.68449365521907867057e-1 3.15813741875921028890e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 10

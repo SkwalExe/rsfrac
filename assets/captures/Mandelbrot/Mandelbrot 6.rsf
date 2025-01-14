@@ -1,0 +1,12 @@
+frac_name = "Mandelbrot"
+color_palette_name = "Ocean Deep"
+palette_offset = 291
+pos = "(-5.92241936424923291608e-1 4.40388124892241507454e-1)"
+complex_width = "1.23571146571333597127e-2"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(2.72727272727272727253e-1 -1.81818181818181818187e-1)"
+mandel_constant = "(1.31734006734006758215e-1 1.84343434343434364200e-1)"
+bailout = 1.449787974357605
+smoothness = 30

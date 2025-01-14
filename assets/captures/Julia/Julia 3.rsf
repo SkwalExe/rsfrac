@@ -1,0 +1,12 @@
+frac_name = "Julia"
+color_palette_name = "Aurora"
+palette_offset = 155
+pos = "(0 0)"
+complex_width = "3.96916120510084766398"
+precision = 64
+max_iter = 10000
+void_fill = "Transparent"
+julia_constant = "(-7.23651480482035794198e-1 4.11007416540462197960e-1)"
+mandel_constant = "(0 0)"
+bailout = 2.0
+smoothness = 10
