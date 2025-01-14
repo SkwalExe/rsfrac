@@ -41,7 +41,7 @@ features:
 <style>
 .Layout.home {
     background-color: #1B1B1F;
-    background-image: url("https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/captures/screenshot13.png");
+    background-image: url("https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/captures/screenshot13.jpg");
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
