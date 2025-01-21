@@ -82,6 +82,16 @@ impl Default for RenderSettings {
 }
 
 impl RenderSettings {
+    /// Returns the cell size so as to keep the complex plane height
+    pub(crate) fn cell_size_from_height(&self, height: i32) -> Float {
+        self.get_plane_height() / height
+    }
+
+    /// Returns the cell size so as to keep the complex plane width
+    pub(crate) fn _cell_size_from_wid(&self, wid: i32) -> Float {
+        self.get_plane_wid() / wid
+    }
+
     pub(crate) fn increment_color_offset(&mut self) {
         self.color_scheme_offset = (self.color_scheme_offset + 1)
             % (self.get_palette().colors.len() as i32 * self.smoothness);
