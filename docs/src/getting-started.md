@@ -4,6 +4,10 @@
 
 ## How to install 📥 {#installation}
 
+::: warning Windows Compatibility 🪟
+Rsfrac **CAN NOT** be compiled to run natively on windows 🙁. But you can make it work under [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux) ([how to install WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
+:::
+
 From [crates.io](https://crates.io/):
 
 ```bash
@@ -27,6 +31,7 @@ echo 'export PATH=$PATH:~/.cargo/bin' >> ~/.bashrc && bash
 # For zsh
 echo 'export PATH=$PATH:~/.cargo/bin' >> ~/.zshrc && zsh
 ```
+
 :::
 
 Now you can start the application with this command:
