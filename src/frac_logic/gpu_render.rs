@@ -65,7 +65,7 @@ impl RenderSettings {
             ));
         }
 
-        let cell_size = self.get_plane_wid() / size.x;
+        let cell_size = self.cell_size_from_height(size.y);
 
         while !tracker.render_finished() {
             tracker.scroll_logs()?;

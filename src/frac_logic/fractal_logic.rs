@@ -24,7 +24,7 @@ impl RenderSettings {
         // Get the canvas coordinates of each row
         let half_x = size.x / 2;
         let half_y = size.y / 2;
-        let cell_size = self.get_plane_wid() / size.x;
+        let cell_size = self.cell_size_from_height(size.y);
 
         let div_matrix = (-half_y..=-half_y + size.y - 1)
             .into_par_iter()
@@ -123,6 +123,11 @@ impl RenderSettings {
     /// Return the cell size so that the total width of the canvas is 4 on the real axis.
     pub(crate) fn get_default_cell_size(&self) -> Float {
         Float::with_val(self.prec, INITIAL_CANVAS_WIDTH) / self.canvas_size.x
+    }
+
+    /// Get the canvas height in the complex plane.
+    pub(crate) fn get_plane_height(&self) -> Float {
+        (self.canvas_size.y * &self.cell_size).complete(self.prec)
     }
 
     /// Get the canvas width in the complex plane.
