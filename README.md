@@ -13,6 +13,8 @@
 
 <p align="center">💠 Terminal based fractal explorer, including Mandelbrot, Burning Ship, and Julia. 💠</p>
 
+![Screenshot](assets/captures/Mandelbrot/Mandelbrot%203.jpg)
+
 # Documentation ✨
 
 #### [**✨ ⟼ Please head over to our documentation for more information! ⟻ ✨**](https://rsfrac.skwal.net)
@@ -77,20 +79,4 @@ Rsfrac's underlying rendering engine is highly modular. The integrated command s
 
 # Screenshots 🌟
 
-Here is some eye candy that I generated while creating this app!
-
-[💎 For more screenshots, visit the documentation!](https://rsfrac.skwal.net/screenshots.html)
-
-![Screenshot 0](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot0.png)
-
-![Screenshot 1](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot1.png)
-
-![Screenshot 4](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot4.png)
-
-![Screenshot 9](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot9.png)
-
-![Screenshot 11](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot11.png)
-
-![Screenshot 12](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot12.png)
-
-![Screenshot 13](https://raw.githubusercontent.com/SkwalExe/rsfrac/main/assets/screenshot13.png)
+[💎 Here is some eye candy that I generated while creating this app!](https://rsfrac.skwal.net/screenshots.html)
