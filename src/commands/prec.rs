@@ -2,7 +2,7 @@ use super::{command_increment::command_increment, Command};
 use crate::AppState;
 
 pub(crate) const MIN_DECIMAL_PREC: u32 = 8;
-pub(crate) const MAX_DECIMAL_PREC: u32 = 10000;
+pub(crate) const MAX_DECIMAL_PREC: u32 = 65535;
 
 pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let val = command_increment(
@@ -12,10 +12,12 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     )?;
-    state.log_info(concat!(
-        "Arbitrary precision if not taken into account when GPU mode is enabled. ",
-        "You can disable GPU mode with the <command gpu> command."
-    ));
+    if state.render_settings.use_gpu {
+        state.log_info(concat!(
+            "Arbitrary precision if not taken into account when GPU mode is enabled. ",
+            "You can disable GPU mode with the <command gpu> command."
+        ));
+    }
     state.set_decimal_prec(val);
     Ok(())
 }
