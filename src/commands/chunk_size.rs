@@ -40,8 +40,8 @@ pub(crate) const CHUNK_SIZE: Command = Command {
     accepted_arg_count: &[0, 1],
 
     detailed_desc: Some(concat!(
-        "This is sometimes needed because the GPU can time out under a huge computational, ",
-        "this returning incorrect results. Changing the maximum chunk size can help reduce ",
+        "This is sometimes needed because the GPU can time out under a huge computational charge, ",
+        "thus returning incorrect results. Changing the maximum chunk size can help reduce ",
         "render passes duration, therefore preventing timeouts and inconsistent results. ",
         "There are as of today no WGPU apis allowing to know if the GPU job finished or timed out.\n",
         "<green Usage: <command [no args]>>\n",

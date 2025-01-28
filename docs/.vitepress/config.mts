@@ -23,8 +23,7 @@ export default defineConfig({
             provider: "local",
         },
         editLink: {
-            pattern:
-                "https://github.com/skwalexe/rsfrac/edit/main/docs/src/:path",
+            pattern: "https://github.com/skwalexe/rsfrac/edit/main/docs/src/:path",
         },
         sidebar: [
             {
@@ -42,6 +41,12 @@ export default defineConfig({
                     { text: "📜 The Logs Panel", link: "/the-logs-panel" },
                     { text: "🛠️ The Command System", link: "/the-command-system" },
                     { text: "🧭 Navigation", link: "/navigation" },
+                    { text: "📷 Taking Screenshots", link: "/taking-screenshots" },
+                    { text: "⚡ GPU Mode", link: "/gpu-mode" },
+                    { text: "🔢 Arbitrary Precision", link: "/arbitrary-precision" },
+                    { text: "🎨 Color Palettes", link: "/color-palettes" },
+                    { text: "💠 Render Settings", link: "/render-settings" },
+                    { text: "📖 Fractal Logic", link: "/fractal-logic" },
                 ],
             },
             {

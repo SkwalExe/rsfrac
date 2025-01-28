@@ -2,10 +2,14 @@
 
 <p align="center">💠 The Terminal-Based Fractal Explorer 💠</p>
 
-## How to install 📥 {#installation}
-
 ::: warning Windows Compatibility 🪟
 Rsfrac **CAN NOT** be compiled to run natively on windows 🙁. But you can make it work under [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux) ([how to install WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
+:::
+
+## How to install 📥 {#installation}
+
+::: info
+To install cargo, you may use [Rustup](https://rustup.rs/).
 :::
 
 From [crates.io](https://crates.io/):
@@ -19,6 +23,7 @@ From the [Github repo](https://github.com/SkwalExe/rsfrac)
 ```bash
 cargo install --git https://github.com/SkwalExe/rsfrac
 ```
+
 
 ## Starting the app
 

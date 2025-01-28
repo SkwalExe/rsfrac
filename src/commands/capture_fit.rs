@@ -48,5 +48,5 @@ pub(crate) const CAPTURE_FIT: Command = Command {
         "Take a screenshot with the specified height or width.",
     )),
     basic_desc:
-        "Takes a high quality screenshot while maintaining the same aspect ration as your canvas.",
+        "Takes a high quality screenshot while maintaining the same aspect ratio as your canvas.",
 };
