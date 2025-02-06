@@ -1,0 +1,28 @@
+name: Check for typing/linting/formatting errors
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
+          # This is important to fetch the changes to the previous commit
+          fetch-depth: 0
+      - name: Install system dependencies
+        run: sudo apt-get install -y libgmp-dev libmpfr-dev libmpc-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install Rsfrac
+        run: cargo install rsfrac
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install textual-web
+      - run: textual-web --config ganglion.toml
+
