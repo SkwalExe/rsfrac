@@ -15,10 +15,10 @@ jobs:
           # This is important to fetch the changes to the previous commit
           fetch-depth: 0
       - name: Install system dependencies
-        run: sudo apt-get install -y libgmp-dev libmpfr-dev libmpc-dev
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Install Rsfrac
-        run: cargo install rsfrac
+        run: sudo apt-get install -y curl libgmp-dev libmpfr-dev libmpc-dev
+      - name: Download rsfrac binary
+        run: curl https://github.com/SkwalExe/rsfrac/releases/latest/download/rsfrac-online-linux-gnu-x86_x64 -o ./rsfrac
+      - run: chmod +x ./rsfrac
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
