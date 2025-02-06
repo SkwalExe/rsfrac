@@ -1,8 +1,7 @@
-name: Check for typing/linting/formatting errors
+name: Run Rsfrac online
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  workflow_dispatch
 
 jobs:
   ci:
