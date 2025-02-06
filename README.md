@@ -80,3 +80,10 @@ Rsfrac's underlying rendering engine is highly modular. The integrated command s
 # Screenshots 🌟
 
 [💎 Here is some eye candy that I generated while creating this app!](https://rsfrac.skwal.net/screenshots.html)
+
+# Additional info
+
+```bash
+# Creating statically linked build
+RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target x86_64-unknown-linux-gnu
+```
