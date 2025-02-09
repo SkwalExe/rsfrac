@@ -42,3 +42,5 @@ tui-markup = { version = "0.5.0", features = ["ratatui", "ansi"] }
 tui-scrollview = "=0.4.1"
 wgpu = "23.0.0"
 
+[features]
+web-runner = []
