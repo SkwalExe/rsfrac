@@ -12,6 +12,9 @@ use crate::{
 };
 
 /// The delay listening for key events before each terminal redraw.
+#[cfg(feature = "web-runner")]
+const FRAME_DELAY: i32 = 800;
+#[cfg(not(feature = "web-runner"))]
 const FRAME_DELAY: i32 = 80;
 const WAITING_JOBS_MESSAGE_ID: i64 = 0x1;
 
