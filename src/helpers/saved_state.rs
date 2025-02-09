@@ -1,6 +1,6 @@
 use crate::frac_logic::RenderSettings;
 use serde::{Deserialize, Serialize};
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, str::FromStr};
 
 use super::{void_fills, VoidFill};
 
@@ -37,6 +37,14 @@ impl From<&RenderSettings> for SavedState {
             bailout: Some(rs.bailout),
             smoothness: Some(rs.smoothness),
         }
+    }
+}
+
+impl FromStr for SavedState {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        toml::from_str(s)
+            .map_err(|err| format!("Could not parse the provided state file: {err}"))?
     }
 }
 

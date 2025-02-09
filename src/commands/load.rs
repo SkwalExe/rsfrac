@@ -1,6 +1,7 @@
 use std::{
     fs::{self, File},
     io::Read,
+    str::FromStr,
     sync::Mutex,
 };
 
@@ -82,8 +83,8 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
     let mut str = String::new();
     file.read_to_string(&mut str)
         .map_err(|err| format!("The file cannot be read: {err}"))?;
-    let saved: SavedState =
-        toml::from_str(&str).map_err(|err| format!("Could not parse the provided file: {err}"))?;
+
+    let saved: SavedState = SavedState::from_str(&str)?;
     state.apply(saved, &filename);
     Ok(())
 }
