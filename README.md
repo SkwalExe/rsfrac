@@ -27,7 +27,14 @@
 
 # How to install 📥
 
-#### [**✨ ⟼ For up-to-date instructions, please head over to our documentation ⟻ ✨**](https://rsfrac.skwal.net)
+#### [**✨ ⟼ For up-to-date instructions, please head over to our documentation ⟻ ✨**](https://rsfrac.skwal.net/getting-started.html)
+
+
+To install build dependencies:
+
+```bash
+sudo apt install build-essentials m4
+```
 
 From [crates.io](https://crates.io/):
 

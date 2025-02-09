@@ -8,9 +8,20 @@ Rsfrac **CAN NOT** be compiled to run natively on windows 🙁. But you can make
 
 ## How to install 📥 {#installation}
 
-::: info
-To install cargo, you may use [Rustup](https://rustup.rs/).
+::: info `cargo` not found?
+
+Cargo is the package manager for rust projects, it can be installed with:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 :::
+
+
+To install build dependencies:
+```bash
+sudo apt install build-essentials m4
+```
 
 From [crates.io](https://crates.io/):
 
