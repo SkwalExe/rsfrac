@@ -33,6 +33,7 @@ rand = "0.8.5"
 ratatui = { version = "0.28.1", features = ["all-widgets", "unstable-rendered-line-info"] }
 rayon = "1.10.0"
 regex = "1.11.1"
+reqwest = { version = "0.12.12", features = ["blocking"] }
 rug = "1.26.1"
 serde = { version = "1.0.215", features = ["derive"] }
 strum = "0.26.3"
