@@ -1,7 +1,7 @@
 use chrono::Local;
 
 use super::Command;
-use crate::AppState;
+use crate::{helpers::markup::esc, AppState};
 
 pub(crate) const SAVE_EXTENSION: &str = ".rsf";
 
@@ -17,7 +17,7 @@ pub(crate) fn execute_save(state: &mut AppState, args: Vec<&str>) -> Result<(), 
     } + SAVE_EXTENSION;
 
     state.render_settings.save(&filename)?;
-    state.log_success(format!("State successfully saved as <command {filename}>."));
+    state.log_success(format!("State successfully saved as <command {}>.", esc(filename)));
     Ok(())
 }
 

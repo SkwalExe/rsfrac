@@ -1,13 +1,17 @@
 use std::str::FromStr;
 
 use super::Command;
-use crate::{helpers::SavedState, AppState};
+use crate::{
+    helpers::{markup::esc, SavedState},
+    AppState,
+};
 
 pub(crate) fn execute_load_remote(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let url = args[0];
     let res = reqwest::blocking::get(url)
-        .map_err(|err| format!("Could not perform HTTP/S request: {err}"))?
-        .text().map_err(|err| format!("Could not read HTTP/S response: {err}"))?;
+        .map_err(|err| esc(format!("Could not perform HTTP/S request: {}", esc(err))))?
+        .text()
+        .map_err(|err| esc(format!("Could not read HTTP/S response: {}", esc(err))))?;
 
     let saved: SavedState = SavedState::from_str(&res)?;
     state.apply(saved, &url);

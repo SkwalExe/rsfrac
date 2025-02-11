@@ -1,7 +1,6 @@
 use super::Command;
 use crate::{
-    fractals::{get_frac_index_by_name, FRACTALS},
-    AppState,
+    fractals::{get_frac_index_by_name, FRACTALS}, helpers::markup::esc, AppState
 };
 
 pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
@@ -33,7 +32,7 @@ pub(crate) fn execute_frac(state: &mut AppState, args: Vec<&str>) -> Result<(), 
 
     let frac_name = args[if info { 1 } else { 0 }];
     let frac_i = get_frac_index_by_name(frac_name).ok_or(format!(
-        "Could not find fractal with name: <command {frac_name}>"
+        "Could not find fractal with name: <command {}>", esc(frac_name)
     ))?;
 
     if info {

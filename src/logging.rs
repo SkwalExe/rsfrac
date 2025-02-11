@@ -4,7 +4,7 @@ use ansi_term::ANSIStrings;
 use ratatui::DefaultTerminal;
 use tui_markup::compile_with;
 
-use crate::helpers::markup::get_ansi_generator;
+use crate::helpers::markup::{esc, get_ansi_generator};
 use crate::{App, AppState};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -43,6 +43,8 @@ impl App {
 }
 
 impl AppState {
+    #![allow(dead_code)]
+
     /// Print the initial log messages
     pub(crate) fn initial_message(&mut self) {
         self.log_raw(format!(
@@ -74,6 +76,8 @@ impl AppState {
         true
     }
 
+    // ====================================================
+
     /// Creates a new log message.
     pub(crate) fn log_raw(&mut self, message: impl Into<String>) {
         self.log_messages.push(message.into());
@@ -83,6 +87,37 @@ impl AppState {
         let state = &mut self.log_panel_scroll_state.lock().unwrap();
         state.scroll_to_bottom();
     }
+
+    /// Creates a new log message and escape the content.
+    pub(crate) fn log_raw_esc(&mut self, message: impl Into<String>) {
+        self.log_messages.push(esc(message.into()));
+        if self.log_messages.len() > LOG_MESSAGE_LIMIT {
+            self.log_messages.remove(0);
+        }
+        let state = &mut self.log_panel_scroll_state.lock().unwrap();
+        state.scroll_to_bottom();
+    }
+
+    // ====================================================
+
+    /// Creates a new success log message with the provided message and a fixed title.
+    pub(crate) fn log_success_esc(&mut self, message: impl Into<String>) {
+        self.log_success(esc(message.into()))
+    }
+    /// Creates a new info log message with the provided message and a fixed title.
+    pub(crate) fn log_info_esc(&mut self, message: impl Into<String>) {
+        self.log_info(esc(message.into()))
+    }
+    /// Creates a new error log message with the provided message and a fixed title.
+    pub(crate) fn log_error_esc(&mut self, message: impl Into<String>) {
+        self.log_error(esc(message.into()));
+    }
+    /// Creates a new warning log message with the provided message and a fixed title.
+    pub(crate) fn log_warn_esc(&mut self, message: impl Into<String>) {
+        self.log_warn(esc(message.into()));
+    }
+
+    // ====================================================
 
     /// Creates a new success log message with the provided message and a fixed title.
     pub(crate) fn log_success(&mut self, message: impl Into<String>) {
@@ -100,6 +135,8 @@ impl AppState {
     pub(crate) fn log_warn(&mut self, message: impl Into<String>) {
         self.log_warn_title("Warning", message);
     }
+
+    // ====================================================
 
     /// Creates a new success log message with the provided title and message.
     pub(crate) fn log_success_title(
@@ -120,5 +157,40 @@ impl AppState {
     /// Creates a new error log message with the provided title and message.
     pub(crate) fn log_error_title(&mut self, title: impl Into<String>, message: impl Into<String>) {
         self.log_raw(format!("<bgred  {} >\n{}", title.into(), message.into()))
+    }
+
+    // ====================================================
+
+    /// Creates a new success log message with the provided title and message.
+    pub(crate) fn log_success_title_esc(
+        &mut self,
+        title: impl Into<String>,
+        message: impl Into<String>,
+    ) {
+        self.log_success_title(title, esc(message.into()))
+    }
+    /// Creates a new success log message with the provided title and message.
+    pub(crate) fn log_info_title_esc(
+        &mut self,
+        title: impl Into<String>,
+        message: impl Into<String>,
+    ) {
+        self.log_info_title(title, esc(message.into()))
+    }
+    /// Creates a new success log message with the provided title and message.
+    pub(crate) fn log_warn_title_esc(
+        &mut self,
+        title: impl Into<String>,
+        message: impl Into<String>,
+    ) {
+        self.log_warn_title(title, esc(message.into()))
+    }
+    /// Creates a new success log message with the provided title and message.
+    pub(crate) fn log_error_title_esc(
+        &mut self,
+        title: impl Into<String>,
+        message: impl Into<String>,
+    ) {
+        self.log_error_title(title, esc(message.into()))
     }
 }

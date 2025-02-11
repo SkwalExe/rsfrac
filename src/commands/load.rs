@@ -6,7 +6,11 @@ use std::{
 };
 
 use super::Command;
-use crate::{commands::save::SAVE_EXTENSION, helpers::SavedState, AppState};
+use crate::{
+    commands::save::SAVE_EXTENSION,
+    helpers::{markup::esc, SavedState},
+    AppState,
+};
 const MAX_SEARCH_DEPTH: i32 = 10;
 
 fn find_state_files(path: &str, depth: i32) -> Result<Vec<String>, String> {
@@ -57,7 +61,7 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
                 {
                     let mut res = String::new();
                     for (i, filename) in locked.iter().enumerate() {
-                        res += &format!("<acc {i}>: {filename}\n");
+                        res += &format!("<acc {i}>: {}\n", esc(filename));
                     }
                     res.trim().to_string()
                 }
@@ -95,12 +99,17 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         }
     }
 
-    let mut file = File::open(&filename)
-        .map_err(|err| format!("Could not open file <command {filename}>: {err}"))?;
+    let mut file = File::open(&filename).map_err(|err| {
+        format!(
+            "Could not open file <command {}>: {}",
+            esc(&filename),
+            esc(err)
+        )
+    })?;
 
     let mut str = String::new();
     file.read_to_string(&mut str)
-        .map_err(|err| format!("The file cannot be read: {err}"))?;
+        .map_err(|err| format!("The file cannot be read: {}", esc(err)))?;
 
     let saved: SavedState = SavedState::from_str(&str)?;
     state.apply(saved, &filename);
