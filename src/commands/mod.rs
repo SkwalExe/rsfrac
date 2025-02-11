@@ -18,6 +18,7 @@ pub(crate) mod max_iter;
 pub(crate) mod move_dist;
 pub(crate) mod pos;
 pub(crate) mod prec;
+pub(crate) mod load_remote;
 pub(crate) mod quit;
 pub(crate) mod save;
 pub(crate) mod smoothness;
@@ -42,7 +43,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 22] {
+pub(crate) fn get_commands_list() -> [&'static Command; 23] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -50,6 +51,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 22] {
         &version::VERSION_COMMAND,
         &save::SAVE,
         &load::LOAD,
+        &load_remote::LOAD_REMOTE,
         &stop::STOP,
         &chunk_size::CHUNK_SIZE,
         &capture::CAPTURE,
