@@ -10,7 +10,7 @@ use ratatui::style::Color;
 use crate::{
     commands::save::SAVE_EXTENSION,
     frac_logic::{DivergMatrix, RenderSettings},
-    helpers::Vec2,
+    helpers::{markup::esc, Vec2},
     AppState,
 };
 
@@ -108,11 +108,13 @@ impl ScreenshotMaster {
                 );
 
                 if let Err(err) = buf.save_with_format(&filename_cap, self.rs_copy.image_format) {
-                    state.log_error(format!("Could not save screenshot: {err}"));
+                    state.log_error(format!("Could not save screenshot: {}", esc(err)));
                 } else {
                     state.log_success(format!(
                         "Screenshot ({}x{}) saved to <acc {}>",
-                        self.size.x, self.size.y, filename_cap
+                        self.size.x,
+                        self.size.y,
+                        esc(filename_cap)
                     ));
 
                     match self.rs_copy.save(&filename_save) {

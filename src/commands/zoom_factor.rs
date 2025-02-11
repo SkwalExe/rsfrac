@@ -1,5 +1,5 @@
 use super::Command;
-use crate::AppState;
+use crate::{helpers::markup::esc, AppState};
 
 pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     // If no args are provided, show the current positino
@@ -16,7 +16,7 @@ pub(crate) fn execute_zoom_factor(state: &mut AppState, args: Vec<&str>) -> Resu
 
     let new_value = args[0]
         .parse::<i32>()
-        .map_err(|err| format!("Please provide a valid integer: {err}"))?;
+        .map_err(|err| format!("Please provide a valid integer: {}", esc(err)))?;
 
     if !(1..=500).contains(&new_value) {
         return Err("Please, provide a value between 1 and 500.".to_string());

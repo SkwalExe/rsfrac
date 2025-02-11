@@ -16,7 +16,7 @@ use crate::{
     components::{Canvas, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
     fractals::get_frac_index_by_name,
-    helpers::{void_fills, Focus, SavedState, ZoomDirection},
+    helpers::{markup::esc, void_fills, Focus, SavedState, ZoomDirection},
 };
 
 pub(crate) struct AppState {
@@ -109,21 +109,21 @@ impl AppState {
             // Change the canvas position
             if let Some(pos) = saved.pos {
                 self.render_settings.pos = Complex::parse(pos)
-                    .map_err(|err| format!("Invalid canvas position: {err}"))?
+                    .map_err(|err| format!("Invalid canvas position: {}", esc(err)))?
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 
             // Change the mandelbrot constant
             if let Some(c) = saved.mandel_constant {
                 self.render_settings.mandel_constant = Complex::parse(c)
-                    .map_err(|err| format!("Invalid mandelbrot constant: {err}"))?
+                    .map_err(|err| format!("Invalid mandelbrot constant: {}", esc(err)))?
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 
             // Change the julia constant
             if let Some(c) = saved.julia_constant {
                 self.render_settings.julia_constant = Complex::parse(c)
-                    .map_err(|err| format!("Invalid julia constant: {err}"))?
+                    .map_err(|err| format!("Invalid julia constant: {}", esc(err)))?
                     .complete((self.render_settings.prec, self.render_settings.prec));
             }
 
@@ -136,7 +136,7 @@ impl AppState {
             if let Some(complex_width) = saved.complex_width {
                 self.render_settings.set_width(
                     Float::parse(complex_width)
-                        .map_err(|err| format!("Invalid canvas width: {err}"))?
+                        .map_err(|err| format!("Invalid canvas width: {}", esc(err)))?
                         .complete(self.render_settings.prec),
                 );
             }
@@ -164,7 +164,7 @@ impl AppState {
                 "Could not finish loading the state file (<command {filename}>) due to an error: <red {err}>"
             )),
             Ok(_) => self.log_success(format!(
-                "Successfully loaded state file: <command {filename}>.",
+                "Successfully loaded state from: <command {}>.", esc(filename),
             ))
         }
     }

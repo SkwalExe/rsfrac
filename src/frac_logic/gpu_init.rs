@@ -2,7 +2,7 @@ use std::sync::mpsc::Sender;
 
 use futures::executor;
 
-use crate::app::SlaveMessage;
+use crate::{app::SlaveMessage, helpers::markup::esc};
 
 use super::{
     gpu_util::{msg_send, SendSlaveMessage},
@@ -59,7 +59,7 @@ impl RenderSettings {
                 None,
             )
             .await
-            .map_err(|err| format!("Could not request device: {err}"))?;
+            .map_err(|err| format!("Could not request device: {}", esc(err)))?;
 
         (self.wgpu_state.device, self.wgpu_state.queue) = (Some(device), Some(queue));
 

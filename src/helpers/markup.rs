@@ -1,6 +1,8 @@
 //! Contains the ratatui and ansi markup generator logic.
 // LATER: Find a way to remove the repetition here...
 
+use std::fmt::Display;
+
 use ansi_term::{Color as ANSIColor, Style as ANSIStyle};
 use ratatui::style::{Color, Style};
 use tui_markup::generator::{ANSIStringsGenerator, RatatuiTextGenerator};
@@ -26,6 +28,14 @@ impl From<MyOwnColorType> for ANSIColor {
     fn from(value: MyOwnColorType) -> Self {
         ANSIColor::RGB(value.0, value.1, value.2)
     }
+}
+
+/// Escape tui-markup syntax in the given string.
+pub(crate) fn esc(t: impl Display) -> String {
+    let mut out = format!("{t}").replace("\\", "\\\\");
+    out = out.replace(">", "\\>");
+    out = out.replace("<", "\\<");
+    out
 }
 
 /// Returns an markup generator for ansi output.

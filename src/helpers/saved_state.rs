@@ -2,7 +2,7 @@ use crate::frac_logic::RenderSettings;
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::Write, str::FromStr};
 
-use super::{void_fills, VoidFill};
+use super::{markup::esc, void_fills, VoidFill};
 
 /// Describes the state data that can be saved to a rsf file.
 #[derive(Serialize, Deserialize)]
@@ -43,8 +43,8 @@ impl From<&RenderSettings> for SavedState {
 impl FromStr for SavedState {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(toml::from_str(s)
-            .map_err(|err| format!("Could not parse the provided state file: {err}"))?)
+        toml::from_str(s)
+            .map_err(|err| format!("Could not parse the provided state file: {}", esc(err)))
     }
 }
 
@@ -53,13 +53,13 @@ impl RenderSettings {
     pub(crate) fn save(&self, filename: &str) -> Result<(), String> {
         let saved_state = SavedState::from(self);
         let str = toml::to_string_pretty(&saved_state)
-            .map_err(|err| format!("Could not save the current state: {err}"))?;
+            .map_err(|err| format!("Could not save the current state: {}", esc(err)))?;
 
         let mut file = File::create(filename)
-            .map_err(|err| format!("Could not create <command {filename}>: {err}"))?;
+            .map_err(|err| format!("Could not create <command {filename}>: {}", esc(err)))?;
 
         file.write(str.as_bytes())
-            .map_err(|err| format!("Could not write file: {err}"))?;
+            .map_err(|err| format!("Could not write file: {}", esc(err)))?;
         Ok(())
     }
 }

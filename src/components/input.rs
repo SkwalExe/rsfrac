@@ -9,7 +9,11 @@ use ratatui::{
 };
 use tui_input::Input as TuiInput;
 
-use crate::{commands::get_command_by_name, helpers::Focus, AppState};
+use crate::{
+    commands::get_command_by_name,
+    helpers::{markup::esc, Focus},
+    AppState,
+};
 use tui_input::backend::crossterm::EventHandler;
 
 pub(crate) struct Input<'a> {
@@ -68,7 +72,7 @@ impl<'a> Input<'a> {
         // The first argument is the command name
         let command_name = args.remove(0);
         if let Some(command) = get_command_by_name(command_name) {
-            state.log_raw(format!("<command \\> {}>", input));
+            state.log_raw(format!("<command \\> {}>", esc(&input)));
             if !command.accepted_arg_count.contains(&args.len()) {
                 // If the number of provided arguments in not in the accepted argument
                 // count list, then print an error and return
@@ -94,7 +98,7 @@ impl<'a> Input<'a> {
                     "Command not found: <bgred,white {}>. ",
                     "Use <command help> for an overview of available commands."
                 ),
-                command_name
+                esc(command_name)
             ))
         }
     }

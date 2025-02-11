@@ -1,5 +1,9 @@
 use super::Command;
-use crate::{app::WaitingScreenshot, helpers::Vec2, AppState};
+use crate::{
+    app::WaitingScreenshot,
+    helpers::{markup::esc, Vec2},
+    AppState,
+};
 
 pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let size = if args.is_empty() {
@@ -10,11 +14,17 @@ pub(crate) fn execute_capture(state: &mut AppState, args: Vec<&str>) -> Result<(
 
         let parsed_width = width.parse().map_err(|err| {
             format!(
-                "The provided width could not be parsed, make sure to enter a valid integer: {err}"
+                "The provided width could not be parsed, make sure to enter a valid integer: {}",
+                esc(err)
             )
         })?;
 
-        let parsed_height: i32 = height.parse().map_err(|err| format!("The provided height could not be parsed, make sure to enter a valid integer: {err}"))?;
+        let parsed_height: i32 = height.parse().map_err(|err| {
+            format!(
+                "The provided height could not be parsed, make sure to enter a valid integer: {}",
+                esc(err)
+            )
+        })?;
 
         let size_range = 16..u16::MAX as i32 + 1;
 
