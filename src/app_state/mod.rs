@@ -164,7 +164,7 @@ impl AppState {
                 "Could not finish loading the state file (<command {filename}>) due to an error: <red {err}>"
             )),
             Ok(_) => self.log_success(format!(
-                "Successfully loaded state file: <command {filename}>.",
+                "Successfully loaded state from: <command {filename}>.",
             ))
         }
     }

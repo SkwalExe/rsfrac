@@ -7,6 +7,38 @@ use std::{
 
 use super::Command;
 use crate::{commands::save::SAVE_EXTENSION, helpers::SavedState, AppState};
+const MAX_SEARCH_DEPTH: i32 = 10;
+
+fn find_state_files(path: &str, depth: i32) -> Result<Vec<String>, String> {
+    // eprintln!("Depth: {depth} -> Looking for state files in {path}");
+    if depth > MAX_SEARCH_DEPTH {
+        return Err(String::from("Max depth exceeded."));
+    }
+
+    Ok(fs::read_dir(&path)
+        .map_err(|err| format!("Cannot list directory: {}: {err}", path))?
+        // Only keep sane entries
+        .filter_map(|entry| entry.ok())
+        // Only keep files and directories
+        .filter(|entry| {
+            entry.file_type().is_ok()
+            // UNWRAP: is_ok() checked above
+                && (entry.file_type().unwrap().is_file() || entry.file_type().unwrap().is_dir())
+        })
+        // Look into subdirectories
+        .flat_map(|entry| {
+            let entry_path = entry.path().to_string_lossy().into_owned();
+            // UNWRAP: is_ok() checked above
+            if entry.file_type().unwrap().is_file() {
+                Vec::from([entry_path])
+            } else {
+                find_state_files(&entry_path, depth + 1).unwrap_or(Vec::new())
+            }
+        })
+        // Only keep files ending in .rsf
+        .filter(|filename| filename.ends_with(SAVE_EXTENSION))
+        .collect::<Vec<_>>())
+}
 
 pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     static DETECTED_FILES: Mutex<Vec<String>> = Mutex::new(Vec::new());
@@ -14,21 +46,7 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
     if args.is_empty() {
         *CURRENT_STATE_FILE_INDEX.lock().unwrap() = 0;
         let mut locked = DETECTED_FILES.lock().unwrap();
-        *locked = fs::read_dir(".")
-            .map_err(|err| format!("Cannot list current working directory: {err}"))?
-            // Only keep sane entries
-            .filter_map(|entry| entry.ok())
-            // Only keep files not directories
-            .filter(|entry| {
-                let ft = entry.file_type();
-                ft.is_ok() && ft.unwrap().is_file()
-            })
-            // Only keep files with valid unicode names
-            .filter_map(|entry| entry.file_name().into_string().ok())
-            // Only keep files ending in .rsf
-            .filter(|filename| filename.ends_with(SAVE_EXTENSION))
-            .collect::<Vec<_>>();
-
+        *locked = find_state_files(".", 0)?;
         locked.sort_unstable();
 
         state.log_info(if locked.is_empty() {
