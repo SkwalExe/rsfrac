@@ -43,8 +43,8 @@ impl From<&RenderSettings> for SavedState {
 impl FromStr for SavedState {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(toml::from_str(s)
-            .map_err(|err| format!("Could not parse the provided state file: {}", esc(err)))?)
+        toml::from_str(s)
+            .map_err(|err| format!("Could not parse the provided state file: {}", esc(err)))
     }
 }
 

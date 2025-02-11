@@ -17,7 +17,10 @@ pub(crate) fn execute_save(state: &mut AppState, args: Vec<&str>) -> Result<(), 
     } + SAVE_EXTENSION;
 
     state.render_settings.save(&filename)?;
-    state.log_success(format!("State successfully saved as <command {}>.", esc(filename)));
+    state.log_success(format!(
+        "State successfully saved as <command {}>.",
+        esc(filename)
+    ));
     Ok(())
 }
 

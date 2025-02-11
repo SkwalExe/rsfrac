@@ -112,7 +112,9 @@ impl ScreenshotMaster {
                 } else {
                     state.log_success(format!(
                         "Screenshot ({}x{}) saved to <acc {}>",
-                        self.size.x, self.size.y, esc(filename_cap)
+                        self.size.x,
+                        self.size.y,
+                        esc(filename_cap)
                     ));
 
                     match self.rs_copy.save(&filename_save) {

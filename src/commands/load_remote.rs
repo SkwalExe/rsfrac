@@ -14,7 +14,7 @@ pub(crate) fn execute_load_remote(state: &mut AppState, args: Vec<&str>) -> Resu
         .map_err(|err| esc(format!("Could not read HTTP/S response: {}", esc(err))))?;
 
     let saved: SavedState = SavedState::from_str(&res)?;
-    state.apply(saved, &url);
+    state.apply(saved, url);
     Ok(())
 }
 

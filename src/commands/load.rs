@@ -19,7 +19,7 @@ fn find_state_files(path: &str, depth: i32) -> Result<Vec<String>, String> {
         return Err(String::from("Max depth exceeded."));
     }
 
-    Ok(fs::read_dir(&path)
+    Ok(fs::read_dir(path)
         .map_err(|err| format!("Cannot list directory: {}: {err}", path))?
         // Only keep sane entries
         .filter_map(|entry| entry.ok())
@@ -36,7 +36,7 @@ fn find_state_files(path: &str, depth: i32) -> Result<Vec<String>, String> {
             if entry.file_type().unwrap().is_file() {
                 Vec::from([entry_path])
             } else {
-                find_state_files(&entry_path, depth + 1).unwrap_or(Vec::new())
+                find_state_files(&entry_path, depth + 1).unwrap_or_default()
             }
         })
         // Only keep files ending in .rsf
