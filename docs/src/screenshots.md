@@ -8,155 +8,189 @@ To learn more about how **you** can create such images, you may read the [screen
 
 ## Mandelbrot 💠
 
-State file: [State File 1](/assets/captures/mandelbrot/mandelbrot_1.rsf)
+State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_1.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_1.rsf
 ```
+
 ![Screenshot 1](/assets/captures/mandelbrot/mandelbrot_1.jpg)
 
 ---
 
-State file: [State File 2](/assets/captures/mandelbrot/mandelbrot_2.rsf)
+State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_2.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_2.rsf
 ```
+
 ![Screenshot 2](/assets/captures/mandelbrot/mandelbrot_2.jpg)
 
 ---
 
-State file: [State File 3](/assets/captures/mandelbrot/mandelbrot_3.rsf)
+State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_3.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_3.rsf
 ```
+
 ![Screenshot 3](/assets/captures/mandelbrot/mandelbrot_3.jpg)
 
 ---
 
-State file: [State File 4](/assets/captures/mandelbrot/mandelbrot_4.rsf)
+State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_4.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_4.rsf
 ```
+
 ![Screenshot 4](/assets/captures/mandelbrot/mandelbrot_4.jpg)
 
 ---
 
-State file: [State File 5](/assets/captures/mandelbrot/mandelbrot_5.rsf)
+State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_5.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_5.rsf
 ```
+
 ![Screenshot 5](/assets/captures/mandelbrot/mandelbrot_5.jpg)
 
 ---
 
-State file: [State File 6](/assets/captures/mandelbrot/mandelbrot_6.rsf)
+State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_6.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_6.rsf
 ```
+
 ![Screenshot 6](/assets/captures/mandelbrot/mandelbrot_6.jpg)
 
 ## Burning Ship 💠
 
-State file: [State File 1](/assets/captures/burning_ship/burning_ship_1.rsf)
+State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_1.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_1.rsf
 ```
+
 ![Screenshot 1](/assets/captures/burning_ship/burning_ship_1.jpg)
 
 ---
 
-State file: [State File 2](/assets/captures/burning_ship/burning_ship_2.rsf)
+State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_2.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_2.rsf
 ```
+
 ![Screenshot 2](/assets/captures/burning_ship/burning_ship_2.jpg)
 
 ---
 
-State file: [State File 3](/assets/captures/burning_ship/burning_ship_3.rsf)
+State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_3.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_3.rsf
 ```
+
 ![Screenshot 3](/assets/captures/burning_ship/burning_ship_3.jpg)
 
 ---
 
-State file: [State File 4](/assets/captures/burning_ship/burning_ship_4.rsf)
+State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_4.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_4.rsf
 ```
+
 ![Screenshot 4](/assets/captures/burning_ship/burning_ship_4.jpg)
 
 ## Julia 💠
 
-State file: [State File 1](/assets/captures/julia/julia_1.rsf)
+State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_1.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_1.rsf
 ```
+
 ![Screenshot 1](/assets/captures/julia/julia_1.jpg)
 
 ---
 
-State file: [State File 2](/assets/captures/julia/julia_2.rsf)
+State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_2.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_2.rsf
 ```
+
 ![Screenshot 2](/assets/captures/julia/julia_2.jpg)
 
 ---
 
-State file: [State File 3](/assets/captures/julia/julia_3.rsf)
+State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_3.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_3.rsf
 ```
+
 ![Screenshot 3](/assets/captures/julia/julia_3.jpg)
 
 ---
 
-State file: [State File 4](/assets/captures/julia/julia_4.rsf)
+State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_4.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_4.rsf
 ```
+
 ![Screenshot 4](/assets/captures/julia/julia_4.jpg)
 
 ---
 
-State file: [State File 5](/assets/captures/julia/julia_5.rsf)
+State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_5.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_5.rsf
 ```
+
 ![Screenshot 5](/assets/captures/julia/julia_5.jpg)
 
 ---
 
-State file: [State File 6](/assets/captures/julia/julia_6.rsf)
+State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_6.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_6.rsf
 ```
+
 ![Screenshot 6](/assets/captures/julia/julia_6.jpg)
 
 ---
 
-State file: [State File 7](/assets/captures/julia/julia_7.rsf)
+State file: [State File 7](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_7.rsf)
+
 ```bash
 # Paste this in the command input to load the application state.
 load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_7.rsf
 ```
+
 ![Screenshot 7](/assets/captures/julia/julia_7.jpg)
 
 ## Other screenshots 💠
