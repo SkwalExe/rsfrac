@@ -3,6 +3,7 @@ use crate::AppState;
 
 pub(crate) fn execute_stop(state: &mut AppState, _args: Vec<&str>) -> Result<(), String> {
     state.remove_jobs = true;
+    state.log_info("All jobs have been removed.");
     Ok(())
 }
 pub(crate) const STOP: Command = Command {

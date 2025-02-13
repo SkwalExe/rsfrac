@@ -97,7 +97,7 @@ impl ScreenshotMaster {
                 let filename_base = format!(
                     "{} {}",
                     self.rs_copy.get_frac_obj().name,
-                    Local::now().format("%F %H-%M-%S")
+                    Local::now().format("%F %H-%M-%S%.f")
                 );
 
                 let filename_save = format!("{}{}", filename_base, SAVE_EXTENSION);
