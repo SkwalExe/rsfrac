@@ -51,6 +51,7 @@ impl App {
                 self.render_frame(frame);
             })?;
 
+            // 1 - Remove all jobs is asked so
             if self.app_state.remove_jobs {
                 self.app_state.remove_jobs = false;
                 self.app_state.requested_jobs = Vec::new();
@@ -60,32 +61,7 @@ impl App {
                 }
             }
 
-            if self.parallel_jobs.is_empty() && !self.app_state.requested_jobs.is_empty() {
-                self.parallel_jobs
-                    .push(self.app_state.requested_jobs.remove(0).start());
-            }
-
-            match (
-                self.parallel_jobs.is_empty(),
-                self.app_state.requested_jobs.is_empty(),
-            ) {
-                (false, false) => {
-                    self.app_state.prioritized_log_messages.insert(
-                        WAITING_JOBS_MESSAGE_ID,
-                        format!(
-                            "<yellow {}> jobs waiting in queue.",
-                            self.app_state.requested_jobs.len()
-                        ),
-                    );
-                }
-                _ => {
-                    self.app_state
-                        .prioritized_log_messages
-                        .remove(&WAITING_JOBS_MESSAGE_ID);
-                }
-            }
-
-            // Cycle through all the running jobs, non-blockingly handle messages
+            // 2 - Cycle through all the running jobs, non-blockingly handle messages
             // and remove finished ones.
             self.parallel_jobs.retain_mut(|job| {
                 if job.finished {
@@ -131,6 +107,32 @@ impl App {
                 }
                 true
             });
+
+            // 3 - Start a new job if possible
+            if !self.app_state.pause_jobs
+                && self.parallel_jobs.is_empty()
+                && !self.app_state.requested_jobs.is_empty()
+            {
+                self.parallel_jobs
+                    .push(self.app_state.requested_jobs.remove(0).start());
+            }
+
+            // 4 - Report waiting jobs
+            if !self.app_state.requested_jobs.is_empty() || self.app_state.pause_jobs {
+                self.app_state.prioritized_log_messages.insert(
+                    WAITING_JOBS_MESSAGE_ID,
+                    format!(
+                        "<yellow {}> job(s) waiting in queue. {}",
+                        self.app_state.requested_jobs.len(),
+                        self.app_state.pause_jobs.then_some(
+                            "Job execution is paused, you can resume with the <command pause> command.").unwrap_or_default()
+                    ),
+                );
+            } else {
+                self.app_state
+                    .prioritized_log_messages
+                    .remove(&WAITING_JOBS_MESSAGE_ID);
+            }
 
             // Try not to sleep if the previous operations took some time.
             let delay = 0.max(FRAME_DELAY - start.elapsed().as_millis() as i32) as u64;

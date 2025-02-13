@@ -36,6 +36,7 @@ pub(crate) struct AppState {
     pub(crate) requested_jobs: Vec<WaitingScreenshot>,
     pub(crate) click_config: ClickConfig,
     pub(crate) remove_jobs: bool,
+    pub(crate) pause_jobs: bool,
 }
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
@@ -62,6 +63,7 @@ impl Default for AppState {
             move_dist: DF_MOVE_DISTANCE_GPU,
             requested_jobs: Default::default(),
             click_config: Default::default(),
+            pause_jobs: false,
         }
     }
 }

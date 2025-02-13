@@ -91,6 +91,6 @@ Rsfrac's underlying rendering engine is highly modular. The integrated command s
 # Additional info
 
 ```bash
-# Creating statically linked build
-RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target x86_64-unknown-linux-gnu
+# Creating statically linked build for web runner
+RUSTFLAGS='-C target-feature=+crt-static' cargo build --features web-runner --release --target x86_64-unknown-linux-gnu
 ```
