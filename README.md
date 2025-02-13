@@ -13,7 +13,7 @@
 
 <p align="center">💠 Terminal based fractal explorer, including Mandelbrot, Burning Ship, and Julia. 💠</p>
 
-![Screenshot](assets/captures/Mandelbrot/Mandelbrot%203.jpg)
+![Screenshot](docs/src/assets/captures/mandelbrot/mandelbrot_3.jpg)
 
 # Documentation ✨
 
