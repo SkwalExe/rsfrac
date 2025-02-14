@@ -216,7 +216,7 @@ impl RenderSettings {
                     "Possible GPU timeout, cannot obtain details because ",
                     "of an issue on WGPU's end. Trying to reduce chunk size until the job completes..."
                 ))?;
-                tracker.limit_chunk_size();
+                tracker.limit_chunk_size()?;
                 tracker.reset();
                 result = Vec::new();
                 // reinitialize GPU to clear queue, there must be a better way to do this.

@@ -55,6 +55,7 @@ pub(crate) enum SlaveMessage {
     SetMessage(String),
     ScrollLogs,
     Warning(String),
+    LimitGPUChunkSize(i32),
 }
 
 /// The struct representing the screenshot job state
