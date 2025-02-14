@@ -182,7 +182,8 @@ impl<'a> GpuRenderingTracker<'a> {
     /// Decrease the maximum number of lines to render per pass after a GPU timeout.
     pub(crate) fn limit_chunk_size(&mut self) -> Result<(), String> {
         self.lines_per_chunk_limit = self.max_lines_per_pass() / 4;
-        self.sender.send(SlaveMessage::LimitGPUChunkSize(self.lines_per_chunk_limit))
+        self.sender
+            .send(SlaveMessage::LimitGPUChunkSize(self.lines_per_chunk_limit))
     }
 
     /// When a render is repeated from the beginning because of a GPU timeout.
