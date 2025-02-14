@@ -103,6 +103,9 @@ impl App {
                                 .unwrap()
                                 .scroll_to_bottom();
                         }
+                        SlaveMessage::LimitGPUChunkSize(size) => {
+                            self.app_state.render_settings.chunk_size_limit = Some(size)
+                        }
                     }
                 }
                 true
