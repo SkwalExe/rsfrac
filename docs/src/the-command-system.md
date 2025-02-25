@@ -3,7 +3,7 @@
 The command system is a central feature of Rsfrac.
 It allows you to interact with the **underlying fractal rendering engine** to modify its behavior and execute complex tasks.
 Experimenting with the rendering parameters is an excellent way to satisfy your curiosity, and deepen your understanding of fractals.
-Adjusting the rendering engine can also allow you to **explore fractals in much grater depth** than possible with the default settings, as we will see in a later section. 
+Adjusting the rendering engine can also allow you to **explore fractals in much grater depth** than possible with the default settings, as we will see in a later section.
 
 ### How it works ❓ {#how-it-works}
 
@@ -25,6 +25,17 @@ You can use `help [command_name]` to obtain more information about a command, su
 > ![Preview of help capture](./assets/help-capture.png)
 >
 > In the above screenshot, we can see the output of the `help capture` command.
-> We learn that we can use the `capture` command in two ways. 
+> We learn that we can use the `capture` command in two ways.
+>
 > - Without any arguments, the height and width of the screenshot will be retrieved from the command line arguments passed to the `rsfrac` command when starting the app.
 > - Or we can explicitly give two arguments, the first one being the desired width, and the second one the height.
+
+### The command history
+
+The command history keeps track of every command that was run. You can navigate through the previously entered commands using the **Up and Down arrow keys**, like if you were in a linux shell.
+
+You can also **display the entire history** using the `hist` command. This will associate an index to each command, that you can use to directly edit the command without having to repeatly press the up arrow.
+
+![history command output](/assets/hist.png)
+
+If the `hist` command presented the output visible in the image above, running `hist 3` would set the command input content to `load cycle`.

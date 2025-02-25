@@ -76,6 +76,7 @@ impl App {
         for char in text.chars().map(|c| if c == '\n' { ' ' } else { c }) {
             self.app_state
                 .command_input
+                .0
                 .handle(tui_input::InputRequest::InsertChar(char));
         }
     }
