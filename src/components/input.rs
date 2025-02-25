@@ -35,7 +35,7 @@ impl<'a> Input<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
         "Execute the command [Enter]",
         "Repeat last command [Ctrl+R]",
-        "Edit last command [Ctrl+E]",
+        "Edit last commands [Ctrl+E]",
     ];
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
@@ -45,12 +45,12 @@ impl<'a> Input<'a> {
     }
     /// Run the last command that was ran.
     pub(crate) fn run_last_command(state: &mut AppState) {
-        Input::run_command(state, state.last_command.clone());
+        Input::run_command(state, state.get_command(0));
     }
     /// Runs the command that is currently entered in the command input.
     pub(crate) fn run_current_command(state: &mut AppState) {
-        let input = String::from(state.command_input.value());
-        state.command_input.reset();
+        let input = String::from(state.command_input.0.value());
+        state.command_input.0.reset();
 
         Input::run_command(state, input);
     }
@@ -61,7 +61,11 @@ impl<'a> Input<'a> {
             return;
         }
 
-        state.last_command = input.clone();
+        // Save the command in history only if it is different from the last command
+        if input != state.get_command(0) {
+            state.last_commands.insert(0, input.clone());
+        }
+
         let mut args: Vec<_> = input.split_whitespace().collect();
 
         // Do nothing more if the command is empty
@@ -105,14 +109,25 @@ impl<'a> Input<'a> {
     pub(crate) fn handle_event(state: &mut AppState, key: KeyEvent) {
         match key.code {
             KeyCode::Enter => Input::run_current_command(state),
-            KeyCode::Char('e') if key.modifiers == KeyModifiers::CONTROL => {
-                state.command_input = TuiInput::new(state.last_command.clone());
+            KeyCode::Down => {
+                state.command_input.1 = (state.command_input.1 - 1).max(-1);
+                state.command_input.0 = TuiInput::new(state.get_command(state.command_input.1));
+            }
+            k if {
+                (k == KeyCode::Char('e') && key.modifiers == KeyModifiers::CONTROL)
+                    || k == KeyCode::Up
+            } =>
+            {
+                state.command_input.1 =
+                    (state.command_input.1 + 1).min(state.last_commands.len() as i32 - 1);
+                state.command_input.0 = TuiInput::new(state.get_command(state.command_input.1));
             }
             KeyCode::Char('r') if key.modifiers == KeyModifiers::CONTROL => {
                 Input::run_last_command(state)
             }
             _ => {
-                state.command_input.handle_event(&Event::Key(key));
+                state.command_input.1 = -1;
+                state.command_input.0.handle_event(&Event::Key(key));
             }
         };
     }
@@ -125,8 +140,12 @@ impl Widget for Input<'_> {
         } else {
             Color::DarkGray
         });
-        let scroll = self.state.command_input.visual_scroll(area.width as usize);
-        let input = Paragraph::new(self.state.command_input.value())
+        let scroll = self
+            .state
+            .command_input
+            .0
+            .visual_scroll(area.width as usize);
+        let input = Paragraph::new(self.state.command_input.0.value())
             .block(
                 Block::default()
                     .borders(Borders::ALL)

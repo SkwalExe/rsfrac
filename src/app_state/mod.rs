@@ -28,8 +28,10 @@ pub(crate) struct AppState {
     pub(crate) log_messages: Vec<String>,
     pub(crate) prioritized_log_messages: HashMap<i64, String>,
     pub(crate) log_panel_scroll_state: Mutex<ScrollViewState>,
-    pub(crate) last_command: String,
-    pub(crate) command_input: TuiInput,
+    pub(crate) last_commands: Vec<String>,
+    /// The i32 is where the user is at in the command history. -1 means he is entering a new
+    /// command
+    pub(crate) command_input: (TuiInput, i32),
     pub(crate) move_dist: i32,
     pub(crate) scaling_factor: i32,
     pub(crate) render_settings: RenderSettings,
@@ -51,7 +53,7 @@ impl Default for AppState {
             redraw_canvas: true,
             remove_jobs: false,
             repaint_canvas: true,
-            last_command: String::new(),
+            last_commands: vec![],
             quit: false,
             focused: Default::default(),
             command_input: Default::default(),
@@ -69,6 +71,17 @@ impl Default for AppState {
 }
 
 impl AppState {
+    /// Returns the last executed command or an empty string
+    pub(crate) fn get_command(&self, index: i32) -> String {
+        if index < 0 {
+            return String::new();
+        }
+        self.last_commands
+            .get(index as usize)
+            .cloned()
+            .unwrap_or_default()
+    }
+
     /// Load default settings for CPU mode when GPU init fails at startup
     pub(crate) fn cpu_defaults(&mut self) {
         self.move_dist = DF_MOVE_DISTANCE_CPU;

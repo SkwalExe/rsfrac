@@ -16,11 +16,12 @@ impl App {
             let scroll = self
                 .app_state
                 .command_input
+                .0
                 .visual_scroll(self.chunks.input.width as usize);
             frame.set_cursor_position((
                 self.chunks.input.x
                     + 1
-                    + (self.app_state.command_input.visual_cursor().max(scroll) - scroll) as u16,
+                    + (self.app_state.command_input.0.visual_cursor().max(scroll) - scroll) as u16,
                 self.chunks.input.y + 1,
             ))
         }
