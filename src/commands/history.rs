@@ -17,7 +17,7 @@ pub(crate) fn execute_history(state: &mut AppState, args: Vec<&str>) -> Result<(
         } else {
             format!("Below is shown your command history:\n{}", {
                 let mut res = String::new();
-                for (i, command) in locked.iter().enumerate() {
+                for (i, command) in locked.iter().enumerate().rev() {
                     res += &format!("<acc {i}>: {}\n", esc(command));
                 }
                 res.trim().to_string()
