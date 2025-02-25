@@ -35,7 +35,7 @@ impl<'a> Input<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
         "Execute the command [Enter]",
         "Repeat last command [Ctrl+R]",
-        "Edit last commands [Ctrl+E]",
+        "Edit last commands [Ctrl+E/Arrows]",
     ];
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
@@ -49,7 +49,8 @@ impl<'a> Input<'a> {
     }
     /// Runs the command that is currently entered in the command input.
     pub(crate) fn run_current_command(state: &mut AppState) {
-        let input = String::from(state.command_input.0.value());
+        // ignore whitespace around the command
+        let input = state.command_input.0.value().trim().to_string();
         state.command_input.0.reset();
 
         Input::run_command(state, input);
