@@ -21,6 +21,10 @@ An indicator is also shown on the top left hand corner of the canvas (`GpuMode[o
 The `gpu` command must be used if you want to enable or disable GPU Mode for any reason.
 It is always used without arguments.
 
+Starting from `v0.9.0`, the `gpu_info` command can be used to get detailed information about the GPU currently in use.
+
+![gpu_info command preview](/assets/gpu_info.png)
+
 ## Tweaking GPU parameters ⚙
 
 One GPU parameter can be changed with the `chunk_size (cs)` command.
