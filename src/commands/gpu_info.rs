@@ -16,15 +16,15 @@ pub(crate) fn execute_gpu_info(state: &mut AppState, _args: Vec<&str>) -> Result
         .unwrap()
         .get_info();
     state.log_info_title(
-        "GPU INFO", 
+        "GPU INFO",
         format!(
-            "<blue Name>: {}\n<blue VendorID>: {}\n<blue DeviceID>: {}\n<blue DeviceType>: {}\n<blue Driver>: {}\n<blue DriverInfo>: {}\n<blue Backend>: {}", 
-            esc(info.name), 
-            esc(info.vendor), 
-            esc(info.device), 
-            esc(format!("{:?}", info.device_type)), 
-            esc(info.driver), 
-            esc(info.driver_info), 
+            "<blue Name>: {}\n<blue VendorID>: {}\n<blue DeviceID>: {}\n<blue DeviceType>: {}\n<blue Driver>: {}\n<blue DriverInfo>: {}\n<blue Backend>: {}",
+            esc(info.name),
+            esc(info.vendor),
+            esc(info.device),
+            esc(format!("{:?}", info.device_type)),
+            esc(info.driver),
+            esc(info.driver_info),
             esc(info.backend)
     ));
     Ok(())
