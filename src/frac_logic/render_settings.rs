@@ -42,6 +42,7 @@ pub(crate) struct RenderSettings {
     /// The index of the currently selected fractal.
     /// Must not be set directly!!!!!
     pub(crate) frac_index: usize,
+    pub(crate) hsl_mode: bool,
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,
     pub(crate) void_fill_index: usize,
@@ -60,7 +61,7 @@ pub(crate) struct RenderSettings {
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
-            image_format: ImageFormat::Jpeg,
+            image_format: ImageFormat::Png,
             frac_index: Default::default(),
             pos: Complex::with_val(DF_PREC_GPU, FRACTALS[0].default_pos),
             max_iter: DF_MAX_ITER_GPU,
@@ -77,6 +78,7 @@ impl Default for RenderSettings {
             bailout: DEFAULT_BAILOUT,
             smoothness: DEFAULT_SMOOTHNESS,
             chunk_size_limit: None,
+            hsl_mode: false,
         }
     }
 }
@@ -148,7 +150,7 @@ impl RenderSettings {
     }
 
     /// Returns a color corresponding to the given iteration count, using
-    /// the currently selected color palette.
+    /// the currently selected color palette or hsl mode.
     pub(crate) fn color_from_div(&self, diverg: &i32) -> Color {
         let palette = self.get_palette();
         let mut rng = thread_rng();
@@ -157,7 +159,7 @@ impl RenderSettings {
         if *diverg == -1 {
             // Return void color
 
-            match void_fills_[self.void_fill_index] {
+            return match void_fills_[self.void_fill_index] {
                 VoidFill::Transparent => Color::Reset,
                 VoidFill::Black => BLACK,
                 VoidFill::White => WHITE,
@@ -175,9 +177,19 @@ impl RenderSettings {
                 VoidFill::RedNoise => Color::Rgb(rng.gen_range(0..255), 0, 0),
                 VoidFill::GreenNoise => Color::Rgb(0, rng.gen_range(0..255), 0),
                 VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
-            }
-        } else {
-            colors::palette_color(*diverg, self.color_scheme_offset, palette, self.smoothness)
+            };
         }
+        // If hsl mode is disabled, get the color using the palette
+        if !self.hsl_mode {
+            return colors::palette_color(
+                *diverg,
+                self.color_scheme_offset,
+                palette,
+                self.smoothness,
+            );
+        }
+
+        // TODO: get a color using HSL
+        Color::from_hsl((*diverg + self.color_scheme_offset) as f64, 70., 50.)
     }
 }
