@@ -57,6 +57,8 @@ impl<'a> Input<'a> {
     }
     /// Run the command gived as argument.
     pub(crate) fn run_command(state: &mut AppState, input: String) {
+        state.command_input.1 = -1;
+
         if !input.is_ascii() {
             state.log_error("Your command cannot contain other than ASCII characters, aborting.");
             return;
