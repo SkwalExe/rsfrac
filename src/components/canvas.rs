@@ -263,11 +263,15 @@ impl Widget for Canvas<'_> {
                 Line::from(format!("AvgDiv[{:.2}]", self.state.stats.avg_diverg)).left_aligned(),
             )
             .title_bottom(
-                Line::from(format!(
-                    "Colors[{}+{}]",
-                    self.state.render_settings.get_palette().name,
-                    self.state.render_settings.color_scheme_offset
-                ))
+                Line::from(if self.state.render_settings.hsl_mode {
+                    format!("HSLMode")
+                } else {
+                    format!(
+                        "Palette[{}+{}]",
+                        self.state.render_settings.get_palette().name,
+                        self.state.render_settings.color_scheme_offset
+                    )
+                })
                 .right_aligned(),
             )
             .title_bottom(
