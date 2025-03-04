@@ -41,6 +41,7 @@ impl<'a> Canvas<'a> {
         "Frac[f]",
         "VoidFill[v]",
         "Rst[r]",
+        "HSLMode[n]",
     ];
     pub(crate) fn new(state: &'a AppState, points: &'a CanvasPoints) -> Self {
         Self { state, points }
@@ -214,6 +215,11 @@ impl<'a> Canvas<'a> {
             // Increment color scheme offset
             KeyCode::Char('+') => {
                 state.render_settings.increment_color_offset();
+                state.request_repaint();
+            }
+            // Toggle HSL mode
+            KeyCode::Char('n') => {
+                state.render_settings.hsl_mode = !state.render_settings.hsl_mode;
                 state.request_repaint();
             }
             // Cycle through the void fills
