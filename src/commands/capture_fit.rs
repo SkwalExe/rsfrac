@@ -12,11 +12,21 @@ fn height_from_width(width: i32, state: &AppState) -> i32 {
 }
 
 pub(crate) fn execute_capture_fit(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    if args.is_empty() {
-        let width = 1920;
-        let height = height_from_width(width, state);
-        execute_capture(state, vec![&format!("{width}"), &format!("{height}")])
-    } else {
+    // default height and  width values
+    let mut width = 1920;
+    let mut height = height_from_width(width, state);
+
+    // The filename to save the screenshot and the app state
+    let mut name = None;
+
+    // If there are 1 or 3 args, the last one is the file name
+    if args.len() == 1 || args.len() == 3 {
+        // we can unwrap because we know the len is not 0
+        name = Some(args.last().unwrap());
+    }
+
+    // If there are 2 or 3 arguments, the first two are the size
+    if args.len() == 2 || args.len() == 3 {
         let dimension = ["height", "width"]
             .iter()
             .find(|n| n.starts_with(&args[0].to_lowercase()))
@@ -27,24 +37,36 @@ pub(crate) fn execute_capture_fit(state: &mut AppState, args: Vec<&str>) -> Resu
         })?;
 
         if *dimension == "height" {
-            let width = width_from_height(parsed, state);
-            execute_capture(state, vec![&format!("{width}"), &format!("{parsed}")])
+            height = parsed;
+            width = width_from_height(parsed, state);
         } else {
-            let height = height_from_width(parsed, state);
-            execute_capture(state, vec![&format!("{parsed}"), &format!("{height}")])
+            width = parsed;
+            height = height_from_width(parsed, state);
         }
     }
+
+    let height_str = format!("{height}");
+    let width_str = format!("{width}");
+
+    // arguments passed to the capture command
+    let mut capture_args: Vec<&str> = vec![&width_str, &height_str];
+
+    if let Some(name) = name {
+        capture_args.push(name);
+    }
+
+    execute_capture(state, capture_args)
 }
 
 pub(crate) const CAPTURE_FIT: Command = Command {
     execute: &execute_capture_fit,
     name: "capture_fit",
     aliases: &["cpf"],
-    accepted_arg_count: &[0, 2],
+    accepted_arg_count: &[0, 1, 2, 3],
     detailed_desc: Some(concat!(
-        "<green Usage: <command [no args]>>\n",
+        "<green Usage: <command [?name]>>\n",
         "Capture a screenshot 1920 pixels wide.\n",
-        "<green Usage: <command [height/width] [size]>>\n",
+        "<green Usage: <command [height/width] [size] [?name]>>\n",
         "Take a screenshot with the specified height or width.",
     )),
     basic_desc:

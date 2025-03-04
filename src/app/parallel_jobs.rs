@@ -17,6 +17,7 @@ use crate::{
 pub(crate) struct WaitingScreenshot {
     pub(crate) size: Vec2<i32>,
     pub(crate) rs: RenderSettings,
+    pub(crate) name: Option<String>,
 }
 
 impl WaitingScreenshot {
@@ -25,7 +26,7 @@ impl WaitingScreenshot {
 
         let screenshot = ScreenshotSlave::new(self.size.clone(), tx, self.rs.clone());
         let handle = ScreenshotSlave::start(screenshot);
-        ScreenshotMaster::new(self.size.clone(), rx, handle, self.rs)
+        ScreenshotMaster::new(self.size.clone(), rx, handle, self.rs, self.name)
     }
 }
 
@@ -43,6 +44,7 @@ pub(crate) struct ScreenshotMaster {
     pub(crate) id: i64,
     pub(crate) rs_copy: RenderSettings,
     pub(crate) finished: bool,
+    pub(crate) name: Option<String>,
 }
 
 /// Represents a message sent from a child process
@@ -66,6 +68,7 @@ impl ScreenshotMaster {
         receiver: Receiver<SlaveMessage>,
         handle: JoinHandle<Result<DivergMatrix, String>>,
         rs: RenderSettings,
+        name: Option<String>,
     ) -> Self {
         Self {
             finished: false,
@@ -75,6 +78,7 @@ impl ScreenshotMaster {
             handle: Some(handle),
             id: Utc::now().timestamp_micros(),
             rs_copy: rs,
+            name,
         }
     }
     /// Handles the output of the screenshot child process:
@@ -95,11 +99,11 @@ impl ScreenshotMaster {
                         }
                     });
 
-                let filename_base = format!(
+                let filename_base = self.name.clone().unwrap_or(format!(
                     "{} {}",
                     self.rs_copy.get_frac_obj().name,
                     Local::now().format("%F %H-%M-%S%.f")
-                );
+                ));
 
                 let filename_save = format!("{}{}", filename_base, SAVE_EXTENSION);
                 let filename_cap = format!(
