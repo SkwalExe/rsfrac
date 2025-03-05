@@ -2,7 +2,6 @@
 
 use rug::{ops::CompleteRound, Complex, Float};
 use std::{collections::HashMap, sync::Mutex};
-use strum::{Display, EnumIter, IntoEnumIterator};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
@@ -14,7 +13,7 @@ pub(crate) use stats::Stats;
 use crate::{
     app::WaitingScreenshot,
     colors::get_palette_index_by_name,
-    components::{Canvas, Input, LogPanel},
+    components::{canvas::{selectable_variables, Canvas, SelectedVariable}, Input, LogPanel},
     frac_logic::{CanvasCoords, RenderSettings},
     fractals::get_frac_index_by_name,
     helpers::{markup::esc, void_fills, Focus, SavedState, ZoomDirection},
@@ -44,30 +43,6 @@ pub(crate) struct AppState {
     pub(crate) selected_canvas_variable: usize,
 }
 
-/// Represents all the values that can be selected and controlled from the canvas component
-#[derive(PartialEq, EnumIter, Debug, Display, Clone)]
-pub(crate) enum SelectedVariable {
-    PaletteOffset,
-    HSLSmoothness,
-    HueOffset,
-    HSLSat,
-    HSLLum,
-}
-
-impl PartialEq<usize> for SelectedVariable {
-    fn eq(&self, other: &usize) -> bool {
-        // Return true if the posision of self in selectable_variables() is other
-        selectable_variables()
-            .iter()
-            .position(|x| x == self)
-            .unwrap()
-            == *other // The variant MUST have a position in selectable_variables()
-    }
-}
-
-pub(crate) fn selectable_variables() -> Vec<SelectedVariable> {
-    SelectedVariable::iter().collect()
-}
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
 const DF_SCALING_FACTOR_CPU: i32 = 20;

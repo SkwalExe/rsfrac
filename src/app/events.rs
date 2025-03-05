@@ -5,7 +5,7 @@ use ratatui::{
 
 use crate::{
     app::App,
-    components::{Canvas, Input, LogPanel},
+    components::{canvas::Canvas, Input, LogPanel},
     helpers::Focus,
 };
 
