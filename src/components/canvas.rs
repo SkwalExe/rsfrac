@@ -6,7 +6,7 @@ use ratatui::{
     layout::{Alignment, Rect},
     style::Style,
     symbols::Marker,
-    text::Line,
+    text::{Line, Span},
     widgets::{canvas::Points, Block, Widget},
 };
 use rug::Float;
@@ -14,7 +14,7 @@ use std::ops::{AddAssign, SubAssign};
 
 use crate::{
     app::CanvasPoints,
-    app_state::ClickMode,
+    app_state::{selectable_variables, ClickMode, SelectedVariable, MAX_HSL_VALUE},
     colors,
     fractals::FRACTALS,
     helpers::{void_fills, Focus, ZoomDirection},
@@ -26,13 +26,29 @@ pub(crate) struct Canvas<'a> {
     points: &'a CanvasPoints,
 }
 
+fn red_if(st: impl Into<String>, cond: bool) -> Span<'static> {
+    let as_string = st.into();
+    // eprintln!("Coloring {as_string} to red: {cond}");
+    if !cond {
+        return Span::raw(as_string);
+    }
+
+    Span::styled(
+        as_string,
+        Style::default()
+            .bg(ratatui::style::Color::Rgb(255, 90, 90))
+            .fg(ratatui::style::Color::Rgb(0, 0, 0)),
+    )
+}
+
 impl<'a> Canvas<'a> {
     pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
         "Move[arrow/Vim keys]",
         "Zoom-[s]",
         "Zoom+[d]",
-        "PalOffset+[+]",
-        "PalOffset-[-]",
+        "NextVar[t]",
+        "SelectedVar+[+]",
+        "Selectedvar-[-]",
         "MxDiv-[y]",
         "Prec-[u]",
         "Prec+[i]",
@@ -209,19 +225,68 @@ impl<'a> Canvas<'a> {
             // Todo: remove duplication for + and -
             // Increment color scheme offset
             KeyCode::Char('-') => {
-                state.render_settings.decrement_color_offset();
+                match selectable_variables()[state.selected_canvas_variable] {
+                    SelectedVariable::PaletteOffset => {
+                        state.render_settings.decrement_color_offset();
+                    }
+                    SelectedVariable::HSLLum => {
+                        state.render_settings.hsl_settings.lum =
+                            (state.render_settings.hsl_settings.lum + MAX_HSL_VALUE - 1)
+                                % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HSLSat => {
+                        state.render_settings.hsl_settings.saturation =
+                            (state.render_settings.hsl_settings.saturation + MAX_HSL_VALUE - 1)
+                                % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HueOffset => {
+                        state.render_settings.hsl_settings.hue_offset =
+                            (state.render_settings.hsl_settings.hue_offset + MAX_HSL_VALUE - 1)
+                                % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HSLSmoothness => {
+                        state.render_settings.hsl_settings.smoothness =
+                            (state.render_settings.hsl_settings.smoothness + MAX_HSL_VALUE - 1)
+                                % MAX_HSL_VALUE;
+                    }
+                }
                 state.request_repaint();
             }
             // Increment color scheme offset
             KeyCode::Char('+') => {
-                state.render_settings.increment_color_offset();
+                match selectable_variables()[state.selected_canvas_variable] {
+                    SelectedVariable::PaletteOffset => {
+                        state.render_settings.increment_color_offset();
+                    }
+                    SelectedVariable::HSLLum => {
+                        state.render_settings.hsl_settings.lum =
+                            (state.render_settings.hsl_settings.lum + 1) % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HSLSat => {
+                        state.render_settings.hsl_settings.saturation =
+                            (state.render_settings.hsl_settings.saturation + 1) % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HSLSmoothness => {
+                        state.render_settings.hsl_settings.smoothness =
+                            (state.render_settings.hsl_settings.smoothness + 1) % MAX_HSL_VALUE;
+                    }
+                    SelectedVariable::HueOffset => {
+                        state.render_settings.hsl_settings.hue_offset =
+                            (state.render_settings.hsl_settings.hue_offset + 1) % MAX_HSL_VALUE;
+                    }
+                }
                 state.request_repaint();
             }
             // Toggle HSL mode
             KeyCode::Char('n') => {
-                state.render_settings.hsl_mode = !state.render_settings.hsl_mode;
+                state.render_settings.hsl_settings.enabled =
+                    !state.render_settings.hsl_settings.enabled;
+                // Try to select another canvas var
+                state.prevent_canvas_var_hidden();
                 state.request_repaint();
             }
+            // Cycle through the selectable variables
+            KeyCode::Char('t') => state.next_canv_var(),
             // Cycle through the void fills
             KeyCode::Char('v') => {
                 state.render_settings.void_fill_index =
@@ -263,14 +328,41 @@ impl Widget for Canvas<'_> {
                 Line::from(format!("AvgDiv[{:.2}]", self.state.stats.avg_diverg)).left_aligned(),
             )
             .title_bottom(
-                Line::from(if self.state.render_settings.hsl_mode {
-                    format!("HSLMode")
+                Line::from(if self.state.render_settings.hsl_settings.enabled {
+                    Vec::from([
+                        "HSLMode[".into(),
+                        red_if(
+                            format!("{}", self.state.render_settings.hsl_settings.hue_offset),
+                            self.state.is_var_selected(SelectedVariable::HueOffset),
+                        ),
+                        ",".into(),
+                        red_if(
+                            format!("{}", self.state.render_settings.hsl_settings.saturation),
+                            self.state.is_var_selected(SelectedVariable::HSLSat),
+                        ),
+                        ",".into(),
+                        red_if(
+                            format!("{}", self.state.render_settings.hsl_settings.lum),
+                            self.state.is_var_selected(SelectedVariable::HSLLum),
+                        ),
+                        ",smtss:".into(),
+                        red_if(
+                            format!("{}", self.state.render_settings.hsl_settings.smoothness),
+                            self.state.is_var_selected(SelectedVariable::HSLSmoothness),
+                        ),
+                        "]".into(),
+                    ])
                 } else {
-                    format!(
-                        "Palette[{}+{}]",
-                        self.state.render_settings.get_palette().name,
-                        self.state.render_settings.color_scheme_offset
-                    )
+                    Vec::from([
+                        "Palette[".into(),
+                        self.state.render_settings.get_palette().name.into(),
+                        "+".into(),
+                        red_if(
+                            self.state.render_settings.color_scheme_offset.to_string(),
+                            self.state.is_var_selected(SelectedVariable::PaletteOffset),
+                        ),
+                        "]".into(),
+                    ])
                 })
                 .right_aligned(),
             )

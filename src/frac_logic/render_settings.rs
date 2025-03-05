@@ -5,6 +5,7 @@ use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
 
+use crate::app_state::{HSLSettings, MAX_HSL_VALUE};
 use crate::colors::{self, Palette, COLORS};
 use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
 use crate::commands::prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC};
@@ -42,7 +43,7 @@ pub(crate) struct RenderSettings {
     /// The index of the currently selected fractal.
     /// Must not be set directly!!!!!
     pub(crate) frac_index: usize,
-    pub(crate) hsl_mode: bool,
+    pub(crate) hsl_settings: HSLSettings,
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,
     pub(crate) void_fill_index: usize,
@@ -78,7 +79,7 @@ impl Default for RenderSettings {
             bailout: DEFAULT_BAILOUT,
             smoothness: DEFAULT_SMOOTHNESS,
             chunk_size_limit: None,
-            hsl_mode: false,
+            hsl_settings: Default::default(),
         }
     }
 }
@@ -163,12 +164,8 @@ impl RenderSettings {
                 VoidFill::Transparent => Color::Reset,
                 VoidFill::Black => BLACK,
                 VoidFill::White => WHITE,
-                VoidFill::ColorScheme => colors::palette_color(
-                    *diverg,
-                    self.color_scheme_offset,
-                    palette,
-                    self.smoothness,
-                ),
+                // Same as if the div was 0
+                VoidFill::ColorScheme => self.color_from_div(&0),
                 VoidFill::RGBNoise => Color::Rgb(
                     rng.gen_range(0..255),
                     rng.gen_range(0..255),
@@ -180,7 +177,7 @@ impl RenderSettings {
             };
         }
         // If hsl mode is disabled, get the color using the palette
-        if !self.hsl_mode {
+        if !self.hsl_settings.enabled {
             return colors::palette_color(
                 *diverg,
                 self.color_scheme_offset,
@@ -189,7 +186,17 @@ impl RenderSettings {
             );
         }
 
-        // TODO: get a color using HSL
-        Color::from_hsl((*diverg + self.color_scheme_offset) as f64, 70., 50.)
+        Color::from_hsl(
+            // We must add 1 to prevent division by 0
+            // And we multiply by 20 so that it is not too smooth
+            (*diverg as f64 / (self.hsl_settings.smoothness as f64 + 1.0) * 20.0
+                // The transifion from an offset of 100 and an offset of 0 should not
+                // be visible, it should make a complete loop
+                + self.hsl_settings.hue_offset as f64 * 3.6)                 
+                // The hue should loop around 360
+                % 360.0, 
+            self.hsl_settings.saturation as f64 / MAX_HSL_VALUE as f64 * 100.0,
+            self.hsl_settings.lum as f64 / MAX_HSL_VALUE as f64 * 100.0,
+        )
     }
 }

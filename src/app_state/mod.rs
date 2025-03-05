@@ -2,6 +2,7 @@
 
 use rug::{ops::CompleteRound, Complex, Float};
 use std::{collections::HashMap, sync::Mutex};
+use strum::{Display, EnumIter, IntoEnumIterator};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
@@ -39,6 +40,33 @@ pub(crate) struct AppState {
     pub(crate) click_config: ClickConfig,
     pub(crate) remove_jobs: bool,
     pub(crate) pause_jobs: bool,
+    // The index, in selectable_variables() of the currently selected canvas variable
+    pub(crate) selected_canvas_variable: usize,
+}
+
+/// Represents all the values that can be selected and controlled from the canvas component
+#[derive(PartialEq, EnumIter, Debug, Display, Clone)]
+pub(crate) enum SelectedVariable {
+    PaletteOffset,
+    HSLSmoothness,
+    HueOffset,
+    HSLSat,
+    HSLLum,
+}
+
+impl PartialEq<usize> for SelectedVariable {
+    fn eq(&self, other: &usize) -> bool {
+        // Return true if the posision of self in selectable_variables() is other
+        selectable_variables()
+            .iter()
+            .position(|x| x == self)
+            .unwrap()
+            == *other // The variant MUST have a position in selectable_variables()
+    }
+}
+
+pub(crate) fn selectable_variables() -> Vec<SelectedVariable> {
+    SelectedVariable::iter().collect()
 }
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
@@ -63,6 +91,12 @@ impl Default for AppState {
             render_settings: Default::default(),
             scaling_factor: DF_SCALING_FACTOR_GPU,
             move_dist: DF_MOVE_DISTANCE_GPU,
+            // Basially since this is a index, we need to get the index of the default
+            // value which is PaletteOffset
+            selected_canvas_variable: selectable_variables()
+                .iter()
+                .position(|x| x.eq(&SelectedVariable::PaletteOffset))
+                .unwrap(),
             requested_jobs: Default::default(),
             click_config: Default::default(),
             pause_jobs: false,
@@ -70,7 +104,82 @@ impl Default for AppState {
     }
 }
 
+pub(crate) const MAX_HSL_VALUE: i32 = 100;
+
+#[derive(Debug, Clone)]
+pub(crate) struct HSLSettings {
+    pub(crate) enabled: bool,
+    pub(crate) saturation: i32,
+    pub(crate) lum: i32,
+    pub(crate) hue_offset: i32,
+    pub(crate) smoothness: i32
+}
+
+impl Default for HSLSettings {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            saturation: 64,
+            lum: 48,
+            hue_offset: 69,
+            smoothness: 5,
+        }
+    }
+}
+
 impl AppState {
+    /// Select the next canvas var no matter if it will be hidden or not
+    /// (for example when an HSL parameter is selected but hsl mode is off)
+    pub(crate) fn next_canv_var_(&mut self) {
+        self.selected_canvas_variable =
+            (self.selected_canvas_variable + 1) % selectable_variables().len();
+    }
+    /// Returns true if the currently selected canvas var is hidden
+    pub(crate) fn is_selected_var_hidden(&self) -> bool {
+        if !self.render_settings.hsl_settings.enabled {
+            // If hsl mode is not enabled
+            self.is_var_selected(SelectedVariable::HSLSat)
+                || self.is_var_selected(SelectedVariable::HSLLum)
+                || self.is_var_selected(SelectedVariable::HueOffset)
+        } else if self.render_settings.hsl_settings.enabled {
+            // if hsl mode is enabled
+            self.is_var_selected(SelectedVariable::PaletteOffset)
+        } else {
+            false
+        }
+    }
+    /// Loop canvas parameters until the selected one is visible
+    pub(crate) fn prevent_canvas_var_hidden(&mut self) {
+        // This is an interesting way to mimic a do while...
+        while {
+            // eprintln!(
+            //     "Currenly selected: {}",
+            //     selectable_variables()[self.selected_canvas_variable]
+            // );
+            // Return true (change the selected variable again)
+            // if the selected variable is not visible on the panel
+            self.is_selected_var_hidden()
+        } {
+            // eprintln!("Selecting next available var.");
+            self.next_canv_var_();
+        }
+    }
+    /// Select the next visible canvas variable
+    pub(crate) fn next_canv_var(&mut self) {
+        self.next_canv_var_();
+        self.prevent_canvas_var_hidden();
+    }
+
+    /// Returns true if the specified variable is selected in the canvas
+    pub(crate) fn is_var_selected(&self, var: SelectedVariable) -> bool {
+        // eprintln!(
+        //     "Get variant: {var}, selected index is {}. List is {:?} -> {}",
+        //     self.selected_canvas_variable,
+        //     selectable_variables(),
+        //     var == self.selected_canvas_variable
+        // );
+        var == self.selected_canvas_variable
+    }
     /// Returns the last executed command or an empty string
     pub(crate) fn get_command(&self, index: i32) -> String {
         if index < 0 {
