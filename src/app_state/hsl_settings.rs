@@ -13,10 +13,10 @@ impl Default for HSLSettings {
     fn default() -> Self {
         Self {
             enabled: false,
-            saturation: 64,
-            lum: 48,
+            saturation: 90,
+            lum: 50,
             hue_offset: 69,
-            smoothness: 5,
+            smoothness: 20,
         }
     }
 }
