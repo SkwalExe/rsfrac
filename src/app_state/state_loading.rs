@@ -98,7 +98,7 @@ impl AppState {
                     .ok_or("Invalid void fill name in state file.")?;
             }
 
-            // Enable or diable hsl mode
+            // Enable or disable hsl mode
             if let Some(hsl_enabled) = saved.hsl_mode {
                 self.render_settings.hsl_settings.enabled = hsl_enabled
             }
