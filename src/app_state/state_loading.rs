@@ -12,7 +12,7 @@ impl AppState {
     /// Loads the data from a rsf file.
     pub(crate) fn apply(&mut self, saved: SavedState, filename: &str) {
         // Check if the verison in the state file matches the current app version
-        if saved.version.is_none() || saved.version.as_ref().unwrap() == VERSION {
+        if saved.version.is_none() || saved.version.as_ref().unwrap() != VERSION {
             self.log_warn(format!(
                 "The loaded state file was generated with Rsfrac version [<red {}>]. This should be OK but it is important to know, if you have any issues.",
                 saved.version.unwrap_or("Unspecified".to_string())
