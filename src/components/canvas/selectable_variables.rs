@@ -12,7 +12,7 @@ pub(crate) enum SelectedVariable {
 
 impl PartialEq<usize> for SelectedVariable {
     fn eq(&self, other: &usize) -> bool {
-        // Return true if the posision of self in selectable_variables() is other
+        // Return true if the position of self in selectable_variables() is other
         selectable_variables()
             .iter()
             .position(|x| x == self)
