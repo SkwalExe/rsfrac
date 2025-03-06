@@ -1,74 +1,17 @@
-use ratatui::crossterm::event::{KeyCode, MouseButton, MouseEvent, MouseEventKind};
+use ratatui::crossterm::event::KeyCode;
 use rug::Float;
 use std::ops::{AddAssign, SubAssign};
 
 use crate::{
-    app_state::{ClickMode, MAX_HSL_VALUE},
+    app_state::hsl_settings::MAX_HSL_VALUE,
     colors,
     fractals::FRACTALS,
-    helpers::{decrement_wrap, increment_wrap, void_fills, Focus, ZoomDirection},
+    helpers::{decrement_wrap, increment_wrap, void_fills, ZoomDirection},
     AppState,
 };
 
-
 use super::{selectable_variables, Canvas, SelectedVariable};
-impl<'a> Canvas<'a> {
-    pub(crate) fn handle_mouse_event(state: &mut AppState, event: MouseEvent) {
-        state.focused = Focus::Canvas;
-
-        // first, convert the key press position to canvas coordinates
-
-        let canvas_pos = state
-            .render_settings
-            .ratatui_to_canvas_coords(event.column, event.row);
-
-        let action = match event.kind {
-            MouseEventKind::Down(MouseButton::Left) => &state.click_config.left,
-            MouseEventKind::Down(MouseButton::Right) => &state.click_config.right,
-            MouseEventKind::Down(MouseButton::Middle) => &state.click_config.right,
-            _ => return,
-        };
-        match action {
-            ClickMode::Move => {
-                state.render_settings.pos = state.render_settings.coord_to_c(canvas_pos)
-            }
-            ClickMode::ZoomOut => {
-                state.zoom_at(canvas_pos, ZoomDirection::Out);
-            }
-            ClickMode::ZoomIn => {
-                state.zoom_at(canvas_pos, ZoomDirection::In);
-            }
-            ClickMode::JuliaConstant => {
-                state.render_settings.julia_constant = state.render_settings.coord_to_c(canvas_pos)
-            }
-            ClickMode::MandelConstant => {
-                state.render_settings.mandel_constant = state.render_settings.coord_to_c(canvas_pos)
-            }
-            ClickMode::BailOut => {
-                state.render_settings.bailout = state
-                    .render_settings
-                    .coord_to_c(canvas_pos)
-                    .abs()
-                    .real()
-                    .to_f32()
-            }
-            ClickMode::Info => {
-                let point = state.render_settings.coord_to_c(canvas_pos);
-                state.log_info_title(
-                    "Click Info",
-                    format!(
-                        "Real: <acc {}>\nImag: <acc {}>\nDiverg: <acc {}>",
-                        point.real().to_f32(),
-                        point.imag().to_f32(),
-                        (state.render_settings.get_frac_clos())(point, &state.render_settings),
-                    ),
-                )
-            }
-        }
-
-        state.request_redraw();
-    }
-
+impl Canvas<'_> {
     pub(crate) fn handle_key_code(state: &mut AppState, code: KeyCode) {
         match code {
             // When H is pressed move the position of the canvas
@@ -237,8 +180,10 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('t') => state.next_canv_var(),
             // Cycle through the void fills
             KeyCode::Char('v') => {
-                state.render_settings.void_fill_index =
-                    (state.render_settings.void_fill_index + 1) % void_fills().len();
+                increment_wrap(
+                    &mut state.render_settings.void_fill_index,
+                    void_fills().len(),
+                );
                 state.request_repaint();
             }
             // Increment the maximum divergence

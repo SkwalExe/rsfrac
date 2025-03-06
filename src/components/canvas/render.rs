@@ -1,5 +1,10 @@
 use ratatui::{
-    buffer::Buffer, layout::{Alignment, Rect}, style::Style, symbols::Marker, text::{Line, Span}, widgets::{canvas::Points, Block, Widget}
+    buffer::Buffer,
+    layout::{Alignment, Rect},
+    style::Style,
+    symbols::Marker,
+    text::{Line, Span},
+    widgets::{canvas::Points, Block, Widget},
 };
 
 use crate::helpers::{void_fills, Focus};

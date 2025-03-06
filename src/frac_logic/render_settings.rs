@@ -5,7 +5,7 @@ use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
 
-use crate::app_state::{HSLSettings, MAX_HSL_VALUE};
+use crate::app_state::hsl_settings::{HSLSettings, MAX_HSL_VALUE};
 use crate::colors::{self, Palette, COLORS};
 use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
 use crate::commands::prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC};
@@ -190,9 +190,9 @@ impl RenderSettings {
             (*diverg as f64 / (self.hsl_settings.smoothness as f64 + 1.0) * 20.0
                 // The transifion from an offset of 100 and an offset of 0 should not
                 // be visible, it should make a complete loop
-                + self.hsl_settings.hue_offset as f64 * 3.6)                 
+                + self.hsl_settings.hue_offset as f64 * 3.6)
                 // The hue should loop around 360
-                % 360.0, 
+                % 360.0,
             self.hsl_settings.saturation as f64 / MAX_HSL_VALUE as f64 * 100.0,
             self.hsl_settings.lum as f64 / MAX_HSL_VALUE as f64 * 100.0,
         )

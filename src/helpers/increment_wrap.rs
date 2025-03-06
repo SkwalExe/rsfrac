@@ -1,6 +1,15 @@
-pub(crate) fn decrement_wrap(num: &mut i32, wrap_around: i32) {
-    *num = (*num + wrap_around - 1) % wrap_around;
+use num_traits::{NumOps, One};
+
+pub(crate) fn decrement_wrap<N>(num: &mut N, wrap_around: N)
+where
+    N: NumOps + Copy + One,
+{
+    *num = (*num + wrap_around - N::one()) % wrap_around;
 }
-pub(crate) fn increment_wrap(num: &mut i32, wrap_around: i32) {
-    *num = (*num + 1) % wrap_around;
+
+pub(crate) fn increment_wrap<N>(num: &mut N, wrap_around: N)
+where
+    N: NumOps + Copy + One,
+{
+    *num = (*num + N::one()) % wrap_around;
 }
