@@ -5,12 +5,13 @@ use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::{Complex, Float};
 
+use crate::app_state::hsl_settings::{HSLSettings, MAX_HSL_VALUE};
 use crate::colors::{self, Palette, COLORS};
 use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
 use crate::commands::prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC};
 use crate::frac_logic::CanvasCoords;
 use crate::fractals::FRACTALS;
-use crate::helpers::{void_fills, VoidFill};
+use crate::helpers::{decrement_wrap, increment_wrap, void_fills, VoidFill};
 
 use super::gpu_util::WgpuState;
 
@@ -42,6 +43,7 @@ pub(crate) struct RenderSettings {
     /// The index of the currently selected fractal.
     /// Must not be set directly!!!!!
     pub(crate) frac_index: usize,
+    pub(crate) hsl_settings: HSLSettings,
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,
     pub(crate) void_fill_index: usize,
@@ -60,7 +62,7 @@ pub(crate) struct RenderSettings {
 impl Default for RenderSettings {
     fn default() -> Self {
         Self {
-            image_format: ImageFormat::Jpeg,
+            image_format: ImageFormat::Png,
             frac_index: Default::default(),
             pos: Complex::with_val(DF_PREC_GPU, FRACTALS[0].default_pos),
             max_iter: DF_MAX_ITER_GPU,
@@ -77,6 +79,7 @@ impl Default for RenderSettings {
             bailout: DEFAULT_BAILOUT,
             smoothness: DEFAULT_SMOOTHNESS,
             chunk_size_limit: None,
+            hsl_settings: Default::default(),
         }
     }
 }
@@ -93,14 +96,12 @@ impl RenderSettings {
     }
 
     pub(crate) fn increment_color_offset(&mut self) {
-        self.color_scheme_offset = (self.color_scheme_offset + 1)
-            % (self.get_palette().colors.len() as i32 * self.smoothness);
+        let max = self.get_palette().colors.len() as i32 * self.smoothness;
+        increment_wrap(&mut self.color_scheme_offset, max);
     }
     pub(crate) fn decrement_color_offset(&mut self) {
-        self.color_scheme_offset = (self.color_scheme_offset
-            + self.get_palette().colors.len() as i32 * self.smoothness
-            - 1)
-            % (self.get_palette().colors.len() as i32 * self.smoothness);
+        let max = self.get_palette().colors.len() as i32 * self.smoothness;
+        decrement_wrap(&mut self.color_scheme_offset, max);
     }
     /// Load the default settings for CPU mode when GPU init fails at startup.
     pub(crate) fn cpu_defaults(&mut self) {
@@ -148,7 +149,7 @@ impl RenderSettings {
     }
 
     /// Returns a color corresponding to the given iteration count, using
-    /// the currently selected color palette.
+    /// the currently selected color palette or hsl mode.
     pub(crate) fn color_from_div(&self, diverg: &i32) -> Color {
         let palette = self.get_palette();
         let mut rng = thread_rng();
@@ -157,16 +158,12 @@ impl RenderSettings {
         if *diverg == -1 {
             // Return void color
 
-            match void_fills_[self.void_fill_index] {
+            return match void_fills_[self.void_fill_index] {
                 VoidFill::Transparent => Color::Reset,
                 VoidFill::Black => BLACK,
                 VoidFill::White => WHITE,
-                VoidFill::ColorScheme => colors::palette_color(
-                    *diverg,
-                    self.color_scheme_offset,
-                    palette,
-                    self.smoothness,
-                ),
+                // Same as if the div was 0
+                VoidFill::ColorScheme => self.color_from_div(&0),
                 VoidFill::RGBNoise => Color::Rgb(
                     rng.gen_range(0..255),
                     rng.gen_range(0..255),
@@ -175,9 +172,28 @@ impl RenderSettings {
                 VoidFill::RedNoise => Color::Rgb(rng.gen_range(0..255), 0, 0),
                 VoidFill::GreenNoise => Color::Rgb(0, rng.gen_range(0..255), 0),
                 VoidFill::BlueNoise => Color::Rgb(0, 0, rng.gen_range(0..255)),
-            }
-        } else {
-            colors::palette_color(*diverg, self.color_scheme_offset, palette, self.smoothness)
+            };
         }
+        // If hsl mode is disabled, get the color using the palette
+        if !self.hsl_settings.enabled {
+            return colors::palette_color(
+                *diverg,
+                self.color_scheme_offset,
+                palette,
+                self.smoothness,
+            );
+        }
+
+        Color::from_hsl(
+            // I tried to implement a logarithmic scale, this is a draft implementation
+            (*diverg as f64 / 10.0f64.powf(self.hsl_settings.smoothness as f64/30.0) * 30.0
+                // The transifion from an offset of 100 and an offset of 0 should not
+                // be visible, it should make a complete loop
+                + self.hsl_settings.hue_offset as f64 * 3.6)
+                // The hue should loop around 360
+                % 360.0,
+            self.hsl_settings.saturation as f64 / MAX_HSL_VALUE as f64 * 100.0,
+            self.hsl_settings.lum as f64 / MAX_HSL_VALUE as f64 * 100.0,
+        )
     }
 }

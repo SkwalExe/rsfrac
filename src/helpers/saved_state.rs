@@ -1,4 +1,4 @@
-use crate::frac_logic::RenderSettings;
+use crate::{frac_logic::RenderSettings, VERSION};
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::Write, str::FromStr};
 
@@ -19,6 +19,12 @@ pub(crate) struct SavedState {
     pub(crate) mandel_constant: Option<String>,
     pub(crate) bailout: Option<f32>,
     pub(crate) smoothness: Option<i32>,
+    pub(crate) hsl_mode: Option<bool>,
+    pub(crate) hsl_saturation: Option<i32>,
+    pub(crate) hsl_lum: Option<i32>,
+    pub(crate) hsl_hue_offset: Option<i32>,
+    pub(crate) hsl_smoothness: Option<i32>,
+    pub(crate) version: Option<String>,
 }
 
 impl From<&RenderSettings> for SavedState {
@@ -36,6 +42,12 @@ impl From<&RenderSettings> for SavedState {
             mandel_constant: Some(rs.mandel_constant.to_string()),
             bailout: Some(rs.bailout),
             smoothness: Some(rs.smoothness),
+            hsl_lum: Some(rs.hsl_settings.lum),
+            hsl_mode: Some(rs.hsl_settings.enabled),
+            hsl_saturation: Some(rs.hsl_settings.saturation),
+            hsl_hue_offset: Some(rs.hsl_settings.hue_offset),
+            hsl_smoothness: Some(rs.hsl_settings.smoothness),
+            version: Some(VERSION.to_string()),
         }
     }
 }

@@ -1,7 +1,7 @@
 use ratatui::{buffer::Buffer, layout::Rect, widgets::Widget, Frame};
 
 use crate::{
-    components::{Canvas, Footer, Input, LogPanel},
+    components::{canvas::Canvas, Footer, Input, LogPanel},
     helpers::Focus,
     App,
 };
