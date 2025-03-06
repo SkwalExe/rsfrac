@@ -188,7 +188,7 @@ impl RenderSettings {
             // We must add 1 to prevent division by 0
             // And we multiply by 20 so that it is not too smooth
             (*diverg as f64 / (self.hsl_settings.smoothness as f64 + 1.0) * 20.0
-                // The transifion from an offset of 100 and an offset of 0 should not
+                // The transition from an offset of 100 and an offset of 0 should not
                 // be visible, it should make a complete loop
                 + self.hsl_settings.hue_offset as f64 * 3.6)
                 // The hue should loop around 360
