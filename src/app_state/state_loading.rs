@@ -4,12 +4,21 @@ use crate::{
     colors::get_palette_index_by_name,
     fractals::get_frac_index_by_name,
     helpers::{markup::esc, void_fills, SavedState},
+    VERSION,
 };
 
 use super::AppState;
 impl AppState {
     /// Loads the data from a rsf file.
     pub(crate) fn apply(&mut self, saved: SavedState, filename: &str) {
+        // Check if the verison in the state file matches the current app version
+        if saved.version.is_none() || saved.version.as_ref().unwrap() == VERSION {
+            self.log_warn(format!(
+                "The loaded state file was generated with Rsfrac version [<red {}>]. This sould be OK but it is important to know, if you have any issues.",
+                saved.version.unwrap_or("Unspecified".to_string())
+            ));
+        }
+
         let result = (|| -> Result<(), String> {
             // Change selected fractal
             if let Some(frac_name) = saved.frac_name {
@@ -87,6 +96,29 @@ impl AppState {
                     .iter()
                     .position(|vf| *vf == void_fill)
                     .ok_or("Invalid void fill name in state file.")?;
+            }
+
+            // Enable or diable hsl mode
+            if let Some(hsl_enabled) = saved.hsl_mode {
+                self.render_settings.hsl_settings.enabled = hsl_enabled
+            }
+
+            // Change the hsl smoothness
+            if let Some(smoothness) = saved.hsl_smoothness {
+                self.render_settings.hsl_settings.smoothness = smoothness;
+            }
+
+            // Change the hsl saturation
+            if let Some(sat) = saved.hsl_saturation {
+                self.render_settings.hsl_settings.saturation = sat;
+            }
+            // Change the hsl lum
+            if let Some(lum) = saved.hsl_lum {
+                self.render_settings.hsl_settings.lum = lum;
+            }
+            // Change the hsl hue offset
+            if let Some(hue_offset) = saved.hsl_hue_offset {
+                self.render_settings.hsl_settings.hue_offset = hue_offset;
             }
 
             Ok(())

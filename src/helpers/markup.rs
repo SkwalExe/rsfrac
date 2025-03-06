@@ -46,7 +46,7 @@ pub fn get_ansi_generator() -> ANSIStringsGenerator<impl Fn(&str) -> Option<ANSI
         "bgred" => Some(ANSIStyle::default().on(RED.into())),
         "red" => Some(ANSIStyle::default().fg(RED.into())),
         "green" => Some(ANSIStyle::default().fg(GREEN.into())),
-        "bgyellow" => Some(ANSIStyle::default().on(YELLOW.into())),
+        "bgyellow" => Some(ANSIStyle::default().on(YELLOW.into()).on(BLACK.into())),
         "yellow" => Some(ANSIStyle::default().fg(YELLOW.into())),
         "bggreen" => Some(ANSIStyle::default().fg(BLACK.into()).on(GREEN.into())),
         "command" => Some(
@@ -64,7 +64,7 @@ pub fn get_ratatui_generator() -> RatatuiTextGenerator<impl Fn(&str) -> Option<S
     RatatuiTextGenerator::new(|tag: &str| match tag {
         "acc" => Some(Style::default().fg(ACCENT_COLOR.into())),
         "bgacc" => Some(Style::default().bg(ACCENT_COLOR.into())),
-        "bgyellow" => Some(Style::default().bg(YELLOW.into())),
+        "bgyellow" => Some(Style::default().bg(YELLOW.into()).fg(BLACK.into())),
         "yellow" => Some(Style::default().fg(YELLOW.into())),
         "bgred" => Some(Style::default().bg(RED.into())),
         "red" => Some(Style::default().fg(RED.into())),
