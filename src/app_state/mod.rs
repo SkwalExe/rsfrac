@@ -13,7 +13,10 @@ pub(crate) use stats::Stats;
 use crate::{
     app::WaitingScreenshot,
     colors::get_palette_index_by_name,
-    components::{canvas::{selectable_variables, Canvas, SelectedVariable}, Input, LogPanel},
+    components::{
+        canvas::{selectable_variables, Canvas, SelectedVariable},
+        Input, LogPanel,
+    },
     frac_logic::{CanvasCoords, RenderSettings},
     fractals::get_frac_index_by_name,
     helpers::{markup::esc, void_fills, Focus, SavedState, ZoomDirection},
@@ -42,7 +45,6 @@ pub(crate) struct AppState {
     // The index, in selectable_variables() of the currently selected canvas variable
     pub(crate) selected_canvas_variable: usize,
 }
-
 
 const DF_MOVE_DISTANCE_CPU: i32 = 8;
 const DF_SCALING_FACTOR_CPU: i32 = 20;
@@ -87,7 +89,7 @@ pub(crate) struct HSLSettings {
     pub(crate) saturation: i32,
     pub(crate) lum: i32,
     pub(crate) hue_offset: i32,
-    pub(crate) smoothness: i32
+    pub(crate) smoothness: i32,
 }
 
 impl Default for HSLSettings {
@@ -116,6 +118,7 @@ impl AppState {
             self.is_var_selected(SelectedVariable::HSLSat)
                 || self.is_var_selected(SelectedVariable::HSLLum)
                 || self.is_var_selected(SelectedVariable::HueOffset)
+                || self.is_var_selected(SelectedVariable::HSLSmoothness)
         } else if self.render_settings.hsl_settings.enabled {
             // if hsl mode is enabled
             self.is_var_selected(SelectedVariable::PaletteOffset)

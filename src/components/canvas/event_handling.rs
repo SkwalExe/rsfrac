@@ -6,9 +6,10 @@ use crate::{
     app_state::{ClickMode, MAX_HSL_VALUE},
     colors,
     fractals::FRACTALS,
-    helpers::{void_fills, Focus, ZoomDirection},
+    helpers::{decrement_wrap, increment_wrap, void_fills, Focus, ZoomDirection},
     AppState,
 };
+
 
 use super::{selectable_variables, Canvas, SelectedVariable};
 impl<'a> Canvas<'a> {
@@ -176,28 +177,27 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('-') => {
                 match selectable_variables()[state.selected_canvas_variable] {
                     SelectedVariable::PaletteOffset => {
-                        state.render_settings.decrement_color_offset();
+                        state.render_settings.decrement_color_offset()
                     }
+
                     SelectedVariable::HSLLum => {
-                        state.render_settings.hsl_settings.lum =
-                            (state.render_settings.hsl_settings.lum + MAX_HSL_VALUE - 1)
-                                % MAX_HSL_VALUE;
+                        decrement_wrap(&mut state.render_settings.hsl_settings.lum, MAX_HSL_VALUE)
                     }
-                    SelectedVariable::HSLSat => {
-                        state.render_settings.hsl_settings.saturation =
-                            (state.render_settings.hsl_settings.saturation + MAX_HSL_VALUE - 1)
-                                % MAX_HSL_VALUE;
-                    }
-                    SelectedVariable::HueOffset => {
-                        state.render_settings.hsl_settings.hue_offset =
-                            (state.render_settings.hsl_settings.hue_offset + MAX_HSL_VALUE - 1)
-                                % MAX_HSL_VALUE;
-                    }
-                    SelectedVariable::HSLSmoothness => {
-                        state.render_settings.hsl_settings.smoothness =
-                            (state.render_settings.hsl_settings.smoothness + MAX_HSL_VALUE - 1)
-                                % MAX_HSL_VALUE;
-                    }
+
+                    SelectedVariable::HSLSat => decrement_wrap(
+                        &mut state.render_settings.hsl_settings.saturation,
+                        MAX_HSL_VALUE,
+                    ),
+
+                    SelectedVariable::HueOffset => decrement_wrap(
+                        &mut state.render_settings.hsl_settings.hue_offset,
+                        MAX_HSL_VALUE,
+                    ),
+
+                    SelectedVariable::HSLSmoothness => decrement_wrap(
+                        &mut state.render_settings.hsl_settings.smoothness,
+                        MAX_HSL_VALUE,
+                    ),
                 }
                 state.request_repaint();
             }
@@ -205,24 +205,23 @@ impl<'a> Canvas<'a> {
             KeyCode::Char('+') => {
                 match selectable_variables()[state.selected_canvas_variable] {
                     SelectedVariable::PaletteOffset => {
-                        state.render_settings.increment_color_offset();
+                        state.render_settings.increment_color_offset()
                     }
                     SelectedVariable::HSLLum => {
-                        state.render_settings.hsl_settings.lum =
-                            (state.render_settings.hsl_settings.lum + 1) % MAX_HSL_VALUE;
+                        increment_wrap(&mut state.render_settings.hsl_settings.lum, MAX_HSL_VALUE)
                     }
-                    SelectedVariable::HSLSat => {
-                        state.render_settings.hsl_settings.saturation =
-                            (state.render_settings.hsl_settings.saturation + 1) % MAX_HSL_VALUE;
-                    }
-                    SelectedVariable::HSLSmoothness => {
-                        state.render_settings.hsl_settings.smoothness =
-                            (state.render_settings.hsl_settings.smoothness + 1) % MAX_HSL_VALUE;
-                    }
-                    SelectedVariable::HueOffset => {
-                        state.render_settings.hsl_settings.hue_offset =
-                            (state.render_settings.hsl_settings.hue_offset + 1) % MAX_HSL_VALUE;
-                    }
+                    SelectedVariable::HSLSat => increment_wrap(
+                        &mut state.render_settings.hsl_settings.saturation,
+                        MAX_HSL_VALUE,
+                    ),
+                    SelectedVariable::HSLSmoothness => increment_wrap(
+                        &mut state.render_settings.hsl_settings.smoothness,
+                        MAX_HSL_VALUE,
+                    ),
+                    SelectedVariable::HueOffset => increment_wrap(
+                        &mut state.render_settings.hsl_settings.hue_offset,
+                        MAX_HSL_VALUE,
+                    ),
                 }
                 state.request_repaint();
             }

@@ -11,7 +11,7 @@ use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
 use crate::commands::prec::{MAX_DECIMAL_PREC, MIN_DECIMAL_PREC};
 use crate::frac_logic::CanvasCoords;
 use crate::fractals::FRACTALS;
-use crate::helpers::{void_fills, VoidFill};
+use crate::helpers::{decrement_wrap, increment_wrap, void_fills, VoidFill};
 
 use super::gpu_util::WgpuState;
 
@@ -96,14 +96,12 @@ impl RenderSettings {
     }
 
     pub(crate) fn increment_color_offset(&mut self) {
-        self.color_scheme_offset = (self.color_scheme_offset + 1)
-            % (self.get_palette().colors.len() as i32 * self.smoothness);
+        let max = self.get_palette().colors.len() as i32 * self.smoothness;
+        increment_wrap(&mut self.color_scheme_offset, max);
     }
     pub(crate) fn decrement_color_offset(&mut self) {
-        self.color_scheme_offset = (self.color_scheme_offset
-            + self.get_palette().colors.len() as i32 * self.smoothness
-            - 1)
-            % (self.get_palette().colors.len() as i32 * self.smoothness);
+        let max = self.get_palette().colors.len() as i32 * self.smoothness;
+        decrement_wrap(&mut self.color_scheme_offset, max);
     }
     /// Load the default settings for CPU mode when GPU init fails at startup.
     pub(crate) fn cpu_defaults(&mut self) {
