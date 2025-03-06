@@ -24,8 +24,8 @@ impl Default for AppState {
             render_settings: Default::default(),
             scaling_factor: DF_SCALING_FACTOR_GPU,
             move_dist: DF_MOVE_DISTANCE_GPU,
-            // Basially since this is a index, we need to get the index of the default
-            // value which is PaletteOffset
+            // Basically, since this is an index, we need to get the index of the default
+            // value, which is PaletteOffset.
             selected_canvas_variable: selectable_variables()
                 .iter()
                 .position(|x| x.eq(&SelectedVariable::PaletteOffset))
