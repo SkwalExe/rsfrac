@@ -185,10 +185,9 @@ impl RenderSettings {
         }
 
         Color::from_hsl(
-            // We must add 1 to prevent division by 0
-            // And we multiply by 20 so that it is not too smooth
-            (*diverg as f64 / (self.hsl_settings.smoothness as f64 + 1.0) * 20.0
-                // The transition from an offset of 100 and an offset of 0 should not
+            // I tried to implement a logarithmic scale, this is a draft implementation
+            (*diverg as f64 / 10.0f64.powf(self.hsl_settings.smoothness as f64/30.0) * 30.0
+                // The transifion from an offset of 100 and an offset of 0 should not
                 // be visible, it should make a complete loop
                 + self.hsl_settings.hue_offset as f64 * 3.6)
                 // The hue should loop around 360
