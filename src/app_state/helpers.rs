@@ -1,5 +1,3 @@
-use wgpu::Backends;
-
 use crate::{
     components::{
         canvas::{selectable_variables, Canvas, SelectedVariable},
@@ -14,21 +12,6 @@ use super::{
     AppState,
 };
 impl AppState {
-    /// List available WGPU adapters and put them in .detected_adapters.
-    /// Do nothing if gpu mode is disabled.
-    pub(crate) fn detect_adapters(&mut self) {
-        // Do nothing if GPU mode is disabled, because we unwrap below...
-        if !self.render_settings.wgpu_state.use_gpu {
-            return;
-        }
-
-        self.detected_adapters = self
-            .render_settings
-            .wgpu_state
-            .instance
-            .enumerate_adapters(Backends::all());
-    }
-
     /// Select the next canvas var no matter if it will be hidden or not
     /// (for example when an HSL parameter is selected but hsl mode is off)
     pub(crate) fn next_canv_var_(&mut self) {

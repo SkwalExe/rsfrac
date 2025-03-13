@@ -31,6 +31,7 @@ impl RenderSettings {
             .wgpu_state
             .adapter
             .as_ref()
+            // An adapter has been selected so we can unwrap
             .unwrap()
             .request_device(
                 &wgpu::DeviceDescriptor {
