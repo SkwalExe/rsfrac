@@ -1,6 +1,7 @@
 use std::sync::mpsc::Sender;
 
 use futures::executor;
+use wgpu::Adapter;
 
 use crate::{app::SlaveMessage, helpers::markup::esc};
 
@@ -10,34 +11,19 @@ use super::{
 };
 
 impl RenderSettings {
-    /// Will initialize the global wgpu state synchronously, while sending status messages
-    pub(crate) fn initialize_gpu_sync(
+    pub(crate) fn select_adapter_sync(
         &mut self,
+        adapter: Adapter,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<(), String> {
-        executor::block_on(self.initialize_gpu_async(sender))
+        executor::block_on(self.select_adapter_async(adapter, sender))
     }
-
-    /// Will initialize the global wgpu state asynchronously, while sending status messages
-    pub(crate) async fn initialize_gpu_async(
+    pub(crate) async fn select_adapter_async(
         &mut self,
+        adapter: Adapter,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<(), String> {
-        msg_send(sender, "Requesting WGPU Instance")?;
-        // Instantiates instance of WebGPU
-        self.wgpu_state.instance = Some(wgpu::Instance::default());
-
-        msg_send(sender, "Instantiating a connection to the GPU")?;
-        self.wgpu_state.adapter = Some(
-            self.wgpu_state
-                .instance
-                .as_ref()
-                .unwrap()
-                .request_adapter(&wgpu::RequestAdapterOptions::default())
-                .await
-                .ok_or("Could not get WGPU adapter.")?,
-        );
-
+        self.wgpu_state.adapter = Some(adapter);
         msg_send(
             sender,
             "Requesting Device handle and job queue from the GPU.",
@@ -64,6 +50,39 @@ impl RenderSettings {
         (self.wgpu_state.device, self.wgpu_state.queue) = (Some(device), Some(queue));
 
         self.update_fractal_shader_async(sender).await?;
+        Ok(())
+    }
+
+    /// Will initialize the global wgpu state synchronously, while sending status messages
+    pub(crate) fn initialize_gpu_sync(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        executor::block_on(self.initialize_gpu_async(sender))
+    }
+
+    /// Will initialize the global wgpu state asynchronously, while sending status messages
+    pub(crate) async fn initialize_gpu_async(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        msg_send(sender, "Requesting WGPU Instance")?;
+        // Instantiates instance of WebGPU
+        self.wgpu_state.instance = Some(wgpu::Instance::default());
+
+        msg_send(sender, "Instantiating a connection to the GPU")?;
+        self.select_adapter_async(
+            self.wgpu_state
+                .instance
+                .as_ref()
+                .unwrap()
+                .request_adapter(&wgpu::RequestAdapterOptions::default())
+                .await
+                .ok_or("Could not get WGPU adapter.")?,
+            sender,
+        )
+        .await?;
+
         msg_send(sender, "GPU initialization finished")?;
         Ok(())
     }

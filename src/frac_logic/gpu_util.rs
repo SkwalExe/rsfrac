@@ -27,8 +27,11 @@ impl SendSlaveMessage for Option<&Sender<SlaveMessage>> {
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
+    /// Instance of WGPU, used for all other contexts
     pub(crate) instance: Option<wgpu::Instance>,
+    /// Handle the a physical graphics device
     pub(crate) adapter: Option<wgpu::Adapter>,
+    /// Represents an open connection to a graphics device
     pub(crate) device: Option<wgpu::Device>,
     pub(crate) queue: Option<wgpu::Queue>,
     pub(crate) cs_module: Option<wgpu::ShaderModule>,
