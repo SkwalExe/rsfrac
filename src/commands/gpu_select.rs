@@ -15,7 +15,7 @@ fn get_adapter_description(adapter: &Adapter) -> String {
 
 pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     // Require GPU mode to be enabled first.
-    if !state.render_settings.use_gpu {
+    if !state.render_settings.wgpu_state.use_gpu {
         return Err("GPU mode must be enabled first.".to_string());
     }
 
@@ -68,7 +68,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
         .render_settings
         .select_adapter_sync(adapter, None)
         // If an error was encountered, disable GPU mode and return the error.
-        .inspect_err(|_| state.render_settings.use_gpu = false)?;
+        .inspect_err(|_| state.render_settings.wgpu_state.use_gpu = false)?;
 
     state.log_success(format!(
         "Successfully selected adapter: {selected_gpu_info}."

@@ -12,7 +12,7 @@ pub(crate) fn execute_prec(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         MIN_DECIMAL_PREC,
         MAX_DECIMAL_PREC,
     )?;
-    if state.render_settings.use_gpu {
+    if state.render_settings.wgpu_state.use_gpu {
         state.log_info(concat!(
             "Arbitrary precision if not taken into account when GPU mode is enabled. ",
             "You can disable GPU mode with the <command gpu> command."

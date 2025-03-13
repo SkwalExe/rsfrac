@@ -15,7 +15,7 @@ impl App {
                 self.app_state.render_settings.canvas_size.y,
             );
 
-            self.diverg_matrix = if self.app_state.render_settings.use_gpu {
+            self.diverg_matrix = if self.app_state.render_settings.wgpu_state.use_gpu {
                 match self
                     .app_state
                     .render_settings
@@ -23,7 +23,7 @@ impl App {
                 {
                     Ok(res) => res,
                     Err(err) => {
-                        self.app_state.render_settings.use_gpu = false;
+                        self.app_state.render_settings.wgpu_state.use_gpu = false;
                         self.app_state.log_error(format!(
                             "Disabling GPU mode, because the render failed with error: {err}",
                         ));

@@ -2,6 +2,8 @@ use std::fmt::Debug;
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
+    /// Whether or not to use the GPU for computations.
+    pub(crate) use_gpu: bool,
     /// Instance of WGPU, used for all other contexts
     pub(crate) instance: Option<wgpu::Instance>,
     /// Handle a physical graphics device
