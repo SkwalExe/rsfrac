@@ -4,7 +4,7 @@ use std::fmt::Debug;
 pub(crate) struct WgpuState {
     /// Instance of WGPU, used for all other contexts
     pub(crate) instance: Option<wgpu::Instance>,
-    /// Handle the a physical graphics device
+    /// Handle a physical graphics device
     pub(crate) adapter: Option<wgpu::Adapter>,
     /// Represents an open connection to a graphics device
     pub(crate) device: Option<wgpu::Device>,
