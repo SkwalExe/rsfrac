@@ -1,10 +1,9 @@
-use std::sync::{LazyLock, Mutex};
-
-use wgpu::{Adapter, Backends};
+use wgpu::Adapter;
 
 use super::Command;
 use crate::{helpers::markup::esc, AppState};
 
+/// Returns a string with basic info about an adapter.
 fn get_adapter_description(adapter: &Adapter) -> String {
     let info = adapter.get_info();
 
@@ -15,27 +14,19 @@ fn get_adapter_description(adapter: &Adapter) -> String {
 }
 
 pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
+    // Require GPU mode to be enabled first.
     if !state.render_settings.use_gpu {
         return Err("GPU mode must be enabled first.".to_string());
     }
 
-    static DETECTED_ADAPTERS: LazyLock<Mutex<Vec<Adapter>>> =
-        LazyLock::new(|| Mutex::new(Vec::new()));
-
-    let mut locked = DETECTED_ADAPTERS.lock().unwrap();
-
+    // If no arguments are provided, show detect and display the visible adapters.
     if args.is_empty() {
-        *locked = state
-            .render_settings
-            .wgpu_state
-            .instance
-            .as_ref()
-            .unwrap()
-            .enumerate_adapters(Backends::all());
+        state.detect_adapters();
 
         state.log_info_title(
             "Detected adapters",
-            locked
+            state
+                .detected_adapters
                 .iter()
                 .enumerate()
                 .map(|(i, adapter)| format!("<acc {i}>: {}", esc(get_adapter_description(adapter))))
@@ -45,24 +36,43 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
         return Ok(());
     }
 
+    // Check if at least one adapter has been detected.
+    if state.detected_adapters.is_empty() {
+        return Err(
+            "No adapter has been detected yet. You must run <command gpu-select> at least once."
+                .to_string(),
+        );
+    }
+
     // check if the provided arg is parsable as an int
     let index = args[0]
         .parse::<usize>()
         .map_err(|_| "The provided argument could not be parsed as an integer.".to_string())?;
-    if index >= locked.len() {
+
+    // Check if an adapter is associated with the provided index.
+    if index >= state.detected_adapters.len() {
         return Err(
             "Provided index is not associated with any adapter in the adapter list.".to_string(),
         );
     }
 
-    let adapter = locked.remove(index);
+    let adapter = state.detected_adapters.remove(index);
+    // Refresh the adapter list since we just removed one.
+    state.detect_adapters();
 
+    // get the adapter info before selecting it because we would lose ownership
+    let selected_gpu_info = esc(get_adapter_description(&adapter));
+
+    // Effectively select the adapter.
     state
         .render_settings
         .select_adapter_sync(adapter, None)
+        // If an error was encountered, disable GPU mode and return the error.
         .inspect_err(|_| state.render_settings.use_gpu = false)?;
 
-    state.log_success("Successfully selected adapter.".to_string());
+    state.log_success(format!(
+        "Successfully selected adapter: {selected_gpu_info}."
+    ));
     Ok(())
 }
 

@@ -33,6 +33,7 @@ impl Default for AppState {
             requested_jobs: Default::default(),
             click_config: Default::default(),
             pause_jobs: false,
+            detected_adapters: Vec::new(),
         }
     }
 }
