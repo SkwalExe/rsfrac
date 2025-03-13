@@ -26,8 +26,6 @@ impl AppState {
             .render_settings
             .wgpu_state
             .instance
-            .as_ref()
-            .unwrap()
             .enumerate_adapters(Backends::all());
     }
 

@@ -64,15 +64,11 @@ impl RenderSettings {
         sender: Option<&Sender<SlaveMessage>>,
     ) -> Result<(), String> {
         msg_send(sender, "Requesting WGPU Instance")?;
-        // Instantiates instance of WebGPU
-        self.wgpu_state.instance = Some(wgpu::Instance::default());
 
         msg_send(sender, "Instantiating a connection to the GPU")?;
         self.select_adapter_async(
             self.wgpu_state
                 .instance
-                .as_ref()
-                .unwrap()
                 .request_adapter(&wgpu::RequestAdapterOptions::default())
                 .await
                 .ok_or("Could not get WGPU adapter.")?,

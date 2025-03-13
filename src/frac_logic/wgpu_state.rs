@@ -5,7 +5,7 @@ pub(crate) struct WgpuState {
     /// Whether or not to use the GPU for computations.
     pub(crate) use_gpu: bool,
     /// Instance of WGPU, used for all other contexts
-    pub(crate) instance: Option<wgpu::Instance>,
+    pub(crate) instance: wgpu::Instance,
     /// Handle a physical graphics device
     pub(crate) adapter: Option<wgpu::Adapter>,
     /// Represents an open connection to a graphics device
