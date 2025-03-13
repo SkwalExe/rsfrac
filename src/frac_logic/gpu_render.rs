@@ -5,20 +5,9 @@ use wgpu::util::DeviceExt;
 
 use crate::{app::SlaveMessage, helpers::Vec2};
 
-use super::{gpu_util::GpuRenderingTracker, DivergMatrix, RenderSettings};
-
-#[derive(bytemuck::NoUninit, Clone, Copy)]
-#[repr(C)]
-pub(crate) struct ParamsBinding {
-    max_iter: i32,
-    size: [i32; 2],
-    pos: [f32; 2],
-    cell_size: f32,
-    y_offset: i32,
-    julia_constant: [f32; 2],
-    mandel_constant: [f32; 2],
-    bailout: f32,
-}
+use super::{
+    gpu_rendering_tracker::GpuRenderingTracker, DivergMatrix, ParamsBinding, RenderSettings,
+};
 
 const GPU_JOB_TIMEOUT: u64 = 15;
 

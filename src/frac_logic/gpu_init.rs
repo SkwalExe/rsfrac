@@ -5,10 +5,7 @@ use wgpu::Adapter;
 
 use crate::{app::SlaveMessage, helpers::markup::esc};
 
-use super::{
-    gpu_util::{msg_send, SendSlaveMessage},
-    RenderSettings,
-};
+use super::{gpu_rendering_tracker::msg_send, gpu_util::SendSlaveMessage, RenderSettings};
 
 impl RenderSettings {
     pub(crate) fn select_adapter_sync(
