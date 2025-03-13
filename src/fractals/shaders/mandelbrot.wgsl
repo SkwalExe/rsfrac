@@ -1,16 +1,16 @@
 struct Params {
     max_iter: i32,
+    y_offset: i32,
     width_px: i32,
     height_px: i32,
     pos_real: f32,
     pos_imag: f32,
     cell_size: f32,
-    y_offset: i32,
+    bailout: f32,
     julia_constant_real: f32,
     julia_constant_imag: f32,
     mandel_constant_real: f32,
     mandel_constant_imag: f32,
-    bailout: f32,
 }
 
 

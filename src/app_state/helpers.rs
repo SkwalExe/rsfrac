@@ -18,7 +18,7 @@ impl AppState {
     /// Do nothing if gpu mode is disabled.
     pub(crate) fn detect_adapters(&mut self) {
         // Do nothing if GPU mode is disabled, because we unwrap below...
-        if !self.render_settings.use_gpu {
+        if !self.render_settings.wgpu_state.use_gpu {
             return;
         }
 

@@ -66,9 +66,9 @@ impl RenderSettings {
     /// message.
     pub(crate) fn select_fractal(&mut self, frac_i: usize) -> Result<(), String> {
         self.frac_index = frac_i;
-        if self.use_gpu {
+        if self.wgpu_state.use_gpu {
             if let Err(err) = self.update_fractal_shader_sync(None) {
-                self.use_gpu = false;
+                self.wgpu_state.use_gpu = false;
                 return Err(format!(
                     "Disabling GPU mode because fractal shader could not be loaded: {err}"
                 ));

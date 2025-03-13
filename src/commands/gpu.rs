@@ -2,8 +2,8 @@ use super::Command;
 use crate::AppState;
 
 pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), String> {
-    if state.render_settings.use_gpu {
-        state.render_settings.use_gpu = false;
+    if state.render_settings.wgpu_state.use_gpu {
+        state.render_settings.wgpu_state.use_gpu = false;
         state.log_info("GPU mode disabled.");
     } else {
         state
@@ -11,7 +11,7 @@ pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), 
             .initialize_gpu_sync(None)
             .map_err(|err| format!("GPU mode could not be enabled: {err}"))?;
         state.log_success("GPU mode initialized successfully! To benefit from high precision arithmetics you will have to disable it with the <command gpu> command.");
-        state.render_settings.use_gpu = true;
+        state.render_settings.wgpu_state.use_gpu = true;
     }
     state.request_redraw();
     Ok(())

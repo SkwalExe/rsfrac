@@ -2,7 +2,7 @@ use super::Command;
 use crate::{helpers::markup::esc, AppState};
 
 pub(crate) fn execute_gpu_info(state: &mut AppState, _args: Vec<&str>) -> Result<(), String> {
-    if !state.render_settings.use_gpu {
+    if !state.render_settings.wgpu_state.use_gpu {
         state.log_info(
             "GPU mode is disabled. You can try to enable it with the <command gpu> command.",
         );

@@ -116,7 +116,7 @@ impl Widget for Canvas<'_> {
             .title_top(
                 Line::from(format!(
                     "GpuMode[{}]",
-                    if self.state.render_settings.use_gpu {
+                    if self.state.render_settings.wgpu_state.use_gpu {
                         "on"
                     } else {
                         "off"

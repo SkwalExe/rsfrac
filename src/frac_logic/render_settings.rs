@@ -36,8 +36,6 @@ pub(crate) struct RenderSettings {
     pub(crate) palette_index: usize,
     pub(crate) color_scheme_offset: i32,
     pub(crate) void_fill_index: usize,
-    /// Whether or not to use the GPU for computations.
-    pub(crate) use_gpu: bool,
     pub(crate) wgpu_state: WgpuState,
     pub(crate) image_format: ImageFormat,
     pub(crate) julia_constant: Complex,
@@ -61,7 +59,6 @@ impl Default for RenderSettings {
             color_scheme_offset: Default::default(),
             palette_index: 4,
             void_fill_index: Default::default(),
-            use_gpu: false,
             wgpu_state: WgpuState::default(),
             julia_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_JULIA_CONSTANT),
             mandel_constant: Complex::with_val(DF_PREC_GPU, DEFAULT_MANDEL_CONSTANT),
