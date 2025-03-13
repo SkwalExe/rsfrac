@@ -12,7 +12,6 @@ mod state_loading;
 mod stats;
 pub(crate) use click_modes::{ClickConfig, ClickMode};
 pub(crate) use stats::Stats;
-use wgpu::Adapter;
 
 use crate::{app::WaitingScreenshot, frac_logic::RenderSettings, helpers::Focus};
 
@@ -38,6 +37,4 @@ pub(crate) struct AppState {
     pub(crate) pause_jobs: bool,
     /// The index, in selectable_variables() of the currently selected canvas variable
     pub(crate) selected_canvas_variable: usize,
-    /// A list of adapters detected with the gpu-select command.
-    pub(crate) detected_adapters: Vec<Adapter>,
 }

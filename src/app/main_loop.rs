@@ -51,7 +51,7 @@ impl App {
                 self.render_frame(frame);
             })?;
 
-            // 1 - Remove all jobs is asked so
+            // 1 - Remove all jobs if asked so
             if self.app_state.remove_jobs {
                 self.app_state.remove_jobs = false;
                 self.app_state.requested_jobs = Vec::new();
