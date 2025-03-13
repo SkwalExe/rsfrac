@@ -48,8 +48,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
     // check if the provided arg is parsable as an int
     let index = args[0]
         .parse::<usize>()
-        .map_err(|_| format!("The provided argment could not be parsed as an integer."))?;
-
+        .map_err(|_| format!("The provided argument could not be parsed as an integer."))?;
     if index >= locked.len() {
         return Err(
             "Provided index is not associated with any adapter in the adapter list.".to_string(),
