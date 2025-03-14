@@ -95,7 +95,7 @@ pub(crate) const GPU_SELECT: Command = Command {
         "When no args are provided, all the available graphical processors ",
         "will be listed and associated with a unique index number.\n",
         "<green Usage: <command [integer]>>\n",
-        "Select the GPU with the specified index. ",
+        "Enable GPU mode and select the processor with the specified index. ",
         "Must be ran after <command gpu_select> alone.\n",
     )),
     basic_desc:
