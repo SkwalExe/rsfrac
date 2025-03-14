@@ -30,7 +30,10 @@ impl WgpuState {
 /// Do no keep WGPU data when copying the AppState.
 impl Clone for WgpuState {
     fn clone(&self) -> Self {
-        Default::default()
+        Self {
+            use_gpu: self.use_gpu,
+            ..Default::default()
+        }
     }
 }
 
@@ -38,5 +41,20 @@ impl Clone for WgpuState {
 impl Debug for WgpuState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("{WgpuState}")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_wgpu_state_clone() {
+        let mut st = WgpuState::default();
+        assert!(!st.use_gpu);
+
+        st.use_gpu = true;
+        // Cloning the WgpuState should keep the use_gpu property.
+        assert!(st.clone().use_gpu);
     }
 }

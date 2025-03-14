@@ -6,33 +6,45 @@ use crate::{app::App, app_state::Stats, helpers::Vec2};
 impl App {
     /// Run the selected fractal algorithm for each canvas coord
     pub(crate) fn render_canvas(&mut self) {
+        // Used to know how long the rendering took.
         let before = Instant::now();
-        if self.app_state.redraw_canvas {
-            self.app_state.redraw_canvas = false;
 
+        // Compute a new divergenve matrix if we are redrawing the canvas.
+        if self.app_state.redraw_canvas {
             let size = Vec2::new(
                 self.app_state.render_settings.canvas_size.x,
                 self.app_state.render_settings.canvas_size.y,
             );
 
-            self.diverg_matrix = if self.app_state.render_settings.wgpu_state.use_gpu {
-                match self
+            // Render differently depending on whether or not GPU mode is enabled.
+            if self.app_state.render_settings.wgpu_state.use_gpu {
+                // In GPU mode, try to render with the GPU, and disable GPU mode in case of a
+                // failure.
+                self.diverg_matrix = match self
                     .app_state
                     .render_settings
                     .get_gpu_diverg_matrix_sync(&size, None)
                 {
+                    // If the render was ok => use the result
                     Ok(res) => res,
+                    // If the render failed:
                     Err(err) => {
+                        // Disable GPU mode.
                         self.app_state.render_settings.wgpu_state.use_gpu = false;
                         self.app_state.log_error(format!(
                             "Disabling GPU mode, because the render failed with error: {err}",
                         ));
-                        self.app_state.render_settings.get_diverg_matrix(&size)
+                        // Run render_canvas again, and ask to redraw.
+                        self.render_canvas();
+                        return;
                     }
                 }
             } else {
-                self.app_state.render_settings.get_diverg_matrix(&size)
+                self.diverg_matrix = self.app_state.render_settings.get_diverg_matrix(&size);
             }
+
+            // Avoid redrawing the canvas again on the next frame.
+            self.app_state.redraw_canvas = false;
         }
 
         if self.app_state.repaint_canvas {

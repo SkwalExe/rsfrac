@@ -21,7 +21,6 @@ impl RenderSettings {
         size: &Vec2<i32>,
         sender: Option<&Sender<SlaveMessage>>,
     ) -> DivergMatrix {
-        // Get the canvas coordinates of each row
         let half_x = size.x / 2;
         let half_y = size.y / 2;
         let cell_size = self.cell_size_from_height(size.y);
@@ -29,7 +28,15 @@ impl RenderSettings {
         let div_matrix = (-half_y..=-half_y + size.y - 1)
             .into_par_iter()
             .map(|y| {
-                let line = (-half_x..=-half_x + size.x)
+                // Before we start to render the line, we must check that the message
+                // pipe is not closed, this would mean the job is calcelled and we would need
+                // to exit without any result.
+                // To check if the message pipe is open, try to send a LineRender message.
+                if sender.send(SlaveMessage::LineRender).is_err() {
+                    return Default::default();
+                };
+
+                (-half_x..=-half_x + size.x)
                     .into_par_iter()
                     .map(|x| {
                         (self.get_frac_clos())(
@@ -37,19 +44,13 @@ impl RenderSettings {
                             self,
                         )
                     })
-                    .collect();
-
-                // Send an update to the parent process,
-                // indicating that one line has been rendered.
-                sender.send(SlaveMessage::LineRender).unwrap();
-
-                line
+                    .collect()
             })
             .collect();
 
         // Send a message to the parent process indicating that the screenshot finished,
         // and it should now wait for the result transfer through the `JoinHandle`.
-        sender.send(SlaveMessage::JobFinished).unwrap();
+        let _ = sender.send(SlaveMessage::JobFinished);
 
         div_matrix
     }
