@@ -57,6 +57,8 @@ impl App {
                 self.app_state.requested_jobs = Vec::new();
                 while !self.parallel_jobs.is_empty() {
                     let job = self.parallel_jobs.remove(0);
+                    // If the job thread is still running, it should
+                    // exit by itself when detecting that the message pipe is closed.
                     self.app_state.prioritized_log_messages.remove(&job.id);
                 }
             }
