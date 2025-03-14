@@ -29,7 +29,7 @@ impl RenderSettings {
             .into_par_iter()
             .map(|y| {
                 // Before we start to render the line, we must check that the message
-                // pipe is not closed, this would mean the job is calcelled and we would need
+                // pipe is not closed, this would mean the job is cancelled and we would need
                 // to exit without any result.
                 // To check if the message pipe is open, try to send a LineRender message.
                 if sender.send(SlaveMessage::LineRender).is_err() {
