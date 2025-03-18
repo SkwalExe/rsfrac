@@ -16,20 +16,16 @@ fn get_adapter_description(adapter: &Adapter) -> String {
 pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     // If no arguments are provided, show detect and display the visible adapters.
     if args.is_empty() {
-        state.render_settings.wgpu_state.detect_adapters();
-
-        state.log_info_title(
-            "Detected adapters",
-            state
-                .render_settings
-                .wgpu_state
-                .detected_adapters
-                .iter()
-                .enumerate()
-                .map(|(i, adapter)| format!("<acc {i}>: {}", esc(get_adapter_description(adapter))))
-                .collect::<Vec<_>>()
-                .join("\n"),
-        );
+        let detected_adapters_string = state
+            .render_settings
+            .wgpu_state
+            .detected_adapters()
+            .iter()
+            .enumerate()
+            .map(|(i, adapter)| format!("<acc {i}>: {}", esc(get_adapter_description(adapter))))
+            .collect::<Vec<_>>()
+            .join("\n");
+        state.log_info_title("Detected adapters", detected_adapters_string);
         return Ok(());
     }
 
@@ -37,7 +33,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
     if state
         .render_settings
         .wgpu_state
-        .detected_adapters
+        .detected_adapters()
         .is_empty()
     {
         return Err(
@@ -52,29 +48,31 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
         .map_err(|_| "The provided argument could not be parsed as an integer.".to_string())?;
 
     // Check if an adapter is associated with the provided index.
-    if index >= state.render_settings.wgpu_state.detected_adapters.len() {
+    if index >= state.render_settings.wgpu_state.detected_adapters().len() {
         return Err(
             "Provided index is not associated with any adapter in the adapter list.".to_string(),
         );
     }
 
-    let adapter = state
-        .render_settings
-        .wgpu_state
-        .detected_adapters
-        .remove(index);
-    // Refresh the adapter list since we just removed one.
-    state.render_settings.wgpu_state.detect_adapters();
+    // Effectively select the adapter.
+    state.render_settings.wgpu_state.set_preferred_adapter(index).inspect_err(|e| {
+        state.log_error(
+            format!(
+                "GPU mode has been disabled because the adapter selected failed due to the following error: {}", 
+                esc(e)
+            )
+        );
+        state.render_settings.wgpu_state.use_gpu = false;
+    });
 
     // get the adapter info before selecting it because we would lose ownership
-    let selected_gpu_info = esc(get_adapter_description(&adapter));
-
-    // Effectively select the adapter.
-    state
-        .render_settings
-        .select_adapter_sync(adapter, None)
-        // If an error was encountered, disable GPU mode and return the error.
-        .inspect_err(|_| state.render_settings.wgpu_state.use_gpu = false)?;
+    let selected_gpu_info = esc(get_adapter_description(
+        state
+            .render_settings
+            .wgpu_state
+            .get_adapter()
+            .ok_or("ERROR: Could not get adapter after successfully selecting it.")?,
+    ));
 
     // If cpu mode was disabled, enable it
     state.render_settings.wgpu_state.use_gpu = true;
