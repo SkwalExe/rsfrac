@@ -150,7 +150,7 @@ impl WgpuState {
 
     /// Returns a reference to the preferred adapter. Returns a fixed error message when no adapter
     /// has been detected.
-    pub(crate) fn get_adapter<'a>(&'a mut self) -> Result<&'a mut Adapter, String> {
+    pub(crate) fn get_adapter(&mut self) -> Result<&mut Adapter, String> {
         self.detected_adapters
             .get_mut(self.preferred_adapter)
             .ok_or("Cannot access the selected adapter.".to_string())
@@ -158,7 +158,7 @@ impl WgpuState {
 
     /// Returns a reference to the currently initialized GPU device. Returns a fixed error message
     /// when the GPU device has not been initialized yet.
-    fn get_device<'a>(&'a self) -> Result<&'a Device, String> {
+    fn get_device(&self) -> Result<&Device, String> {
         self.device.as_ref().ok_or(
             "ERROR: Tried to access the GPU device while it was not initialized.".to_string(),
         )

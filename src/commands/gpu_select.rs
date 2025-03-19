@@ -67,10 +67,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
 
     // get the adapter info before selecting it because we would lose ownership
     let selected_gpu_info = esc(get_adapter_description(
-        state
-            .render_settings
-            .wgpu_state
-            .get_adapter()?
+        state.render_settings.wgpu_state.get_adapter()?,
     ));
 
     // If cpu mode was disabled, enable it
