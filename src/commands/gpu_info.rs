@@ -11,8 +11,7 @@ pub(crate) fn execute_gpu_info(state: &mut AppState, _args: Vec<&str>) -> Result
     let info = state
         .render_settings
         .wgpu_state
-        .get_adapter()
-        .ok_or(format!("Could not retrieve currently selected adapter."))?
+        .get_adapter()?
         .get_info();
     state.log_info_title(
         "GPU INFO",
