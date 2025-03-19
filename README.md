@@ -64,7 +64,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 Rsfrac leverages GPU capabilities and parallel processing for complex arithmetic operations, enabling smooth navigation and rapid rendering.
 
-### **🔢 High Precision Arithmetics**
+### **🔢 High Precision Arithmetic**
 
 Using GMP, MPFR and MPC, Rsfrac allows you to explore fractals infinitely deep by enabling users to increase the decimal precision for calculations as needed.
 

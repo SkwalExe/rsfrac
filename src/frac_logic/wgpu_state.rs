@@ -150,9 +150,9 @@ impl WgpuState {
 
     /// Returns a reference to the preferred adapter. Returns a fixed error message when no adapter
     /// has been detected.
-    pub(crate) fn get_adapter(&mut self) -> Result<&mut Adapter, String> {
+    pub(crate) fn get_adapter(&self) -> Result<&Adapter, String> {
         self.detected_adapters
-            .get_mut(self.preferred_adapter)
+            .get(self.preferred_adapter)
             .ok_or("Cannot access the selected adapter.".to_string())
     }
 
