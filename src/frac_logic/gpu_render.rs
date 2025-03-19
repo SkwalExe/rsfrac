@@ -37,7 +37,7 @@ impl RenderSettings {
             sender,
             size,
             max_buf_size,
-            self.wgpu_state.get_adapter().unwrap().get_info(),
+            self.wgpu_state.get_adapter()?.get_info(),
             self.chunk_size_limit,
         );
 
