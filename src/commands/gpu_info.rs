@@ -8,13 +8,7 @@ pub(crate) fn execute_gpu_info(state: &mut AppState, _args: Vec<&str>) -> Result
         );
         return Ok(());
     }
-    let info = state
-        .render_settings
-        .wgpu_state
-        .adapter
-        .as_ref()
-        .unwrap()
-        .get_info();
+    let info = state.render_settings.wgpu_state.get_adapter()?.get_info();
     state.log_info_title(
         "GPU INFO",
         format!(

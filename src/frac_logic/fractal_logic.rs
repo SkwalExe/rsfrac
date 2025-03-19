@@ -12,6 +12,7 @@ use rug::{Complex, Float};
 use super::gpu_util::SendSlaveMessage;
 
 const INITIAL_CANVAS_WIDTH: i32 = 5;
+/// Represents a matrix of divergence values [row][column]
 pub(crate) type DivergMatrix = Vec<Vec<i32>>;
 
 impl RenderSettings {

@@ -2,7 +2,6 @@
 
 mod canvas_coords;
 mod fractal_logic;
-pub(crate) mod gpu_init;
 pub(crate) mod gpu_render;
 mod gpu_rendering_tracker;
 pub(crate) mod gpu_util;

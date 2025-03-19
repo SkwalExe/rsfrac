@@ -37,7 +37,7 @@ impl RenderSettings {
             sender,
             size,
             max_buf_size,
-            self.wgpu_state.adapter.as_ref().unwrap().get_info(),
+            self.wgpu_state.get_adapter()?.get_info(),
             self.chunk_size_limit,
         );
 
@@ -209,7 +209,7 @@ impl RenderSettings {
                 tracker.reset();
                 result = Vec::new();
                 // reinitialize GPU to clear queue, there must be a better way to do this.
-                self.initialize_gpu_async(sender).await?;
+                self.initialize_gpu()?;
                 continue;
             }
 
