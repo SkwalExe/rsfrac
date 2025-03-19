@@ -163,7 +163,8 @@ impl ScreenshotSlave {
     }
     pub(crate) fn run(&mut self) -> Result<DivergMatrix, String> {
         if self.rs_copy.wgpu_state.use_gpu {
-            self.rs_copy.initialize_gpu_sync(Some(&self.sender))?;
+            // self.rs_copy.initialize_gpu_sync(Some(&self.sender))?;
+            self.rs_copy.initialize_gpu()?;
             let result = self
                 .rs_copy
                 .get_gpu_diverg_matrix_sync(&self.size, Some(&self.sender));

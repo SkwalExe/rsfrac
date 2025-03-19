@@ -67,7 +67,7 @@ impl RenderSettings {
     pub(crate) fn select_fractal(&mut self, frac_i: usize) -> Result<(), String> {
         self.frac_index = frac_i;
         if self.wgpu_state.use_gpu {
-            if let Err(err) = self.update_fractal_shader_sync(None) {
+            if let Err(err) = self.wgpu_state.set_cs(self.get_frac_obj().name) {
                 self.wgpu_state.use_gpu = false;
                 return Err(format!(
                     "Disabling GPU mode because fractal shader could not be loaded: {err}"
@@ -75,6 +75,11 @@ impl RenderSettings {
             };
         }
         Ok(())
+    }
+
+    /// Initializes the WgpuState.
+    pub(crate) fn initialize_gpu(&mut self) -> Result<(), String> {
+        self.wgpu_state.initialize(self.get_frac_obj().name)
     }
 
     /// Returns the selected color palette.

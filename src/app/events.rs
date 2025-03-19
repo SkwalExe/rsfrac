@@ -29,7 +29,7 @@ impl App {
 
             // We cheked if None just before so we can unwrap
             match component.unwrap() {
-                Focus::Canvas => Canvas::handle_mouse_event(&mut self.app_state, event),
+                Focus::Canvas => Canvas::handle_mouse_event(self, event),
                 Focus::Input => Input::handle_mouse_event(&mut self.app_state, event),
                 Focus::LogPanel => LogPanel::handle_mouse_event(&mut self.app_state, event),
             }
