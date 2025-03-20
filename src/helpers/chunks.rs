@@ -96,11 +96,11 @@ mod tests {
     #[test]
     fn test_build_chunks_horizontal() {
         let chunks = Chunks::new(Rect::new(0, 0, 200, 50), &mut App::default());
-        assert_eq!(chunks.footer, Rect::new(0, 48, 200, 2));
-        assert_eq!(chunks.canvas, Rect::new(0, 0, 140, 48));
-        assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 138, 46));
-        assert_eq!(chunks.log_panel, Rect::new(140, 0, 60, 45));
-        assert_eq!(chunks.input, Rect::new(140, 45, 60, 3));
+        assert_eq!(chunks.footer, Rect::new(0, 49, 200, 1));
+        assert_eq!(chunks.canvas, Rect::new(0, 0, 140, 49));
+        assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 138, 47));
+        assert_eq!(chunks.log_panel, Rect::new(140, 0, 60, 46));
+        assert_eq!(chunks.input, Rect::new(140, 46, 60, 3));
     }
     #[test]
     fn test_build_chunks_vertical() {
