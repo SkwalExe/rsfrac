@@ -82,7 +82,8 @@ impl<'a> GpuRenderingTracker<'a> {
     /// Calculate the size of one divergence line in the output buffer.
     pub(crate) fn output_buffer_line_size(&self) -> u64 {
         // The byte size of one divergence line in the output buffer.
-        self.size.x as u64 * size_of::<u32>() as u64
+        // Max to 1 to prevent division by 0 is some rare cases where to app screen is very small.
+        self.size.x.max(1) as u64 * size_of::<u32>() as u64
     }
 
     /// Calculate the necessary size for the output buffer of the current pass.

@@ -28,7 +28,7 @@ pub struct App {
     pub(crate) diverg_matrix: DivergMatrix,
     pub(crate) parallel_jobs: Vec<ScreenshotMaster>,
     /// Whether or not to render the command system sidebar on the screen.
-    hide_sidepanel: bool,
+    pub(crate) hide_sidepanel: bool,
 }
 
 impl App {
