@@ -85,6 +85,7 @@ impl ScreenshotMaster {
     /// Save the render to a png file, and print a log message.
     pub(crate) fn finished(&self, state: &mut AppState, result: Result<DivergMatrix, String>) {
         match result {
+            Err(err) => state.log_error(format!("Could not finish screenshot, reason: {err}")),
             Ok(result) => {
                 let height = self.size.y as usize;
                 let rs_copy = &self.rs_copy;
@@ -112,6 +113,14 @@ impl ScreenshotMaster {
                     self.rs_copy.image_format.extensions_str()[0]
                 );
 
+                match self.rs_copy.save(&filename_save) {
+                    Err(err) => state.log_error(err),
+                    Ok(_) => state.log_info(format!(
+                        "State file containing capture parameters saved to <acc {}> in case of failure.",
+                        filename_save
+                    )),
+                }
+
                 if let Err(err) = buf.save_with_format(&filename_cap, self.rs_copy.image_format) {
                     state.log_error(format!("Could not save screenshot: {}", esc(err)));
                 } else {
@@ -121,17 +130,8 @@ impl ScreenshotMaster {
                         self.size.y,
                         esc(filename_cap)
                     ));
-
-                    match self.rs_copy.save(&filename_save) {
-                        Err(err) => state.log_error(err),
-                        Ok(_) => state.log_info(format!(
-                            "State file containing capture parameters saved to <acc {}>.",
-                            filename_save
-                        )),
-                    }
                 }
             }
-            Err(err) => state.log_error(format!("Could not finish screenshot, reason: {err}")),
         }
     }
 }
