@@ -44,12 +44,9 @@ impl App {
                     || self.chunks.canvas_inner().height < MIN_SCREEN_SIZE
                 {
                     too_small = true;
-                    frame.buffer_mut().set_string(
-                        0,
-                        0,
-                        "Not enough space".to_string(),
-                        Style::default(),
-                    );
+                    frame
+                        .buffer_mut()
+                        .set_string(0, 0, "Not enough space", Style::default());
                     return;
                 }
 

@@ -20,7 +20,11 @@ impl<'a> Footer<'a> {
         Self { state }
     }
 
-    pub(crate) fn render_text(&self, line_wid: usize, segments: &'static [&'static str]) -> (String, u16) {
+    pub(crate) fn render_text(
+        &self,
+        line_wid: usize,
+        segments: &'static [&'static str],
+    ) -> (String, u16) {
         let mut content = String::from(" Actions:");
         let mut line_len = content.len();
 
