@@ -36,10 +36,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
         .detected_adapters()
         .is_empty()
     {
-        return Err(
-            "No adapter has been detected yet. You must run <command gpu-select> at least once."
-                .to_string(),
-        );
+        return Err("No adapter has been detected. Cannot proceed.".to_string());
     }
 
     // check if the provided arg is parsable as an int
@@ -91,8 +88,7 @@ pub(crate) const GPU_SELECT: Command = Command {
         "When no args are provided, all the available graphical processors ",
         "will be listed and associated with a unique index number.\n",
         "<green Usage: <command [integer]>>\n",
-        "Enable GPU mode and select the processor with the specified index. ",
-        "Must be ran after <command gpu_select> alone.\n",
+        "Enable GPU mode and select the processor with the specified index.",
     )),
     basic_desc:
         "Allows you to select which GPU will be used for rendering the canvas and screenshots.",

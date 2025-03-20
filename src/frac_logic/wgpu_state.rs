@@ -33,9 +33,10 @@ impl WgpuState {
 
         self.frac_name = frac_name.into();
 
-        // try to select the first available adapter, it will automatically update all dependant
+        // try to select the first available adapter (the preferred_adapter should be set to 0 by
+        // default), or the selected one. It will automatically update all the dependant
         // components.
-        self.set_preferred_adapter(0)?;
+        self.set_preferred_adapter(self.preferred_adapter)?;
         Ok(())
     }
 
@@ -44,7 +45,7 @@ impl WgpuState {
     }
 
     /// List available WGPU adapters and put them in .detected_adapters.
-    /// Is ran once on initialization.
+    /// Is ran once on initialization. Returns a fixed error message if no adapter is detected
     fn detect_adapters(&mut self) -> Result<(), String> {
         self.detected_adapters = self.instance.enumerate_adapters(Backends::all());
         if self.detected_adapters.is_empty() {

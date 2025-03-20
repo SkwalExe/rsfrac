@@ -1,8 +1,9 @@
 use super::{command_increment::command_increment, Command};
 use crate::AppState;
 
+// Update the help message if you change this two values.
 const MIN_SMOOTHNESS: i32 = 1;
-const MAX_SMOOTHNESS: i32 = 100;
+const MAX_SMOOTHNESS: i32 = 1000;
 
 pub(crate) fn execute_smoothness(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let val = command_increment(
@@ -31,7 +32,7 @@ pub(crate) const SMOOTHNESS: Command = Command {
         "- If a value is specified directly, set the smoothness to the given value.\n",
         "- If a value is specified alongside an operator, ",
         "increase of decrease the smoothness by the given value.\n",
-        "<acc [smoothness]> must be a valid integer between <acc 1> and <acc 100>.",
+        "<acc [smoothness]> must be a valid integer between <acc 1> and <acc 1000>.",
     )),
     basic_desc: concat!(
         "Changes the smoothness of the color palette, ",
