@@ -19,22 +19,22 @@ impl<'a> Footer<'a> {
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
     }
-}
 
-impl Widget for Footer<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    pub(crate) fn render_text(&self, line_wid: usize, segments: &'static [&'static str]) -> (String, u16) {
         let mut content = String::from(" Actions:");
         let mut line_len = content.len();
 
         // The maximum length of a footer line.
-        let max_line_len = area.width as usize - 2;
+        let max_line_len = line_wid;
+        let mut line_count = 1;
 
-        for seg in self.state.footer_text() {
+        for seg in segments {
             // If the next segments exceeds the maximum footer line length,
             // Move to the next line.
             if line_len + seg.len() > max_line_len {
                 content += "\n";
                 line_len = 0;
+                line_count += 1;
             }
 
             content += " ";
@@ -42,6 +42,14 @@ impl Widget for Footer<'_> {
 
             line_len += seg.len() + 1
         }
+
+        (content, line_count)
+    }
+}
+
+impl Widget for Footer<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let (mut content, _) = self.render_text(area.width.into(), self.state.footer_text());
 
         // Highlight the keys
         content = content.replace("[", "[<acc ").replace("]", ">]");

@@ -64,7 +64,7 @@ impl Widget for LogPanel<'_> {
         let mut lines: Vec<(Paragraph, Rect)> = Vec::with_capacity(self.state.log_messages.len());
 
         // -2 -> Space for the scrollbar on the right and some padding
-        let para_width = area.width - 2;
+        let para_width = area.width.saturating_sub(2).max(1);
 
         const BOTTOM_SPACE: u16 = 5;
 

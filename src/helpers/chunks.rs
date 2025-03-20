@@ -2,6 +2,11 @@
 
 use ratatui::layout::{Constraint, Direction as Dir, Layout, Margin, Rect};
 
+use crate::{
+    components::{canvas::Canvas, Footer},
+    App,
+};
+
 /// Used to group the (Rect)s corresponding to each
 /// app component.
 #[derive(Default)]
@@ -28,7 +33,7 @@ impl Chunks {
 
 impl Chunks {
     /// Builds a Chunk group by splitting the given area.
-    pub(crate) fn new(area: Rect, hide_sidepanel: bool) -> Self {
+    pub(crate) fn new(area: Rect, app: &mut App) -> Self {
         // Split the layout differently depending on whether the
         // available space is longer or larger.
         let direction = if area.width <= area.height * 2 {
@@ -37,15 +42,20 @@ impl Chunks {
             Dir::Horizontal
         };
 
+        // The height of the footer is the necessary height to render the canvas footer text. This
+        // is because it is the biggest.
+        let (_, footer_height) =
+            Footer::new(&app.app_state).render_text(area.width as usize, Canvas::FOOTER_TEXT);
+
         // In the base area, split the body from the footer.
         let chunks = Layout::default()
             .direction(Dir::Vertical)
-            .constraints([Constraint::Min(0), Constraint::Length(2)])
+            .constraints([Constraint::Min(0), Constraint::Length(footer_height)])
             .split(area);
         let body = chunks[0];
         let footer = chunks[1];
 
-        if hide_sidepanel {
+        if app.hide_sidepanel {
             return Self {
                 footer,
                 canvas: body,
@@ -85,7 +95,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_build_chunks_horizontal() {
-        let chunks = Chunks::new(Rect::new(0, 0, 200, 50), false);
+        let chunks = Chunks::new(Rect::new(0, 0, 200, 50), &mut App::default());
         assert_eq!(chunks.footer, Rect::new(0, 48, 200, 2));
         assert_eq!(chunks.canvas, Rect::new(0, 0, 140, 48));
         assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 138, 46));
@@ -94,7 +104,7 @@ mod tests {
     }
     #[test]
     fn test_build_chunks_vertical() {
-        let chunks = Chunks::new(Rect::new(0, 0, 100, 100), false);
+        let chunks = Chunks::new(Rect::new(0, 0, 100, 100), &mut App::default());
         assert_eq!(chunks.footer, Rect::new(0, 98, 100, 2));
         assert_eq!(chunks.canvas, Rect::new(0, 0, 100, 69));
         assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 98, 67));

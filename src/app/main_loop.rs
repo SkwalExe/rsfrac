@@ -1,9 +1,11 @@
 use ratatui::{
     crossterm::event::{self, Event, KeyEventKind},
+    style::Style,
     DefaultTerminal,
 };
 use std::{
     io,
+    thread::sleep,
     time::{Duration, Instant},
 };
 
@@ -18,6 +20,9 @@ const FRAME_DELAY: i32 = 800;
 const FRAME_DELAY: i32 = 80;
 const WAITING_JOBS_MESSAGE_ID: i64 = 0x1;
 
+/// The minimum height or width necessary to render the app.
+const MIN_SCREEN_SIZE: u16 = 10;
+
 impl App {
     /// Run the main application loop, perform rendering and event passing
     pub fn run(&mut self, term: &mut DefaultTerminal) -> io::Result<()> {
@@ -29,8 +34,24 @@ impl App {
         while !self.app_state.quit {
             let start = Instant::now();
 
+            // Will be set to true if the screen was to small to render.
+            let mut too_small = false;
+
             term.draw(|frame| {
-                self.chunks = Chunks::new(frame.area(), self.hide_sidepanel);
+                self.chunks = Chunks::new(frame.area(), self);
+                // DO NOT try to render anything if the available size is less
+                if self.chunks.canvas_inner().width < MIN_SCREEN_SIZE
+                    || self.chunks.canvas_inner().height < MIN_SCREEN_SIZE
+                {
+                    too_small = true;
+                    frame.buffer_mut().set_string(
+                        0,
+                        0,
+                        "Not enough space".to_string(),
+                        Style::default(),
+                    );
+                    return;
+                }
 
                 self.app_state.render_settings.canvas_size = CanvasCoords::new(
                     self.chunks.canvas_inner().width,
@@ -50,6 +71,12 @@ impl App {
 
                 self.render_frame(frame);
             })?;
+
+            // If the screen was too small to render, don't try to do anything at all.
+            if too_small {
+                sleep(Duration::from_millis(100));
+                continue;
+            }
 
             // 1 - Remove all jobs if asked so
             if self.app_state.remove_jobs {
