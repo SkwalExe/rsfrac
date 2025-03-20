@@ -13,7 +13,7 @@ impl App {
     /// Send a key event to the focused component
     pub(crate) fn dispatch_event(&mut self, key: KeyEvent) {
         match self.app_state.focused {
-            Focus::Canvas => Canvas::handle_key_code(&mut self.app_state, key.code),
+            Focus::Canvas => Canvas::handle_key_code(self, key.code),
             Focus::Input => Input::handle_event(&mut self.app_state, key),
             Focus::LogPanel => LogPanel::handle_event(&mut self.app_state, key.code),
         }
@@ -56,10 +56,12 @@ impl App {
                 self.app_state.quit = true
             }
             KeyCode::Tab => {
-                self.app_state.focused = match self.app_state.focused {
-                    Focus::Input => Focus::Canvas,
-                    Focus::Canvas => Focus::LogPanel,
-                    Focus::LogPanel => Focus::Input,
+                if !self.hide_sidepanel {
+                    self.app_state.focused = match self.app_state.focused {
+                        Focus::Input => Focus::Canvas,
+                        Focus::Canvas => Focus::LogPanel,
+                        Focus::LogPanel => Focus::Input,
+                    }
                 }
             }
             _ => {

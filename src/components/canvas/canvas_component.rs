@@ -24,6 +24,7 @@ impl<'a> Canvas<'a> {
         "VoidFill[v]",
         "Rst[r]",
         "HSLMode[n]",
+        "ToggleSidepanel[b]",
     ];
     pub(crate) fn new(state: &'a AppState, points: &'a CanvasPoints) -> Self {
         Self { state, points }

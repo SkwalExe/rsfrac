@@ -26,9 +26,9 @@ impl Chunks {
     }
 }
 
-impl From<Rect> for Chunks {
+impl Chunks {
     /// Builds a Chunk group by splitting the given area.
-    fn from(area: Rect) -> Self {
+    pub(crate) fn new(area: Rect, hide_sidepanel: bool) -> Self {
         // Split the layout differently depending on whether the
         // available space is longer or larger.
         let direction = if area.width <= area.height * 2 {
@@ -44,6 +44,15 @@ impl From<Rect> for Chunks {
             .split(area);
         let body = chunks[0];
         let footer = chunks[1];
+
+        if hide_sidepanel {
+            return Self {
+                footer,
+                canvas: body,
+                log_panel: Rect::default(),
+                input: Rect::default(),
+            };
+        }
 
         // In the body, split the canvas for the side chunk,
         // horizontally or vertically depending on (direction).
@@ -76,7 +85,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_build_chunks_horizontal() {
-        let chunks = Chunks::from(Rect::new(0, 0, 200, 50));
+        let chunks = Chunks::new(Rect::new(0, 0, 200, 50), false);
         assert_eq!(chunks.footer, Rect::new(0, 48, 200, 2));
         assert_eq!(chunks.canvas, Rect::new(0, 0, 140, 48));
         assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 138, 46));
@@ -85,7 +94,7 @@ mod tests {
     }
     #[test]
     fn test_build_chunks_vertical() {
-        let chunks = Chunks::from(Rect::new(0, 0, 100, 100));
+        let chunks = Chunks::new(Rect::new(0, 0, 100, 100), false);
         assert_eq!(chunks.footer, Rect::new(0, 98, 100, 2));
         assert_eq!(chunks.canvas, Rect::new(0, 0, 100, 69));
         assert_eq!(chunks.canvas_inner(), Rect::new(1, 1, 98, 67));
