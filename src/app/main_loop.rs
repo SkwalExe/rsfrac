@@ -30,7 +30,7 @@ impl App {
             let start = Instant::now();
 
             term.draw(|frame| {
-                self.chunks = Chunks::from(frame.area());
+                self.chunks = Chunks::new(frame.area(), self.hide_sidepanel);
 
                 self.app_state.render_settings.canvas_size = CanvasCoords::new(
                     self.chunks.canvas_inner().width,

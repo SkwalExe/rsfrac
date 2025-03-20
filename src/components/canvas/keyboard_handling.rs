@@ -76,6 +76,8 @@ impl Canvas<'_> {
                 //
                 app.app_state.request_redraw();
             }
+            // When b is pressed toggle the side panel
+            KeyCode::Char('b') => app.toggle_sidepanel(),
             // When D is pressed decrease the cell size, which will zoom into the canvas
             KeyCode::Char('d') => {
                 app.app_state.zoom(ZoomDirection::In);

@@ -56,10 +56,12 @@ impl App {
                 self.app_state.quit = true
             }
             KeyCode::Tab => {
-                self.app_state.focused = match self.app_state.focused {
-                    Focus::Input => Focus::Canvas,
-                    Focus::Canvas => Focus::LogPanel,
-                    Focus::LogPanel => Focus::Input,
+                if !self.hide_sidepanel {
+                    self.app_state.focused = match self.app_state.focused {
+                        Focus::Input => Focus::Canvas,
+                        Focus::Canvas => Focus::LogPanel,
+                        Focus::LogPanel => Focus::Input,
+                    }
                 }
             }
             _ => {

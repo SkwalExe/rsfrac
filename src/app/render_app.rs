@@ -33,13 +33,14 @@ impl Widget for &App {
         let canvas = Canvas::new(&self.app_state, &self.points);
         canvas.render(self.chunks.canvas, buf);
 
-        let log_panel = LogPanel::new(&self.app_state);
-        log_panel.render(self.chunks.log_panel, buf);
-
-        let input = Input::new(&self.app_state);
-        input.render(self.chunks.input, buf);
-
         let footer = Footer::new(&self.app_state);
         footer.render(self.chunks.footer, buf);
+        if !self.hide_sidepanel {
+            let log_panel = LogPanel::new(&self.app_state);
+            log_panel.render(self.chunks.log_panel, buf);
+
+            let input = Input::new(&self.app_state);
+            input.render(self.chunks.input, buf);
+        }
     }
 }

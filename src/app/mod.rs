@@ -12,7 +12,11 @@ mod render_canvas;
 pub(crate) use parallel_jobs::{ScreenshotMaster, SlaveMessage, WaitingScreenshot};
 pub(crate) type CanvasPoints = HashMap<Color, Vec<(f64, f64)>>;
 
-use crate::{frac_logic::DivergMatrix, helpers::Chunks, AppState};
+use crate::{
+    frac_logic::DivergMatrix,
+    helpers::{Chunks, Focus},
+    AppState,
+};
 
 #[derive(Default)]
 pub struct App {
@@ -23,4 +27,16 @@ pub struct App {
     pub(crate) app_state: AppState,
     pub(crate) diverg_matrix: DivergMatrix,
     pub(crate) parallel_jobs: Vec<ScreenshotMaster>,
+    /// Whether or not to render the command system sidebar on the screen.
+    hide_sidepanel: bool,
+}
+
+impl App {
+    pub(crate) fn toggle_sidepanel(&mut self) {
+        self.hide_sidepanel = !self.hide_sidepanel;
+        self.app_state.request_redraw();
+        if self.hide_sidepanel {
+            self.app_state.focused = Focus::Canvas;
+        }
+    }
 }
