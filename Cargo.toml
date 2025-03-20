@@ -1,6 +1,6 @@
 [package]
 name = "rsfrac"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 authors = ["Léopold Koprivnik <koprivnik@skwal.net>"]
 description = "The Terminal-Based Fractal Explorer. Rsfrac is your terminal gateway to Mandelbrot, Burning Ship, and Julia."
