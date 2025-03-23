@@ -8,7 +8,7 @@ pub(crate) fn execute_gpu(state: &mut AppState, _args: Vec<&str>) -> Result<(), 
         state.render_settings.wgpu_state.use_gpu = false;
         state.log_info("GPU mode disabled.");
     } else {
-        block_on(state.render_settings.initialize_gpu())
+        block_on(state.render_settings.initialize_gpu(None))
             .map_err(|err| format!("GPU mode could not be enabled: {err}"))?;
         state.log_success("GPU mode initialized successfully! To benefit from high precision arithmetic you will have to disable it with the <command gpu> command.");
         state.render_settings.wgpu_state.use_gpu = true;

@@ -27,6 +27,7 @@ pub(crate) mod quit;
 pub(crate) mod save;
 pub(crate) mod smoothness;
 pub(crate) mod stop;
+pub(crate) mod timeout_detection;
 pub(crate) mod version;
 pub(crate) mod zoom_factor;
 
@@ -47,7 +48,7 @@ pub(crate) struct Command {
     pub(crate) accepted_arg_count: &'static [usize],
 }
 
-pub(crate) fn get_commands_list() -> [&'static Command; 27] {
+pub(crate) fn get_commands_list() -> [&'static Command; 28] {
     [
         &help::HELP,
         &quit::QUIT,
@@ -60,6 +61,7 @@ pub(crate) fn get_commands_list() -> [&'static Command; 27] {
         &stop::STOP,
         &pause::PAUSE,
         &chunk_size::CHUNK_SIZE,
+        &timeout_detection::TIMEOUT_DETECTION,
         &capture::CAPTURE,
         &capture_fit::CAPTURE_FIT,
         &capture_hq::CAPTURE_HQ,
