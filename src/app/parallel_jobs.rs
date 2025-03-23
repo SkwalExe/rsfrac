@@ -4,6 +4,7 @@ use std::{
 };
 
 use chrono::{Local, Utc};
+use futures::executor::block_on;
 use image::ImageBuffer;
 use ratatui::style::Color;
 
@@ -159,15 +160,15 @@ impl ScreenshotSlave {
 impl ScreenshotSlave {
     /// Creates a new process, running the screenshot rendering.
     pub(crate) fn start(mut screenshot: Self) -> JoinHandle<Result<DivergMatrix, String>> {
-        thread::spawn(move || screenshot.run())
+        thread::spawn(move || block_on(screenshot.run()))
     }
-    pub(crate) fn run(&mut self) -> Result<DivergMatrix, String> {
+    pub(crate) async fn run(&mut self) -> Result<DivergMatrix, String> {
         if self.rs_copy.wgpu_state.use_gpu {
-            // self.rs_copy.initialize_gpu_sync(Some(&self.sender))?;
-            self.rs_copy.initialize_gpu()?;
+            self.rs_copy.initialize_gpu().await?;
             let result = self
                 .rs_copy
-                .get_gpu_diverg_matrix_sync(&self.size, Some(&self.sender));
+                .get_gpu_diverg_matrix_async(&self.size, Some(&self.sender))
+                .await;
             self.sender
                 .send(SlaveMessage::JobFinished)
                 .map_err(|err| format!("Could not open message channel: {err}"))?;

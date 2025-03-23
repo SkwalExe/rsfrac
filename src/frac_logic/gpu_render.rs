@@ -1,6 +1,5 @@
 use std::{sync::mpsc::Sender, time::Instant};
 
-use futures::executor;
 use wgpu::util::DeviceExt;
 
 use crate::{app::SlaveMessage, helpers::Vec2};
@@ -12,13 +11,6 @@ use super::{
 const GPU_JOB_TIMEOUT: u64 = 15;
 
 impl RenderSettings {
-    pub(crate) fn get_gpu_diverg_matrix_sync(
-        &mut self,
-        size: &Vec2<i32>,
-        sender: Option<&Sender<SlaveMessage>>,
-    ) -> Result<DivergMatrix, String> {
-        executor::block_on(self.get_gpu_diverg_matrix_async(size, sender))
-    }
     pub(crate) async fn get_gpu_diverg_matrix_async(
         &mut self,
         size: &Vec2<i32>,
@@ -209,7 +201,7 @@ impl RenderSettings {
                 tracker.reset();
                 result = Vec::new();
                 // reinitialize GPU to clear queue, there must be a better way to do this.
-                self.initialize_gpu()?;
+                self.initialize_gpu().await?;
                 continue;
             }
 
