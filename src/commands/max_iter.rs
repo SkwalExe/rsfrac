@@ -2,7 +2,8 @@ use super::{command_increment::command_increment, Command};
 use crate::AppState;
 
 pub(crate) const MIN_MAX_ITER: i32 = 8;
-pub(crate) const MAX_MAX_ITER: i32 = 100000;
+// Even in GPU mode, some complex positions can see divergence values above 100000...
+pub(crate) const MAX_MAX_ITER: i32 = 1000000;
 
 pub(crate) fn execute_max_iter(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
     let val = command_increment(
