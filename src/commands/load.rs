@@ -1,67 +1,75 @@
 use std::{
     fs::{self, File},
     io::Read,
+    path::PathBuf,
     str::FromStr,
-    sync::Mutex,
 };
 
 use super::Command;
 use crate::{
     commands::save::SAVE_EXTENSION,
-    helpers::{markup::esc, SavedState},
+    helpers::{increment_wrap, markup::esc, SavedState},
     AppState,
 };
 const MAX_SEARCH_DEPTH: i32 = 10;
 
-fn find_state_files(path: &str, depth: i32) -> Result<Vec<String>, String> {
-    // eprintln!("Depth: {depth} -> Looking for state files in {path}");
-    if depth > MAX_SEARCH_DEPTH {
-        return Err(String::from("Max depth exceeded."));
-    }
+/// Returns an error message when the max depth has just been exceeded.
+fn find_state_files(path: PathBuf, depth: i32) -> Result<(Vec<PathBuf>, i32), String> {
+    // eprintln!("Searching in directory: {}", path.to_string_lossy());
+    let mut results: Vec<PathBuf> = vec![];
+    let mut searched_directories = 0;
 
-    Ok(fs::read_dir(path)
-        .map_err(|err| format!("Cannot list directory: {}: {err}", path))?
+    fs::read_dir(&path)
+        .map_err(|err| {
+            format!(
+                "Cannot list directory: {}: {err}",
+                path.to_owned().to_string_lossy()
+            )
+        })?
         // Only keep sane entries
         .filter_map(|entry| entry.ok())
-        // Only keep files and directories
-        .filter(|entry| {
-            entry.file_type().is_ok()
-            // UNWRAP: is_ok() checked above
-                && (entry.file_type().unwrap().is_file() || entry.file_type().unwrap().is_dir())
-        })
-        // Look into subdirectories
-        .flat_map(|entry| {
-            let entry_path = entry.path().to_string_lossy().into_owned();
-            // UNWRAP: is_ok() checked above
-            if entry.file_type().unwrap().is_file() {
-                Vec::from([entry_path])
-            } else {
-                find_state_files(&entry_path, depth + 1).unwrap_or_default()
+        .for_each(|entry| {
+            // Ignore entries with an invalid file type.
+            let Ok(filetype) = entry.file_type() else {
+                return;
+            };
+
+            if filetype.is_file()
+                && entry
+                    .file_name()
+                    .to_string_lossy()
+                    .ends_with(SAVE_EXTENSION)
+            {
+                results.push(entry.path());
+                // eprintln!("Detected state file: {}", entry.path().to_string_lossy())
+            } else if filetype.is_dir() && depth < MAX_SEARCH_DEPTH {
+                if let Ok((mut files, searched_dirs)) = find_state_files(entry.path(), depth + 1) {
+                    searched_directories += searched_dirs + 1;
+                    results.append(&mut files);
+                }
             }
-        })
-        // Only keep files ending in .rsf
-        .filter(|filename| filename.ends_with(SAVE_EXTENSION))
-        .collect::<Vec<_>>())
+        });
+
+    Ok((results, searched_directories))
 }
 
 pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    static DETECTED_FILES: Mutex<Vec<String>> = Mutex::new(Vec::new());
-    static CURRENT_STATE_FILE_INDEX: Mutex<usize> = Mutex::new(0);
+    // If no arguments are passed, detect state files.
     if args.is_empty() {
-        *CURRENT_STATE_FILE_INDEX.lock().unwrap() = 0;
-        let mut locked = DETECTED_FILES.lock().unwrap();
-        *locked = find_state_files(".", 0)?;
-        locked.sort_unstable();
+        state.current_state_file_index = 0;
+        let searched_dirs;
+        (state.detected_state_files, searched_dirs) = find_state_files(PathBuf::from("."), 0)?;
+        state.detected_state_files.sort_unstable();
 
-        state.log_info(if locked.is_empty() {
-            "No state file detected in your current working directory.".to_string()
+        state.log_info(if state.detected_state_files.is_empty() {
+            format!("Looked into <acc {searched_dirs}> directories, but no state file was found.")
         } else {
             format!(
-                "These state files have been detected in your current working directory:\n{}",
+                "Looked into <acc {searched_dirs}> directories, the following state files have been detected:\n{}",
                 {
                     let mut res = String::new();
-                    for (i, filename) in locked.iter().enumerate() {
-                        res += &format!("<acc {i}>: {}\n", esc(filename));
+                    for (i, filename) in state.detected_state_files.iter().enumerate() {
+                        res += &format!("<acc {i}>: {}\n", esc(filename.to_string_lossy()));
                     }
                     res.trim().to_string()
                 }
@@ -70,11 +78,12 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
         return Ok(());
     }
 
+    // From here, at least one argument has been passed.
+
     let mut filename = args[0].to_string();
 
     if filename == "cycle" {
-        let files_ = DETECTED_FILES.lock().unwrap();
-        if files_.is_empty() {
+        if state.detected_state_files.is_empty() {
             return Err(concat!(
                 "No state file has been found in your current working directory, ",
                 "or the detection has not been performed yet. ",
@@ -83,19 +92,18 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
             .to_string());
         }
 
-        let mut index = CURRENT_STATE_FILE_INDEX.lock().unwrap();
-
-        filename = format!("{index}");
-
-        *index = (*index + 1) % files_.len();
+        filename = state.current_state_file_index.to_string();
+        increment_wrap(
+            &mut state.current_state_file_index,
+            state.detected_state_files.len(),
+        );
     }
 
     // Check if the provided filename can be parsed to an integer
     if let Ok(num) = filename.parse::<usize>() {
-        let locked = DETECTED_FILES.lock().unwrap();
         // Check if the detected files vector can be indexed by this integer
-        if let Some(filename_) = locked.get(num) {
-            filename = filename_.to_string();
+        if let Some(filename_) = state.detected_state_files.get(num) {
+            filename = filename_.to_string_lossy().to_string();
         }
     }
 

@@ -20,8 +20,12 @@ pub(crate) struct LogPanel<'a> {
 }
 
 impl<'a> LogPanel<'a> {
-    pub(crate) const FOOTER_TEXT: &'static [&'static str] =
-        &["ScrollUp[k/up]", "ScrollDown[j/down]"];
+    pub(crate) const FOOTER_TEXT: &'static [&'static str] = &[
+        "Scroll[arrows/jk]",
+        "Top[Home]",
+        "Bottom[End]",
+        "[PageUp/PageDown]",
+    ];
     pub(crate) fn new(state: &'a AppState) -> Self {
         Self { state }
     }

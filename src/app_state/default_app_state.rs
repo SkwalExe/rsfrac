@@ -33,6 +33,8 @@ impl Default for AppState {
             requested_jobs: Default::default(),
             click_config: Default::default(),
             pause_jobs: false,
+            detected_state_files: Default::default(),
+            current_state_file_index: Default::default(),
         }
     }
 }
