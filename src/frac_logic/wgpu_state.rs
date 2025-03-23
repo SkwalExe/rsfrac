@@ -1,8 +1,10 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, sync::mpsc::Sender};
 
 use wgpu::{Adapter, Backends, Device, ShaderModuleDescriptor};
 
-use crate::helpers::markup::esc;
+use crate::{app::SlaveMessage, helpers::markup::esc};
+
+use super::gpu_rendering_tracker::msg_send;
 
 #[derive(Default)]
 pub(crate) struct WgpuState {
@@ -22,11 +24,24 @@ pub(crate) struct WgpuState {
     preferred_adapter: usize,
     /// The shader name of the desired fractal.
     frac_name: String,
+    /// Whether or not to use timeout detection
+    pub(crate) disable_timeout_detection: bool,
 }
 
 impl WgpuState {
     /// Initialize all GPU components.
-    pub(crate) async fn initialize(&mut self, frac_name: impl Into<String>) -> Result<(), String> {
+    pub(crate) async fn initialize(
+        &mut self,
+        frac_name: impl Into<String>,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        // This method can be called on already-initialized instances.
+        // In this case, we should always stop all runing jobs by freeing the queue, device, etc.
+        msg_send(sender, "Clearing previous state: device")?;
+        let device = self.device.take();
+        drop(device);
+
+        msg_send(sender, "Detecting adapters...")?;
         // Perform adapter detection.
         self.detect_adapters()?;
 
@@ -35,7 +50,8 @@ impl WgpuState {
         // try to select the first available adapter (the preferred_adapter should be set to 0 by
         // default), or the selected one. It will automatically update all the dependant
         // components.
-        self.set_preferred_adapter(self.preferred_adapter).await?;
+        self.set_preferred_adapter(self.preferred_adapter, sender)
+            .await?;
         Ok(())
     }
 
@@ -54,7 +70,11 @@ impl WgpuState {
     }
 
     /// Set the preferred adapter index, and make sure the index is valid.
-    pub(crate) async fn set_preferred_adapter(&mut self, index: usize) -> Result<(), String> {
+    pub(crate) async fn set_preferred_adapter(
+        &mut self,
+        index: usize,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
         if index >= self.detected_adapters.len() {
             return Err(
                 "Cannot update the preferred adapter because the provided index is invalid."
@@ -63,7 +83,7 @@ impl WgpuState {
         }
 
         self.preferred_adapter = index;
-        self.update_device_and_queue().await?;
+        self.update_device_and_queue(sender).await?;
         Ok(())
     }
 
@@ -88,13 +108,17 @@ impl WgpuState {
     /// Set the wanted shader module descriptor.
     pub(crate) fn set_cs(&mut self, frac_name: impl Into<String>) -> Result<(), String> {
         self.frac_name = frac_name.into();
-        self.update_cs_module()
+        self.update_cs_module(None)
     }
 
     /// After changing the selected adapter, update the device and the queue.
-    async fn update_device_and_queue(&mut self) -> Result<(), String> {
+    async fn update_device_and_queue(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
         // `request_device` instantiates the feature specific connection to the GPU, defining some parameters,
         //  `features` being the available features.
+        msg_send(sender, "Requesting new device and queue...")?;
         let (device, queue) = self
             .get_adapter()?
             .request_device(
@@ -111,11 +135,12 @@ impl WgpuState {
 
         (self.device, self.queue) = (Some(device), Some(queue));
 
-        self.update_cs_module()
+        self.update_cs_module(sender)
     }
 
     /// After selecting an adapter and updating the device and queue, update the cs module
-    fn update_cs_module(&mut self) -> Result<(), String> {
+    fn update_cs_module(&mut self, sender: Option<&Sender<SlaveMessage>>) -> Result<(), String> {
+        msg_send(sender, "Updating CS module...")?;
         self.cs_module = Some(
             self
             .device
@@ -125,12 +150,13 @@ impl WgpuState {
                 self.get_cs_descriptor()?
             ),
         );
-        self.update_pipeline()?;
+        self.update_pipeline(sender)?;
         Ok(())
     }
 
     /// The latest step of GPU initialization is the pipeline.
-    fn update_pipeline(&mut self) -> Result<(), String> {
+    fn update_pipeline(&mut self, sender: Option<&Sender<SlaveMessage>>) -> Result<(), String> {
+        msg_send(sender, "Updating the GPU pipeline...")?;
         self.compute_pipeline = Some(
             self.get_device()?
                 .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
@@ -145,6 +171,7 @@ impl WgpuState {
                     cache: None,
                 }),
         );
+        msg_send(sender, "GPU pipeline update finished.")?;
         Ok(())
     }
 
@@ -158,7 +185,7 @@ impl WgpuState {
 
     /// Returns a reference to the currently initialized GPU device. Returns a fixed error message
     /// when the GPU device has not been initialized yet.
-    fn get_device(&self) -> Result<&Device, String> {
+    pub(crate) fn get_device(&self) -> Result<&Device, String> {
         self.device.as_ref().ok_or(
             "ERROR: Tried to access the GPU device while it was not initialized.".to_string(),
         )
@@ -171,6 +198,7 @@ impl Clone for WgpuState {
         Self {
             use_gpu: self.use_gpu,
             preferred_adapter: self.preferred_adapter,
+            disable_timeout_detection: self.disable_timeout_detection,
             ..Default::default()
         }
     }

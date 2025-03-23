@@ -16,3 +16,7 @@ pub(crate) use saved_state::SavedState;
 pub(crate) use vec2::Vec2;
 pub(crate) use void_fills::{void_fills, VoidFill};
 pub(crate) use zoom_direction::ZoomDirection;
+
+pub(crate) fn flip_bool(b: &mut bool) {
+    *b = !*b
+}

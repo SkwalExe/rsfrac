@@ -2,7 +2,7 @@ use std::{sync::mpsc::Sender, time::Instant};
 
 use wgpu::util::DeviceExt;
 
-use crate::{app::SlaveMessage, helpers::Vec2};
+use crate::{app::SlaveMessage, frac_logic::gpu_rendering_tracker::msg_send, helpers::Vec2};
 
 use super::{
     gpu_rendering_tracker::GpuRenderingTracker, DivergMatrix, ParamsBinding, RenderSettings,
@@ -48,7 +48,8 @@ impl RenderSettings {
 
         let cell_size = self.cell_size_from_height(size.y);
 
-        while !tracker.render_finished() {
+        'a: while !tracker.render_finished() {
+            msg_send(sender, "Beginning new render pass...")?;
             tracker.scroll_logs()?;
             tracker.begin_pass();
 
@@ -171,39 +172,60 @@ impl RenderSettings {
                 .unwrap()
                 .submit(Some(encoder.finish()));
 
-            // Note that we're not calling `.await` here.
-            let buffer_slice = staging_buffer.slice(..);
-            // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
-            let (sender_, receiver) = flume::bounded(1);
-            buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender_.send(v).unwrap());
-
-            tracker.send("Waiting for the GPU job to finish")?;
             // Poll the device in a blocking manner so that our future resolves.
             // In an actual application, `device.poll(...)` should
             // be called in an event loop or on another thread.
 
             let before_poll = Instant::now();
-            self.wgpu_state
-                .device
-                .as_ref()
-                .unwrap()
-                .poll(wgpu::Maintain::wait())
-                .panic_on_timeout();
+
             // .panic_on_timeout();
             // Seems to be unimplemented??????
+            // ==========
+            // Loop while the queue is not empty
+            while !self
+                .wgpu_state
+                .get_device()?
+                .poll(wgpu::Maintain::Poll)
+                .is_queue_empty()
+            {
+                // This message is very important, because it will end the job by returning if the
+                // message channel is closed.
+                tracker.send("Waiting for the GPU job to finish")?;
+                // eprintln!(
+                //     "Waiting for GPU job to finish... TD: {} Elapsed: {}",
+                //     !self.wgpu_state.disable_timeout_detection,
+                //     before_poll.elapsed().as_millis() as f64 / 1000.0
+                // );
 
-            if before_poll.elapsed().as_secs() > GPU_JOB_TIMEOUT {
-                tracker.warn(concat!(
-                    "Possible GPU timeout, cannot obtain details because ",
-                    "of an issue on WGPU's end. Trying to reduce chunk size until the job completes..."
-                ))?;
-                tracker.limit_chunk_size()?;
-                tracker.reset();
-                result = Vec::new();
-                // reinitialize GPU to clear queue, there must be a better way to do this.
-                self.initialize_gpu().await?;
-                continue;
+                // Check if we are exceeding the timeout
+                if !self.wgpu_state.disable_timeout_detection
+                    && before_poll.elapsed().as_secs() >= GPU_JOB_TIMEOUT
+                {
+                    tracker.warn(concat!(
+                        "Possible GPU timeout, cannot obtain details because ",
+                        "of an issue on WGPU's end. Trying to reduce chunk size until the job completes..."
+                    ))?;
+                    tracker.limit_chunk_size()?;
+                    tracker.reset();
+                    result = Vec::new();
+                    // reinitialize GPU to clear queue. WgpuState.initialize() will drop the queue,
+                    // pipeline, and device and make new ones. Dropping existing one should end all
+                    // running jobs.
+                    self.initialize_gpu(sender).await?;
+                    msg_send(sender, "Now will begin a new render pass.")?;
+                    continue 'a;
+                }
             }
+
+            // Note that we're not calling `.await` here.
+            let buffer_slice = staging_buffer.slice(..);
+            // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
+            let (sender_, receiver) = flume::bounded(1);
+            buffer_slice.map_async(wgpu::MapMode::Read, move |v| {
+                sender_.send(v).inspect_err(|e| eprintln!("{e}")).unwrap();
+            });
+            // We need to call .poll to start .map_async above, check language server documentation (Shift K).
+            self.wgpu_state.get_device()?.poll(wgpu::Maintain::wait());
 
             // Awaits until `buffer_future` can be read from
             tracker.send("Receiving output buffer data")?;
