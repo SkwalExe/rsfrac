@@ -1,6 +1,5 @@
 use std::fmt::Debug;
 
-use futures::executor::block_on;
 use wgpu::{Adapter, Backends, Device, ShaderModuleDescriptor};
 
 use crate::helpers::markup::esc;
@@ -27,7 +26,7 @@ pub(crate) struct WgpuState {
 
 impl WgpuState {
     /// Initialize all GPU components.
-    pub(crate) fn initialize(&mut self, frac_name: impl Into<String>) -> Result<(), String> {
+    pub(crate) async fn initialize(&mut self, frac_name: impl Into<String>) -> Result<(), String> {
         // Perform adapter detection.
         self.detect_adapters()?;
 
@@ -36,7 +35,7 @@ impl WgpuState {
         // try to select the first available adapter (the preferred_adapter should be set to 0 by
         // default), or the selected one. It will automatically update all the dependant
         // components.
-        self.set_preferred_adapter(self.preferred_adapter)?;
+        self.set_preferred_adapter(self.preferred_adapter).await?;
         Ok(())
     }
 
@@ -55,7 +54,7 @@ impl WgpuState {
     }
 
     /// Set the preferred adapter index, and make sure the index is valid.
-    pub(crate) fn set_preferred_adapter(&mut self, index: usize) -> Result<(), String> {
+    pub(crate) async fn set_preferred_adapter(&mut self, index: usize) -> Result<(), String> {
         if index >= self.detected_adapters.len() {
             return Err(
                 "Cannot update the preferred adapter because the provided index is invalid."
@@ -64,7 +63,7 @@ impl WgpuState {
         }
 
         self.preferred_adapter = index;
-        block_on(self.update_device_and_queue())?;
+        self.update_device_and_queue().await?;
         Ok(())
     }
 

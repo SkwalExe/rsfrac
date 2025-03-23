@@ -78,8 +78,8 @@ impl RenderSettings {
     }
 
     /// Initializes the WgpuState.
-    pub(crate) fn initialize_gpu(&mut self) -> Result<(), String> {
-        self.wgpu_state.initialize(self.get_frac_obj().name)
+    pub(crate) async fn initialize_gpu(&mut self) -> Result<(), String> {
+        self.wgpu_state.initialize(self.get_frac_obj().name).await
     }
 
     /// Returns the selected color palette.

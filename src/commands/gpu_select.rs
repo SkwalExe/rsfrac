@@ -1,3 +1,4 @@
+use futures::executor::block_on;
 use wgpu::Adapter;
 
 use super::Command;
@@ -52,7 +53,7 @@ pub(crate) fn execute_gpu_select(state: &mut AppState, args: Vec<&str>) -> Resul
     }
 
     // Effectively select the adapter.
-    state.render_settings.wgpu_state.set_preferred_adapter(index).inspect_err(|e| {
+    block_on(state.render_settings.wgpu_state.set_preferred_adapter(index)).inspect_err(|e| {
         state.log_error(
             format!(
                 "GPU mode has been disabled because the adapter selected failed due to the following error: {}", 

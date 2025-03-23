@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
+use futures::executor::block_on;
+
 use crate::{app::App, app_state::Stats, helpers::Vec2};
 
 impl App {
@@ -20,11 +22,11 @@ impl App {
             if self.app_state.render_settings.wgpu_state.use_gpu {
                 // In GPU mode, try to render with the GPU, and disable GPU mode in case of a
                 // failure.
-                self.diverg_matrix = match self
-                    .app_state
-                    .render_settings
-                    .get_gpu_diverg_matrix_sync(&size, None)
-                {
+                self.diverg_matrix = match block_on(
+                    self.app_state
+                        .render_settings
+                        .get_gpu_diverg_matrix_async(&size, None),
+                ) {
                     // If the render was ok => use the result
                     Ok(res) => res,
                     // If the render failed:
