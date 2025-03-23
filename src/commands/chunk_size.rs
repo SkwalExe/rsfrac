@@ -15,6 +15,7 @@ pub(crate) fn execute_chunk_size(state: &mut AppState, args: Vec<&str>) -> Resul
 
     if args[0].to_lowercase() == "reset" {
         state.render_settings.chunk_size_limit = None;
+        state.log_success("Successfully reset chunk size limit to: unlimited.");
         return Ok(());
     }
 

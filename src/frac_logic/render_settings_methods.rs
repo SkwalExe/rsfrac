@@ -1,9 +1,12 @@
 //! Contains the `RenderSettings` methods.
 
+use std::sync::mpsc::Sender;
+
 use rand::{thread_rng, Rng};
 use ratatui::style::Color;
 use rug::Float;
 
+use crate::app::SlaveMessage;
 use crate::app_state::hsl_settings::MAX_HSL_VALUE;
 use crate::colors::{self, Palette, COLORS};
 use crate::commands::max_iter::{MAX_MAX_ITER, MIN_MAX_ITER};
@@ -78,8 +81,13 @@ impl RenderSettings {
     }
 
     /// Initializes the WgpuState.
-    pub(crate) async fn initialize_gpu(&mut self) -> Result<(), String> {
-        self.wgpu_state.initialize(self.get_frac_obj().name).await
+    pub(crate) async fn initialize_gpu(
+        &mut self,
+        sender: Option<&Sender<SlaveMessage>>,
+    ) -> Result<(), String> {
+        self.wgpu_state
+            .initialize(self.get_frac_obj().name, sender)
+            .await
     }
 
     /// Returns the selected color palette.

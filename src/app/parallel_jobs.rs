@@ -164,7 +164,7 @@ impl ScreenshotSlave {
     }
     pub(crate) async fn run(&mut self) -> Result<DivergMatrix, String> {
         if self.rs_copy.wgpu_state.use_gpu {
-            self.rs_copy.initialize_gpu().await?;
+            self.rs_copy.initialize_gpu(Some(&self.sender)).await?;
             let result = self
                 .rs_copy
                 .get_gpu_diverg_matrix_async(&self.size, Some(&self.sender))
