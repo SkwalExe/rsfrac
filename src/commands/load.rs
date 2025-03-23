@@ -3,13 +3,12 @@ use std::{
     io::Read,
     path::PathBuf,
     str::FromStr,
-    sync::Mutex,
 };
 
 use super::Command;
 use crate::{
     commands::save::SAVE_EXTENSION,
-    helpers::{markup::esc, SavedState},
+    helpers::{increment_wrap, markup::esc, SavedState},
     AppState,
 };
 const MAX_SEARCH_DEPTH: i32 = 10;
@@ -55,30 +54,21 @@ fn find_state_files(path: PathBuf, depth: i32) -> Result<(Vec<PathBuf>, i32), St
 }
 
 pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), String> {
-    static DETECTED_FILES: Mutex<Vec<PathBuf>> = Mutex::new(Vec::new());
-    static CURRENT_STATE_FILE_INDEX: Mutex<usize> = Mutex::new(0);
-    let mut detected_files_locked = DETECTED_FILES
-        .lock()
-        .map_err(|e| format!("ERROR: Could not access detect detected files list: {e}"))?;
-    let mut current_state_file_index_locked = CURRENT_STATE_FILE_INDEX
-        .lock()
-        .map_err(|e| format!("ERROR: Could not access current state file index: {e}"))?;
-
     // If no arguments are passed, detect state files.
     if args.is_empty() {
-        *current_state_file_index_locked = 0;
+        state.current_state_file_index = 0;
         let searched_dirs;
-        (*detected_files_locked, searched_dirs) = find_state_files(PathBuf::from("."), 0)?;
-        detected_files_locked.sort_unstable();
+        (state.detected_state_files, searched_dirs) = find_state_files(PathBuf::from("."), 0)?;
+        state.detected_state_files.sort_unstable();
 
-        state.log_info(if detected_files_locked.is_empty() {
+        state.log_info(if state.detected_state_files.is_empty() {
             format!("Looked into <acc {searched_dirs}> directories, but no state file was found.")
         } else {
             format!(
                 "Looked into <acc {searched_dirs}> directories, the following state files have been detected:\n{}",
                 {
                     let mut res = String::new();
-                    for (i, filename) in detected_files_locked.iter().enumerate() {
+                    for (i, filename) in state.detected_state_files.iter().enumerate() {
                         res += &format!("<acc {i}>: {}\n", esc(filename.to_string_lossy()));
                     }
                     res.trim().to_string()
@@ -93,7 +83,7 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
     let mut filename = args[0].to_string();
 
     if filename == "cycle" {
-        if detected_files_locked.is_empty() {
+        if state.detected_state_files.is_empty() {
             return Err(concat!(
                 "No state file has been found in your current working directory, ",
                 "or the detection has not been performed yet. ",
@@ -102,15 +92,17 @@ pub(crate) fn execute_load(state: &mut AppState, args: Vec<&str>) -> Result<(), 
             .to_string());
         }
 
-        filename = current_state_file_index_locked.to_string();
-        *current_state_file_index_locked =
-            (*current_state_file_index_locked + 1) % detected_files_locked.len();
+        filename = state.current_state_file_index.to_string();
+        increment_wrap(
+            &mut state.current_state_file_index,
+            state.detected_state_files.len(),
+        );
     }
 
     // Check if the provided filename can be parsed to an integer
     if let Ok(num) = filename.parse::<usize>() {
         // Check if the detected files vector can be indexed by this integer
-        if let Some(filename_) = detected_files_locked.get(num) {
+        if let Some(filename_) = state.detected_state_files.get(num) {
             filename = filename_.to_string_lossy().to_string();
         }
     }

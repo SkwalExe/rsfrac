@@ -1,6 +1,6 @@
 //! Contains the logic state of the application (can be headless).
 
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 use tui_input::Input as TuiInput;
 use tui_scrollview::ScrollViewState;
 
@@ -37,4 +37,6 @@ pub(crate) struct AppState {
     pub(crate) pause_jobs: bool,
     /// The index, in selectable_variables() of the currently selected canvas variable
     pub(crate) selected_canvas_variable: usize,
+    pub(crate) detected_state_files: Vec<PathBuf>,
+    pub(crate) current_state_file_index: usize,
 }
