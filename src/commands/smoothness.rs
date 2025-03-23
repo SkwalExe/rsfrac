@@ -14,7 +14,7 @@ pub(crate) fn execute_smoothness(state: &mut AppState, args: Vec<&str>) -> Resul
         MAX_SMOOTHNESS,
     )?;
     state.render_settings.smoothness = val;
-    state.request_redraw();
+    state.request_repaint();
 
     Ok(())
 }
