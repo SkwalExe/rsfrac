@@ -2,13 +2,19 @@
 
 Here is some eye candy that I generated while creating this app!
 These screenshots are **ULTRA-HIGH QUALITY (7680x4320)** and can therefore be downloaded and used as wallpaper, etc.
+
+::: warning 
+If you want to download the full definition image, use the download link instead of saving the image on the page directly (these are compressed to improve the page speed).
+:::
+
 **The state files can be used to go to the place of the screenshot in the app!!!**
 
 To learn more about how **you** can create such images, you may read the [screenshot guide 🔗](/taking-screenshots).
 
 ## Mandelbrot 💠
 
-State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_1.rsf)
+- State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_1.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_1.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -19,7 +25,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_2.rsf)
+- State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_2.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_2.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -30,7 +37,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_3.rsf)
+- State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_3.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_3.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -41,7 +49,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_4.rsf)
+- State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_4.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_4.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -52,7 +61,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_5.rsf)
+- State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_5.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_5.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -63,7 +73,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_6.rsf)
+- State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/mandelbrot/mandelbrot_6.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/mandelbrot/mandelbrot_6.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -74,7 +85,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ## Burning Ship 💠
 
-State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_1.rsf)
+- State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_1.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/burning_ship/burning_ship_1.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -85,7 +97,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_2.rsf)
+- State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_2.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/burning_ship/burning_ship_2.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -96,7 +109,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_3.rsf)
+- State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_3.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/burning_ship/burning_ship_3.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -107,7 +121,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_4.rsf)
+- State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/burning_ship/burning_ship_4.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/burning_ship/burning_ship_4.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -118,7 +133,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ## Julia 💠
 
-State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_1.rsf)
+- State file: [State File 1](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_1.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_1.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -129,7 +145,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_2.rsf)
+- State file: [State File 2](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_2.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_2.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -140,7 +157,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_3.rsf)
+- State file: [State File 3](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_3.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_3.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -151,7 +169,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_4.rsf)
+- State file: [State File 4](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_4.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_4.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -162,7 +181,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_5.rsf)
+- State file: [State File 5](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_5.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_5.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -173,7 +193,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_6.rsf)
+- State file: [State File 6](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_6.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_6.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
@@ -184,7 +205,8 @@ load_remote https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/asse
 
 ---
 
-State file: [State File 7](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_7.rsf)
+- State file: [State File 7](https://raw.githubusercontent.com/skwalexe/rsfrac/main/docs/src/assets/captures/julia/julia_7.rsf)
+- Full definition (7680x4320): [Download](https://raw.githubusercontent.com/SkwalExe/rsfrac/refs/heads/main/docs/src/assets/captures/julia/julia_7.jpg)
 
 ```bash
 # Paste this in the command input to load the application state.
